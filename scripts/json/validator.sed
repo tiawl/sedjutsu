@@ -1,4 +1,25 @@
-#! /usr/bin/env --split-string sed --null-data --quiet --file
+##  README ####################################################################
+#                                                                             #
+#   This script can be used to emulate some features of `jq`, `json_pp` or    #
+#   `json_xs`.                                                                #
+#                                                                             #
+#   Because it is particulary hard to deal with the `n` and `N` GNU `sed`     #
+#   commands (If there is no more input, these commands make `sed` exits      #
+#   and `sed` does not have any way internally to know if there is more       #
+#   input), this script expects a oneliner input.                             #
+#                                                                             #
+#   So if your input contains new line characters, you definitly want to      #
+#   use the `-z`/`--null-data` GNU `sed` option.                              #
+#                                                                             #
+#   However, if your input contains NUL characters, avoid this option.        #
+#                                                                             #
+#   If your input contains new line characters AND NUL characters, `sed`      #
+#   can not deal with it and this JSON validator can not help you.            #
+#                                                                             #
+#   If you do not want to see the trailing new line, use the `-n`/`--quiet`   #
+#   option.                                                                   #
+#                                                                             #
+###############################################################################
 
 # Init the holdspace with these following variables:
 # - an empty workflow stack
@@ -22,8 +43,7 @@
   b json_validator___element
   : json_validator___json_1
     /^$/ {
-      # If there is no more input then sed exits without processing any more commands: this is the SUCCESS exit door
-      n
+      b json_validator___SUCCESS
     }
     s/.*/garbage after main element/
     b json_validator___FAILURE
@@ -818,3 +838,8 @@
   s/$/\n/
   w /dev/stderr
   Q 6
+
+: json_validator___SUCCESS
+  s/.*/JSON parsing succeed\n/
+  p
+  z
