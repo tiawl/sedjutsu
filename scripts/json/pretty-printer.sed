@@ -1,7 +1,16 @@
 ### README ####################################################################
 #                                                                             #
-#   This script can be used to emulate some features of `jq`, `json_pp` or    #
-#   `json_xs`.                                                                #
+#   This script can be used to emulate some `jq`, `json_pp` or `json_xs`      #
+#   features.                                                                 #
+#                                                                             #
+#   You can configure this script with these environment variables:           #
+#   - SEDJUTSU_INDENT: use the given number of spaces (between 1 and 8)       #
+#     for indentation (default: 4)                                            #
+#   - SEDJUTSU_MONOCHROME: disable color                                      #
+#   - SEDJUTSU_COLORS: use it like JQ_COLORS (for more details, see:          #
+#     https://jqlang.org/manual/#colors)                                      #
+#   If SEDJUTSU_MONOCHROME and SEDJUTSU_COLORS are set when the script run,   #
+#   coloring is disabled.                                                     #
 #                                                                             #
 #   Because it is particulary hard to deal with the `n` and `N` GNU `sed`     #
 #   commands (If there is no more input, these commands make `sed` exits      #
@@ -32,10 +41,44 @@
 # - an empty workflow stack
 # - col
 # - row
+# - current indentation level
+# - options
+# - final output
 : init_holdspace
   x
-  s/^/\n1\n1/
-  x
+  s/^/printf '%s:%s%s\\n' "${SEDJUTSU_INDENT:-4}" "${SEDJUTSU_MONOCHROME+y:}" "${SEDJUTSU_COLORS:-0;90:0;39:0;39:0;39:0;32:1;39:1;39:1;34}"/
+  e
+  /^[1-8]:/ ! {
+    z
+    s/^/SEDJUTSU_INDENT environment variable must be an integer between 1 and 8/
+    b json_pp___BADOPTION_FAILURE
+  }
+  # When set, SEDJUTSU_MONOCHROME disables color by using default escape sequences everywhere
+  s/^\([1-8]\):y:.*\n/\1:0;39:0;39:0;39:0;39:0;39:0;39:0;39:0;39\n/
+  /^[1-8]\(:[01];\(3[0-79]\|9[0-7]\)\)\{8\}/ ! {
+    z
+    s/^/SEDJUTSU_COLORS environment variable must be a colon-delimited list of 8 partial terminal escape sequences matching this pattern "[01];(3[0-79]|9[0-7])" and in this order: null:false:true:numbers:strings:arrays:objects:keys/
+    b json_pp___BADOPTION_FAILURE
+  }
+  t init_holdspace_check_options_and_reset_conditional_branching
+  : init_holdspace_check_options_and_reset_conditional_branching
+    s/^1:/\n1\n1\n\n :/
+    t init_holdspace_end
+    s/^2:/\n1\n1\n\n  :/
+    t init_holdspace_end
+    s/^3:/\n1\n1\n\n   :/
+    t init_holdspace_end
+    s/^4:/\n1\n1\n\n    :/
+    t init_holdspace_end
+    s/^5:/\n1\n1\n\n     :/
+    t init_holdspace_end
+    s/^6:/\n1\n1\n\n      :/
+    t init_holdspace_end
+    s/^7:/\n1\n1\n\n       :/
+    t init_holdspace_end
+    s/^8:/\n1\n1\n\n        :/
+    : init_holdspace_end
+      x
 
 #
 # JSON grammar in McKeeman Form
@@ -54,7 +97,7 @@
     }
     z
     s/^/garbage after main element/
-    b json_pp___FAILURE
+    b json_pp___PARSING_FAILURE
 
 ### value
 ###    object
@@ -91,7 +134,7 @@
   }
   z
   s/^/malformed JSON string, neither array, object, number, string or atom/
-  b json_pp___FAILURE
+  b json_pp___PARSING_FAILURE
 
 ### object
 ###     '{' ws '}'
@@ -112,7 +155,7 @@
       }
       z
       s/^/`,` or `}` expected while parsing JSON object/
-      b json_pp___FAILURE
+      b json_pp___PARSING_FAILURE
   }
   /^{/ {
     s/^{//
@@ -129,7 +172,7 @@
       }
       z
       s/^/`,` or `}` expected while parsing JSON object/
-      b json_pp___FAILURE
+      b json_pp___PARSING_FAILURE
   }
   b json_pp___RETURN
 
@@ -171,7 +214,7 @@
     }
     z
     s/^/`:` expected/
-    b json_pp___FAILURE
+    b json_pp___PARSING_FAILURE
   : json_pp___member_4
     b json_pp___element
 
@@ -194,7 +237,7 @@
       }
       z
       s/^/`,` or `]` expected while parsing JSON array/
-      b json_pp___FAILURE
+      b json_pp___PARSING_FAILURE
   }
   /^\[/ {
     s/^\[//
@@ -211,7 +254,7 @@
       }
       z
       s/^/`,` or `]` expected while parsing JSON array/
-      b json_pp___FAILURE
+      b json_pp___PARSING_FAILURE
   }
   b json_pp___RETURN
 
@@ -259,7 +302,7 @@
   }
   z
   s/^/`"` expected while parsing JSON string/
-  b json_pp___FAILURE
+  b json_pp___PARSING_FAILURE
   : json_pp___string_1
     b json_pp___characters
   : json_pp___string_2
@@ -269,7 +312,7 @@
     }
     z
     s/^/Unexpected end of string while parsing JSON string/
-    b json_pp___FAILURE
+    b json_pp___PARSING_FAILURE
 
 ### characters
 ###     ""
@@ -301,7 +344,7 @@
   /^[\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"]/ {
     z
     s/^/Invalid character encountered/
-    b json_pp___FAILURE
+    b json_pp___PARSING_FAILURE
   }
   s/.//
   b incr_col
@@ -338,7 +381,7 @@
   }
   z
   s/^/Invalid escaped character encountered/
-  b json_pp___FAILURE
+  b json_pp___PARSING_FAILURE
 
 ### hex
 ###     digit
@@ -354,7 +397,7 @@
   }
   z
   s/^/Invalid hexadecimal character encountered/
-  b json_pp___FAILURE
+  b json_pp___PARSING_FAILURE
 
 ### number
 ###     integer fraction exponent
@@ -395,7 +438,7 @@
   }
   z
   s/^/Invalid integer encountered/
-  b json_pp___FAILURE
+  b json_pp___PARSING_FAILURE
 
 ### digits
 ###     digit
@@ -423,7 +466,7 @@
   }
   z
   s/^/Invalid digit encountered/
-  b json_pp___FAILURE
+  b json_pp___PARSING_FAILURE
 
 ### onenine
 ###     '1' . '9'
@@ -434,7 +477,7 @@
   }
   z
   s/^/Invalid onenine encountered/
-  b json_pp___FAILURE
+  b json_pp___PARSING_FAILURE
 
 ### fraction
 ###     ""
@@ -854,7 +897,7 @@
   z
   Q 5
 
-: json_pp___FAILURE
+: json_pp___PARSING_FAILURE
   H
   x
   s/^[^\n]*\n\([0-9]\+\)\n\([0-9]\+\)/JSON parsing error at ROW \1, COL \2: /
@@ -862,6 +905,13 @@
   w /dev/stderr
   z
   Q 6
+
+: json_pp___BADOPTION_FAILURE
+  s/^/Error when parsion options: /
+  s/$/\n/
+  w /dev/stderr
+  z
+  Q 7
 
 : json_pp___SUCCESS
   s/.*/JSON parsing succeed\n/

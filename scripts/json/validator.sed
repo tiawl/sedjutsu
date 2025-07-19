@@ -1,7 +1,7 @@
 ### README ####################################################################
 #                                                                             #
-#   This script can be used to emulate some features of `jq`, `json_pp` or    #
-#   `json_xs`.                                                                #
+#   This script can be used to emulate some `jq`, `json_pp` or `json_xs`      #
+#   features.                                                                 #
 #                                                                             #
 #   Because it is particulary hard to deal with the `n` and `N` GNU `sed`     #
 #   commands (If there is no more input, these commands make `sed` exits      #
