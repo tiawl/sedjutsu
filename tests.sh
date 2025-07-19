@@ -1,13 +1,14 @@
 #! /usr/bin/env bash
 
 tests_json () {
-  local json sed json_d all basename script
+  local json sed json_d all basename script quiet
   json_d='data/json'
   script="${1}"
-  all='no'
   readonly json_d script
 
-  shift
+  set -f
+  set -- ${@:2}
+  set +f
 
   while [[ "${#}" -gt 0 ]]
   do
@@ -15,6 +16,8 @@ tests_json () {
     ( --all ) all='yes' ;;
     ( --fast ) all='no' ;;
     ( --skip ) return 0 ;;
+    ( --quiet ) quiet='yes' ;;
+    ( --verbose ) quiet='no' ;;
     ( * ) printf 'Unknown json validator test option: "%s"' "${1}" >&2; exit 1 ;;
     esac
     shift
@@ -46,7 +49,11 @@ tests_json () {
     local code
     code='0'
 
-    ${sed} --quiet --file "${script}" "${json}" > /dev/null 2>&1 || code="${?}"
+    case "${quiet}" in
+    ( 'yes' ) ${sed} --quiet --file "${script}" "${json}" > /dev/null 2>&1 || code="${?}" ;;
+    ( 'no' ) ${sed} --quiet --file "${script}" "${json}" || code="${?}" ;;
+    ( * ) printf 'Reached unreachable code\n' >&2; exit 1 ;;
+    esac
 
     if [[ "${code}" -eq 0 ]]
     then
@@ -69,8 +76,8 @@ tests () {
   shopt -s lastpipe
 
   local -A opts
-  opts[json_validator]='--fast'
-  opts[json_pp]='--fast'
+  opts[json_validator]='--fast --quiet'
+  opts[json_pp]='--fast --quiet'
 
   while [[ "${#}" -gt 0 ]]
   do
@@ -85,7 +92,7 @@ tests () {
         printf 'The "--json-validator" option takes 1 argument\n' >&2
         exit 1
       fi
-      opts[json_validator]="--${1}" ;;
+      opts[json_validator]="${opts[json_validator]} --${1//,/ --}" ;;
     ( --json-pp )
       shift
       if [[ -z "${1:-}" ]]
@@ -93,7 +100,7 @@ tests () {
         printf 'The "--json-pp" option takes 1 argument\n' >&2
         exit 1
       fi
-      opts[json_pp]="--${1}" ;;
+      opts[json_pp]="${opts[json_pp]} --${1//,/ --}" ;;
     ( * ) printf 'Unknown option: "%s"' "${1}" >&2; exit 1 ;;
     esac
     shift

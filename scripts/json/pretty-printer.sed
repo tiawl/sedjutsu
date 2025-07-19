@@ -52,7 +52,8 @@
     /^$/ {
       b json_pp___SUCCESS
     }
-    s/.*/garbage after main element/
+    z
+    s/^/garbage after main element/
     b json_pp___FAILURE
 
 ### value
@@ -88,7 +89,8 @@
     s/....//
     b incr4_col
   }
-  s/.*/malformed JSON string, neither array, object, number, string or atom/
+  z
+  s/^/malformed JSON string, neither array, object, number, string or atom/
   b json_pp___FAILURE
 
 ### object
@@ -108,7 +110,8 @@
         s/.//
         b incr_col
       }
-      s/.*/`,` or `}` expected while parsing JSON object/
+      z
+      s/^/`,` or `}` expected while parsing JSON object/
       b json_pp___FAILURE
   }
   /^{/ {
@@ -124,7 +127,8 @@
         s/.//
         b incr_col
       }
-      s/.*/`,` or `}` expected while parsing JSON object/
+      z
+      s/^/`,` or `}` expected while parsing JSON object/
       b json_pp___FAILURE
   }
   b json_pp___RETURN
@@ -165,7 +169,8 @@
       s/.//
       b incr_col
     }
-    s/.*/`:` expected/
+    z
+    s/^/`:` expected/
     b json_pp___FAILURE
   : json_pp___member_4
     b json_pp___element
@@ -187,7 +192,8 @@
         s/.//
         b incr_col
       }
-      s/.*/`,` or `]` expected while parsing JSON array/
+      z
+      s/^/`,` or `]` expected while parsing JSON array/
       b json_pp___FAILURE
   }
   /^\[/ {
@@ -203,7 +209,8 @@
         s/.//
         b incr_col
       }
-      s/.*/`,` or `]` expected while parsing JSON array/
+      z
+      s/^/`,` or `]` expected while parsing JSON array/
       b json_pp___FAILURE
   }
   b json_pp___RETURN
@@ -250,7 +257,8 @@
     s/.//
     b incr_col
   }
-  s/.*/`"` expected while parsing JSON string/
+  z
+  s/^/`"` expected while parsing JSON string/
   b json_pp___FAILURE
   : json_pp___string_1
     b json_pp___characters
@@ -259,7 +267,8 @@
       s/.//
       b incr_col
     }
-    s/.*/Unexpected end of string while parsing JSON string/
+    z
+    s/^/Unexpected end of string while parsing JSON string/
     b json_pp___FAILURE
 
 ### characters
@@ -290,7 +299,8 @@
       b json_pp___escape
   }
   /^[\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"]/ {
-    s/.*/Invalid character encountered/
+    z
+    s/^/Invalid character encountered/
     b json_pp___FAILURE
   }
   s/.//
@@ -326,7 +336,8 @@
     s/.//
     b incr_col
   }
-  s/.*/Invalid escaped character encountered/
+  z
+  s/^/Invalid escaped character encountered/
   b json_pp___FAILURE
 
 ### hex
@@ -341,7 +352,8 @@
   /^[0-9]/ {
     b json_pp___digit
   }
-  s/.*/Invalid hexadecimal character encountered/
+  z
+  s/^/Invalid hexadecimal character encountered/
   b json_pp___FAILURE
 
 ### number
@@ -381,7 +393,8 @@
   /^[0-9]/ {
     b json_pp___digit
   }
-  s/.*/Invalid integer encountered/
+  z
+  s/^/Invalid integer encountered/
   b json_pp___FAILURE
 
 ### digits
@@ -408,7 +421,8 @@
   /^[1-9]/ {
     b json_pp___onenine
   }
-  s/.*/Invalid digit encountered/
+  z
+  s/^/Invalid digit encountered/
   b json_pp___FAILURE
 
 ### onenine
@@ -418,7 +432,8 @@
     s/.//
     b incr_col
   }
-  s/.*/Invalid onenine encountered/
+  z
+  s/^/Invalid onenine encountered/
   b json_pp___FAILURE
 
 ### fraction
@@ -836,6 +851,7 @@
   s/^/Reached unreachable code in scripts\/json\/pretty-printer.sed: /
   s/$/\n/
   w /dev/stderr
+  z
   Q 5
 
 : json_pp___FAILURE
@@ -844,6 +860,7 @@
   s/^[^\n]*\n\([0-9]\+\)\n\([0-9]\+\)/JSON parsing error at ROW \1, COL \2: /
   s/$/\n/
   w /dev/stderr
+  z
   Q 6
 
 : json_pp___SUCCESS
