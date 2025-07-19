@@ -1,16 +1,20 @@
 #! /usr/bin/env bash
 
-tests_json_validator () {
-  local json sed json_d all basename
+tests_json () {
+  local json sed json_d all basename script
   json_d='data/json'
+  script="${1}"
   all='no'
-  readonly json_d
+  readonly json_d script
+
+  shift
 
   while [[ "${#}" -gt 0 ]]
   do
     case "${1}" in
     ( --all ) all='yes' ;;
     ( --fast ) all='no' ;;
+    ( --skip ) return 0 ;;
     ( * ) printf 'Unknown json validator test option: "%s"' "${1}" >&2; exit 1 ;;
     esac
     shift
@@ -28,12 +32,12 @@ tests_json_validator () {
       then
         sed='sed --null-data'
       else
-        printf '[\033[38;5;6mSKIPPED\033[m] %s\n' "${basename}"
+        printf '[\033[38;5;6mSKIPPED\033[m] %s > %s\n' "${script}" "${basename}"
         continue
       fi ;;
     ( "${json_d}"'/n_multidigit_number_then_00.json' ) sed='sed' ;;
     ( "${json_d}"'/n_structure_no_data.json' )
-      printf '[\033[38;5;2mOK\033[m] n_structure_no_data.json\n     \033[38;5;5m=> SED does not operate on empty files\033[m\n'
+      printf '[\033[38;5;2mOK\033[m] %s > n_structure_no_data.json\n     \033[38;5;5m=> SED does not operate on empty files\033[m\n' "${script}"
       continue ;;
     ( * ) sed='sed --null-data' ;;
     esac
@@ -42,13 +46,13 @@ tests_json_validator () {
     local code
     code='0'
 
-    ${sed} --quiet --file scripts/json/validator.sed "${json}" > /dev/null 2>&1 || code="${?}"
+    ${sed} --quiet --file "${script}" "${json}" > /dev/null 2>&1 || code="${?}"
 
     if [[ "${code}" -eq 0 ]]
     then
-      printf '[\033[38;5;2mOK\033[m] %s\n' "${basename}"
+      printf '[\033[38;5;2mOK\033[m] %s > %s\n' "${script}" "${basename}"
     else
-      printf '[\033[38;5;1mKO\033[m] %s\n' "${basename}"
+      printf '[\033[38;5;1mKO\033[m] %s > %s\n' "${script}" "${basename}"
     fi
 
     case "${code}${basename}" in
@@ -64,14 +68,15 @@ tests () {
   set -o pipefail
   shopt -s lastpipe
 
-  local json_validator
-  json_validator='--fast'
+  local -A opts
+  opts[json_validator]='--fast'
+  opts[json_pp]='--fast'
 
   while [[ "${#}" -gt 0 ]]
   do
     case "${1}" in
     # Handle '--file=file1' the same as '--file file1' for long-form 1-arg options
-    ( --json-validator=* ) set -- "${1%%=*}" "${1#*=}" "${@:2}"; continue ;;
+    ( --json-validator=*|--json-pp=* ) set -- "${1%%=*}" "${1#*=}" "${@:2}"; continue ;;
 
     ( --json-validator )
       shift
@@ -80,13 +85,22 @@ tests () {
         printf 'The "--json-validator" option takes 1 argument\n' >&2
         exit 1
       fi
-      json_validator="--${1}" ;;
+      opts[json_validator]="--${1}" ;;
+    ( --json-pp )
+      shift
+      if [[ -z "${1:-}" ]]
+      then
+        printf 'The "--json-pp" option takes 1 argument\n' >&2
+        exit 1
+      fi
+      opts[json_pp]="--${1}" ;;
     ( * ) printf 'Unknown option: "%s"' "${1}" >&2; exit 1 ;;
     esac
     shift
   done
 
-  tests_json_validator "${json_validator}"
+  tests_json 'scripts/json/validator.sed' "${opts[json_validator]}"
+  tests_json 'scripts/json/pretty-printer.sed' "${opts[json_pp]}"
 }
 
 tests "${@}"

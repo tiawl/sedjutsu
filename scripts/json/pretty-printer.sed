@@ -30,8 +30,8 @@
 
 # Init the holdspace with these following variables:
 # - an empty workflow stack
-# - row
 # - col
+# - row
 : init_holdspace
   x
   s/^/\n1\n1/
@@ -495,144 +495,143 @@
 : incr_col
   x
   : incr_col_nines2underscores
-    s/9\(_*\)$/_\1/
+    s/^\([^\n]*\n[0-9]*\)9\(_*\n\)/\1_\2/
     t incr_col_nines2underscores
   : incr_col_lastdigit
-    s/\n\(_*\)$/\n1\1/
+    s/^\([^\n]*\n\)\(_*\n\)/\11\2/
     t incr_col_underscores2zeroes
-    s/8\(_*\)$/9\1/
+    s/^\([^\n]*\n[0-9]*\)8\(_*\n\)/\19\2/
     t incr_col_underscores2zeroes
-    s/7\(_*\)$/8\1/
+    s/^\([^\n]*\n[0-9]*\)7\(_*\n\)/\18\2/
     t incr_col_underscores2zeroes
-    s/6\(_*\)$/7\1/
+    s/^\([^\n]*\n[0-9]*\)6\(_*\n\)/\17\2/
     t incr_col_underscores2zeroes
-    s/5\(_*\)$/6\1/
+    s/^\([^\n]*\n[0-9]*\)5\(_*\n\)/\16\2/
     t incr_col_underscores2zeroes
-    s/4\(_*\)$/5\1/
+    s/^\([^\n]*\n[0-9]*\)4\(_*\n\)/\15\2/
     t incr_col_underscores2zeroes
-    s/3\(_*\)$/4\1/
+    s/^\([^\n]*\n[0-9]*\)3\(_*\n\)/\14\2/
     t incr_col_underscores2zeroes
-    s/2\(_*\)$/3\1/
+    s/^\([^\n]*\n[0-9]*\)2\(_*\n\)/\13\2/
     t incr_col_underscores2zeroes
-    s/1\(_*\)$/2\1/
+    s/^\([^\n]*\n[0-9]*\)1\(_*\n\)/\12\2/
     t incr_col_underscores2zeroes
-    s/0\(_*\)$/1\1/
+    s/^\([^\n]*\n[0-9]*\)0\(_*\n\)/\11\2/
   : incr_col_underscores2zeroes
-    s/_\(_*\)$/0\1/
+    s/^\([^\n]*\n[0-9]*\)_\(_*\n\)/\10\2/
     t incr_col_underscores2zeroes
-  p
   x
   b json_validator___RETURN
 
 : incr_row
   x
-  s/\n[^\n]\+$//
+  s/^\([^\n]*\n\)[0-9]*\n/\1/
   s/^/ir/
   x
   b incr_col
   : incr_row_1
     x
-    s/$/\n1/
+    s/^\([^\n]*\n\)/\11\n/
     x
   b json_validator___RETURN
 
 : incr4_col
   x
-  s/9$/D/
-  s/8$/C/
-  s/7$/B/
-  s/6$/A/
+  s/^\([^\n]*\n[0-9]*\)9\n/\1D\n/
+  s/^\([^\n]*\n[0-9]*\)8\n/\1C\n/
+  s/^\([^\n]*\n[0-9]*\)7\n/\1B\n/
+  s/^\([^\n]*\n[0-9]*\)6\n/\1A\n/
   : incr4_col_nines2As
-    s/9\(A*[ABCD]\)$/A\1/
+    s/^\([^\n]*\n[0-9]*\)9\(A*[ABCD]\n\)/\1A\2/
     t incr4_col_nines2As
   : incr4_col_ge10
-    s/\n\(A*[ABCD]\)$/\n1\1/
+    s/^\([^\n]*\n\)\(A*[ABCD]\n\)/\11\2/
     t incr4_col_lastdigit
-    s/8\(A*[ABCD]\)$/9\1/
+    s/^\([^\n]*\n[0-9]*\)8\(A*[ABCD]\n\)/\19\2/
     t incr4_col_lastdigit
-    s/7\(A*[ABCD]\)$/8\1/
+    s/^\([^\n]*\n[0-9]*\)7\(A*[ABCD]\n\)/\18\2/
     t incr4_col_lastdigit
-    s/6\(A*[ABCD]\)$/7\1/
+    s/^\([^\n]*\n[0-9]*\)6\(A*[ABCD]\n\)/\17\2/
     t incr4_col_lastdigit
-    s/5\(A*[ABCD]\)$/6\1/
+    s/^\([^\n]*\n[0-9]*\)5\(A*[ABCD]\n\)/\16\2/
     t incr4_col_lastdigit
-    s/4\(A*[ABCD]\)$/5\1/
+    s/^\([^\n]*\n[0-9]*\)4\(A*[ABCD]\n\)/\15\2/
     t incr4_col_lastdigit
-    s/3\(A*[ABCD]\)$/4\1/
+    s/^\([^\n]*\n[0-9]*\)3\(A*[ABCD]\n\)/\14\2/
     t incr4_col_lastdigit
-    s/2\(A*[ABCD]\)$/3\1/
+    s/^\([^\n]*\n[0-9]*\)2\(A*[ABCD]\n\)/\13\2/
     t incr4_col_lastdigit
-    s/1\(A*[ABCD]\)$/2\1/
+    s/^\([^\n]*\n[0-9]*\)1\(A*[ABCD]\n\)/\12\2/
     t incr4_col_lastdigit
-    s/0\(A*[ABCD]\)$/1\1/
+    s/^\([^\n]*\n[0-9]*\)0\(A*[ABCD]\n\)/\11\2/
   : incr4_col_lastdigit
-    s/5$/9/
+    s/^\([^\n]*\n[0-9]*\)5\n/\19\n/
     t incr4_col_letters2numbers
-    s/4$/8/
+    s/^\([^\n]*\n[0-9]*\)4\n/\18\n/
     t incr4_col_letters2numbers
-    s/3$/7/
+    s/^\([^\n]*\n[0-9]*\)3\n/\17\n/
     t incr4_col_letters2numbers
-    s/2$/6/
+    s/^\([^\n]*\n[0-9]*\)2\n/\16\n/
     t incr4_col_letters2numbers
-    s/1$/5/
+    s/^\([^\n]*\n[0-9]*\)1\n/\15\n/
     t incr4_col_letters2numbers
-    s/0$/4/
+    s/^\([^\n]*\n[0-9]*\)0\n/\14\n/
   : incr4_col_letters2numbers
-    s/A\(A*[BCD]\?\)/0\1/
+    s/^\([^\n]*\n[0-9]*\)A\(A*[BCD]\?\)/\10\2/
     t incr4_col_letters2numbers
-    s/B$/1/
-    s/C$/2/
-    s/D$/3/
+    s/^\([^\n]*\n[0-9]*\)B\n/\11\n/
+    s/^\([^\n]*\n[0-9]*\)C\n/\12\n/
+    s/^\([^\n]*\n[0-9]*\)D\n/\13\n/
   x
   b json_validator___RETURN
 
 : incr5_col
   x
-  s/9$/E/
-  s/8$/D/
-  s/7$/C/
-  s/6$/B/
-  s/5$/A/
+  s/^\([^\n]*\n[0-9]*\)9\n/\1E\n/
+  s/^\([^\n]*\n[0-9]*\)8\n/\1D\n/
+  s/^\([^\n]*\n[0-9]*\)7\n/\1C\n/
+  s/^\([^\n]*\n[0-9]*\)6\n/\1B\n/
+  s/^\([^\n]*\n[0-9]*\)5\n/\1A\n/
   : incr5_col_nines2As
-    s/9\(A*[ABCDE]\)$/A\1/
+    s/^\([^\n]*\n[0-9]*\)9\(A*[ABCDE]\n\)/\1A\2/
     t incr5_col_nines2As
   : incr5_col_ge10
-    s/\n\(A*[ABCDE]\)$/\n1\1/
+    s/^\([^\n]*\n\)\(A*[ABCDE]\n\)/\11\2/
     t incr5_col_lastdigit
-    s/8\(A*[ABCDE]\)$/9\1/
+    s/^\([^\n]*\n[0-9]*\)8\(A*[ABCDE]\n\)/\19\2/
     t incr5_col_lastdigit
-    s/7\(A*[ABCDE]\)$/8\1/
+    s/^\([^\n]*\n[0-9]*\)7\(A*[ABCDE]\n\)/\18\2/
     t incr5_col_lastdigit
-    s/6\(A*[ABCDE]\)$/7\1/
+    s/^\([^\n]*\n[0-9]*\)6\(A*[ABCDE]\n\)/\17\2/
     t incr5_col_lastdigit
-    s/5\(A*[ABCDE]\)$/6\1/
+    s/^\([^\n]*\n[0-9]*\)5\(A*[ABCDE]\n\)/\16\2/
     t incr5_col_lastdigit
-    s/4\(A*[ABCDE]\)$/5\1/
+    s/^\([^\n]*\n[0-9]*\)4\(A*[ABCDE]\n\)/\15\2/
     t incr5_col_lastdigit
-    s/3\(A*[ABCDE]\)$/4\1/
+    s/^\([^\n]*\n[0-9]*\)3\(A*[ABCDE]\n\)/\14\2/
     t incr5_col_lastdigit
-    s/2\(A*[ABCDE]\)$/3\1/
+    s/^\([^\n]*\n[0-9]*\)2\(A*[ABCDE]\n\)/\13\2/
     t incr5_col_lastdigit
-    s/1\(A*[ABCDE]\)$/2\1/
+    s/^\([^\n]*\n[0-9]*\)1\(A*[ABCDE]\n\)/\12\2/
     t incr5_col_lastdigit
-    s/0\(A*[ABCDE]\)$/1\1/
+    s/^\([^\n]*\n[0-9]*\)0\(A*[ABCDE]\n\)/\11\2/
   : incr5_col_lastdigit
-    s/4$/9/
+    s/^\([^\n]*\n[0-9]*\)4\n/\19\n/
     t incr5_col_letters2numbers
-    s/3$/8/
+    s/^\([^\n]*\n[0-9]*\)3\n/\18\n/
     t incr5_col_letters2numbers
-    s/2$/7/
+    s/^\([^\n]*\n[0-9]*\)2\n/\17\n/
     t incr5_col_letters2numbers
-    s/1$/6/
+    s/^\([^\n]*\n[0-9]*\)1\n/\16\n/
     t incr5_col_letters2numbers
-    s/0$/5/
+    s/^\([^\n]*\n[0-9]*\)0\n/\15\n/
   : incr5_col_letters2numbers
-    s/A\(A*[BCDE]\?\)/0\1/
+    s/^\([^\n]*\n[0-9]*\)A\(A*[BCDE]\?\)/\10\2/
     t incr5_col_letters2numbers
-    s/B$/1/
-    s/C$/2/
-    s/D$/3/
-    s/E$/4/
+    s/^\([^\n]*\n[0-9]*\)B\n/\11\n/
+    s/^\([^\n]*\n[0-9]*\)C\n/\12\n/
+    s/^\([^\n]*\n[0-9]*\)D\n/\13\n/
+    s/^\([^\n]*\n[0-9]*\)E\n/\14\n/
   x
   b json_validator___RETURN
 
