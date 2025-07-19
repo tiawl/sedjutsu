@@ -5,8 +5,8 @@
 #                                                                             #
 #   Because it is particulary hard to deal with the `n` and `N` GNU `sed`     #
 #   commands (If there is no more input, these commands make `sed` exits      #
-#   and `sed` does not have any way internally to know if there is more       #
-#   input), this script expects a oneliner input.                             #
+#   and `sed` has no way to know internally if there is more input), this     #
+#   script expects a oneliner input.                                          #
 #                                                                             #
 #   If your input contains new line characters without NUL characters, you    #
 #   definitly want to use the `-z`/`--null-data` GNU `sed` option.            #
@@ -835,6 +835,7 @@
 
 : json_validator___UNREACHABLE
   s/^/Reached unreachable code in scripts\/json\/validator.sed: /
+  s/$/\n/
   w /dev/stderr
   Q 5
 
