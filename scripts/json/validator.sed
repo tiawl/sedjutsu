@@ -856,10 +856,9 @@
   Q 5
 
 : json_validator___FAILURE
-  # TODO
   H
   x
-  s/^[^\n]*\n\([0-9]\+\)\n\([0-9]\+\)/JSON parsing error at ROW \1, COL \2: /
+  s/^[^\n]*\n\([0-9]\+\)\n\([0-9]\+\)[\n\x00]/JSON parsing error at ROW \1, COL \2: /
   s/$/\n/
   w /dev/stderr
   z
