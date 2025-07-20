@@ -42,7 +42,7 @@
 # - an empty workflow stack
 # - env vars
 # - the next line to print
-# - env vars (yes, again: [1] env vars are readonly, so there is no risk of a potential sync error between the 2 locations, [2] having a copy here, allow us to remove part of the complexity from (already too) complex regex patterns later)
+# - env vars (yes, again: [1] env vars are readonly, so there is no risk of a potential sync error between the 2 locations in the hold space, [2] having a copy here, allow us to remove part of the complexity from (already too) complex regex patterns later)
 # - row
 # - col
 : init_holdspace
@@ -81,7 +81,7 @@
     : init_holdspace_end
       s/.*/\n\0\n\n\0\n1\n1/
       x
-      b json_pp__json
+      b json_pp___json
 
 #
 # JSON grammar in McKeeman Form
@@ -118,7 +118,18 @@
     b json_pp___array
   }
   /^"/ {
+    x
+    s/^/v1/
+    # Format the output for the next line to print
+    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{3\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2m\1\2\3/
+    x
     b json_pp___string
+    : json_pp___value_1
+      x
+      # Format the output for the next line to print
+      s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/\\033[0m\1/
+      x
+      b json_pp___RETURN
   }
   /^[-0-9]/ {
     b json_pp___number
@@ -156,28 +167,18 @@
 ###     '{' members '}'
 : json_pp___object
   /^{[\x20\x0a\x0d\x09]*}/ {
-    # TODO: print
     s/.//
     x
     s/^/o1o2/
-    # Increment the indent level
-    s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)/\1\2\3\2/
     # Format the output for the next line to print
-    s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m{\\033[0m\1\2\3/
+    s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m{}\\033[0m\1\2\3/
     x
     b incr_col
     : json_pp___object_1
       b json_pp___ws
     : json_pp___object_2
       /^}/ {
-        # TODO: print
         s/.//
-        x
-        # Decrement the indent level
-        s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
-        # Format the output for the next line to print
-        s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m}\\033[0m\1\2\3/
-        x
         b incr_col
       }
       z
@@ -185,29 +186,33 @@
       b json_pp___PARSING_FAILURE
   }
   /^{/ {
-    # TODO: print
     s/.//
     x
-    s/^/o3o4/
-    # Increment the indent level
-    s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)/\1\2\3\2/
+    s/^/o3o4o5o6/
     # Format the output for the next line to print
     s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m{\\033[0m\1\2\3/
     x
-    b incr_col
+    b json_pp___PRINT
     : json_pp___object_3
-      b json_pp___members
+      x
+      # Increment the indent level
+      s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)/\1\2\3\2/
+      x
+      b incr_col
     : json_pp___object_4
+      b json_pp___members
+    : json_pp___object_5
       /^}/ {
-        # TODO: print
         s/.//
-        x
-        # Decrement the indent level
-        s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
-        # Format the output for the next line to print
-        s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m}\\033[0m\1\2\3/
-        x
-        b incr_col
+        b json_pp___PRINT
+        : json_pp___object_6
+          x
+          # Decrement the indent level
+          s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
+          # Format the output for the next line to print
+          s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m}\\033[0m\1\2\3/
+          x
+          b incr_col
       }
       z
       s/^/`,` or `}` expected while parsing JSON object/
@@ -225,17 +230,18 @@
   b json_pp___member
   : json_pp___members_1
     /^,/ {
-      # TODO: print
       s/.//
       x
-      s/^/M2/
+      s/^/M2M3/
       # Format the output for the next line to print
       s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m,\\033[0m\1\2\3/
       x
-      b incr_col
+      b json_pp___PRINT
+      : json_pp___members_2
+        b incr_col
     }
     b json_pp___RETURN
-  : json_pp___members_2
+  : json_pp___members_3
     b json_pp___members
 
 ### member
@@ -246,9 +252,16 @@
   x
   b json_pp___ws
   : json_pp___member_1
-    # TODO: add key color
+    x
+    # Format the output for the next line to print
+    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(\n[0-9]\+\)\{2\}\)$/\\033[\2m\1\2\3/
+    x
     b json_pp___string
   : json_pp___member_2
+    x
+    # Format the output for the next line to print
+    s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/\\033[0m\1/
+    x
     b json_pp___ws
   : json_pp___member_3
     /^:/ {
@@ -270,28 +283,18 @@
 ###     '[' elements ']'
 : json_pp___array
   /^\[[\x20\x0a\x0d\x09]*]/ {
-    # TODO: print
     s/.//
     x
     s/^/a1a2/
-    # Increment the indent level
-    s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)/\1\2\3\2/
     # Format the output for the next line to print
-    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2m[\\033[0m\1\2\3/
+    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2m[]\\033[0m\1\2\3/
     x
     b incr_col
     : json_pp___array_1
       b json_pp___ws
     : json_pp___array_2
       /^]/ {
-        # TODO: print
         s/.//
-        x
-        # Decrement the indent level
-        s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
-        # Format the output for the next line to print
-        s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\)$/\\033]\2m[\\033[0m\1\2\3/
-        x
         b incr_col
       }
       z
@@ -299,29 +302,33 @@
       b json_pp___PARSING_FAILURE
   }
   /^\[/ {
-    # TODO: print
     s/.//
     x
-    s/^/a3a4/
-    # Increment the indent level
-    s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)/\1\2\3\2/
+    s/^/a3a4a5a6/
     # Format the output for the next line to print
     s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2m[\\033[0m\1\2\3/
     x
-    b incr_col
+    b json_pp___PRINT
     : json_pp___array_3
-      b json_pp___elements
+      x
+      # Increment the indent level
+      s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)/\1\2\3\2/
+      x
+      b incr_col
     : json_pp___array_4
+      b json_pp___elements
+    : json_pp___array_5
       /^]/ {
-        # TODO: print
         s/.//
-        x
-        # Decrement the indent level
-        s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
-        # Format the output for the next line to print
-        s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\)$/\\033]\2m[\\033[0m\1\2\3/
-        x
-        b incr_col
+        b json_pp___PRINT
+        : json_pp___array_6
+          x
+          # Decrement the indent level
+          s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
+          # Format the output for the next line to print
+          s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\)$/\\033]\2m[\\033[0m\1\2\3/
+          x
+          b incr_col
       }
       z
       s/^/`,` or `]` expected while parsing JSON array/
@@ -339,17 +346,18 @@
   b json_pp___element
   : json_pp___elements_1
     /^,/ {
-      # TODO: print
       s/.//
       x
       s/^/E2/
       # Format the output for the next line to print
       s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2m,\\033[0m\1\2\3/
       x
-      b incr_col
+      b json_pp___PRINT
+      : json_pp___elements_2
+        b incr_col
     }
     b json_pp___RETURN
-  : json_pp___elements_2
+  : json_pp___elements_3
     b json_pp___elements
 
 ### element
@@ -374,7 +382,7 @@
     s/.//
     x
     # Format the output for the next line to print
-    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{3\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2m"\1\2\3/
+    s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/"\1/
     x
     b incr_col
   }
@@ -388,7 +396,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/"\\033[0m\1/
+      s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/"\1/
       x
       b incr_col
     }
@@ -823,6 +831,22 @@
   x
   b json_pp___RETURN
 
+: json_pp___PRINT
+  # Save the hold and pattern spaces
+  H
+  g
+  # Select the formatted line to print
+  s/^\([^\n]*\n\)\{2\}\([^\n]*\)\n.*/\2/
+  p
+  # Restore the pattern space to its state before the print
+  g
+  s/^\([^\n]*\n\)\{6\}//
+  # Restore the hold space to its state before the print and reset the line to format
+  x
+  s/^\(\([^\n]*\n\)\{2\} \+\)[^\n]*\n\([^\n]*\(\n[0-9]\+\)\{2\}\)\n.*/\1\3/
+  x
+  b json_pp___RETURN
+
 # Redirect the workflow depending of the first element in the workflow stack
 : json_pp___RETURN
   x
@@ -845,6 +869,16 @@
     s/..//
     x
     b json_pp___array_4
+  }
+  /^a5/ {
+    s/..//
+    x
+    b json_pp___array_5
+  }
+  /^a6/ {
+    s/..//
+    x
+    b json_pp___array_6
   }
   /^C1/ {
     s/..//
@@ -870,6 +904,11 @@
     s/..//
     x
     b json_pp___elements_2
+  }
+  /^E3/ {
+    s/..//
+    x
+    b json_pp___elements_3
   }
   /^e1/ {
     s/..//
@@ -915,6 +954,11 @@
     s/..//
     x
     b json_pp___members_2
+  }
+  /^M3/ {
+    s/..//
+    x
+    b json_pp___members_3
   }
   /^m1/ {
     s/..//
@@ -971,6 +1015,16 @@
     x
     b json_pp___object_4
   }
+  /^o5/ {
+    s/..//
+    x
+    b json_pp___object_5
+  }
+  /^o6/ {
+    s/..//
+    x
+    b json_pp___object_6
+  }
   /^s1/ {
     s/..//
     x
@@ -981,15 +1035,10 @@
     x
     b json_pp___string_2
   }
-  /^x1/ {
+  /^v1/ {
     s/..//
     x
-    b json_pp___exponent_1
-  }
-  /^x2/ {
-    s/..//
-    x
-    b json_pp___exponent_2
+    b json_pp___value_1
   }
   /^w1/ {
     s/..//
@@ -1000,6 +1049,16 @@
     s/..//
     x
     b json_pp___ws_2
+  }
+  /^x1/ {
+    s/..//
+    x
+    b json_pp___exponent_1
+  }
+  /^x2/ {
+    s/..//
+    x
+    b json_pp___exponent_2
   }
   /^\\1/ {
     s/..//

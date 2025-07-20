@@ -804,16 +804,6 @@
     x
     b json_validator___string_2
   }
-  /^x1/ {
-    s/..//
-    x
-    b json_validator___exponent_1
-  }
-  /^x2/ {
-    s/..//
-    x
-    b json_validator___exponent_2
-  }
   /^w1/ {
     s/..//
     x
@@ -823,6 +813,16 @@
     s/..//
     x
     b json_validator___ws_2
+  }
+  /^x1/ {
+    s/..//
+    x
+    b json_validator___exponent_1
+  }
+  /^x2/ {
+    s/..//
+    x
+    b json_validator___exponent_2
   }
   /^\\1/ {
     s/..//
