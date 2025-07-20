@@ -26,6 +26,8 @@
 #      because `sed` does not operate on empty files. An empty file should    #
 #      result in a parsing error.                                             #
 #                                                                             #
+#   3) A JSON object with a duplicated key is accepted                        #
+#                                                                             #
 ###############################################################################
 
 # Init the holdspace with these variables:

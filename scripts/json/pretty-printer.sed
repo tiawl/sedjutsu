@@ -36,10 +36,9 @@
 #      because `sed` does not operate on empty files. An empty file should    #
 #      result in a parsing error.                                             #
 #                                                                             #
+#   3) A JSON object with a duplicated key is accepted                        #
+#                                                                             #
 ###############################################################################
-
-# TODO: fix this examples:
-# for i in '{"pp":true}' '[true,true]' 5; do printf '%s' "$i" | sed -z -n -f scripts/json/pretty-printer.sed; done
 
 # Init the holdspace with these variables:
 # - an empty workflow stack
@@ -55,20 +54,28 @@
   s/.$//
   x
   # Map the NUL characters to `Z` characters because shell does not support it
-  y/\x00/Z/
-  s/.*\([\nZ]\)$/printf '%s:%s%s\1\1' "${SEDJUTSU_INDENT:-4}" "${SEDJUTSU_MONOCHROME+y:}" "${SEDJUTSU_COLORS:-0;90:0;39:0;39:0;39:0;32:1;39:1;39:1;34}"/
+  /\x00$/ {
+    z
+    s/^/printf '%s:%s%sZ' "${SEDJUTSU_INDENT:-4}" "${SEDJUTSU_MONOCHROME+y:}" "${SEDJUTSU_COLORS:-0;90:0;39:0;39:0;39:0;32:1;39:1;39:1;34}"/
+  }
+  /\n$/ {
+    z
+    s/^/printf '%s:%s%s\n\n' "${SEDJUTSU_INDENT:-4}" "${SEDJUTSU_MONOCHROME+y:}" "${SEDJUTSU_COLORS:-0;90:0;39:0;39:0;39:0;32:1;39:1;39:1;34}"/
+  }
   e
   /Z$/ {
     s/.$/\x00/
   }
   /^[1-8]:/ ! {
+    h
     z
     s/^/SEDJUTSU_INDENT must be an integer between 1 and 8/
     b json_pp___ENV_FAILURE
   }
   # When set, SEDJUTSU_MONOCHROME disables color by using default escape sequences everywhere
-  s/^\([1-8]\):y:.*/\1:0;39:0;39:0;39:0;39:0;39:0;39:0;39:0;39/
+  s/^\([1-8]\):y:[^\n\x00]*/\1:0;39:0;39:0;39:0;39:0;39:0;39:0;39:0;39/
   /^[1-8]\(:[0-57-9];\(3[0-79]\|9[0-7]\)\)\{8\}/ ! {
+    h
     z
     s/^/SEDJUTSU_COLORS must be a colon-delimited list of 8 partial terminal escape sequences matching this pattern "[0-57-9];(3[0-79]|9[0-7])" and in this order: null:false:true:numbers:strings:arrays:objects:keys/
     b json_pp___ENV_FAILURE
@@ -230,7 +237,7 @@
 ###     '{' ws '}'
 ###     '{' members '}'
 : json_pp___object
-  /^{[\x20\x0a\x0d\x09]*}/ {
+  /^{[ \n\r\t]*}/ {
     s/.//
     x
     s/^/o1o2/
@@ -429,7 +436,7 @@
 ###     '[' ws ']'
 ###     '[' elements ']'
 : json_pp___array
-  /^\[[\x20\x0a\x0d\x09]*]/ {
+  /^\[[ \n\r\t]*]/ {
     s/.//
     x
     s/^/a1a2/
@@ -538,7 +545,7 @@
     /^,/ {
       s/.//
       x
-      s/^/E2/
+      s/^/E2E3/
       # Format the output for the next line to print
       /[^\n\x00]$/ {
         z
@@ -676,7 +683,7 @@
     s/.//
     x
     # Format the output for the next line to print
-    s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[^0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+    s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
   }
   /\n$/ {
     s/.$//
@@ -685,7 +692,7 @@
     s/.//
     x
     # Format the output for the next line to print
-    s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+    s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
   }
   x
   b incr_col
@@ -742,7 +749,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[^0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
     /\n$/ {
       s/.$//
@@ -751,7 +758,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
     }
     x
     b incr_col
@@ -779,7 +786,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[^0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
     /\n$/ {
       s/.$//
@@ -788,7 +795,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
     }
     x
     b incr_col
@@ -908,10 +915,10 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/-\0/
+      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/0\0/
     }
     /\n$/ {
-      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/-\0/
+      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/0\0/
     }
     x
     b incr_col
@@ -940,7 +947,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[^0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
     /\n$/ {
       s/.$//
@@ -949,7 +956,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
     }
     x
     b incr_col
@@ -1005,7 +1012,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[^0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
     /\n$/ {
       s/.$//
@@ -1014,7 +1021,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
     }
     x
     b incr_col
@@ -1044,7 +1051,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[^0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
     /\n$/ {
       s/.$//
@@ -1053,7 +1060,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
     }
     x
     b incr_col
@@ -1067,7 +1074,7 @@
 ###     '000D' ws
 ###     '0009' ws
 : json_pp___ws
-  /^\x0a/ {
+  /^\n/ {
     s/.//
     x
     s/^/w1/
@@ -1076,7 +1083,7 @@
     : json_pp___ws_1
       b json_pp___ws
   }
-  /^[\x20\x0d\x09]/ {
+  /^[ \r\t]/ {
     s/.//
     x
     s/^/w2/
@@ -1515,7 +1522,7 @@
   b json_pp___UNREACHABLE
 
 : json_pp___UNREACHABLE
-  s/^/Reached unreachable code in scripts\/json\/pretty-printer.sed: /
+  s/^/\x1b[0mReached unreachable code in scripts\/json\/pretty-printer.sed: /
   s/$/\n/
   w /dev/stderr
   z
@@ -1533,25 +1540,46 @@
     x
     H
     x
-    s/^[^\x00]*\x00\([0-9]\+\)\x00\([0-9]\+\)/JSON parsing error at ROW \1, COL \2: /
+    s/^\([^\x00]*\x00\)\{4\}\([0-9]\+\)\x00\([0-9]\+\)\x00\(.*\)/\x1b[0mJSON parsing error at ROW \2, COL \3: \4\n/
+    # The duplicated code is assumed: a weird output bug occured when this instruction is not in the same scope
+    w /dev/stderr
+    # If outside the scope it triggers the next conditional statement
+    z
   }
   /\n$/ {
     s/.$//
     x
     H
     x
-    s/^[^\n]*\n\([0-9]\+\)\n\([0-9]\+\)/JSON parsing error at ROW \1, COL \2: /
+    s/^\([^\n]*\n\)\{4\}\([0-9]\+\)\n\([0-9]\+\)\n/\x1b[0mJSON parsing error at ROW \2, COL \3: /
+    # The duplicated code is assumed: a weird output bug occured when this instruction is not in the same scope
+    w /dev/stderr
+    z
   }
-  s/$/\n/
-  w /dev/stderr
-  z
   Q 6
 
 : json_pp___ENV_FAILURE
-  s/^/Error when parsing environment: /
-  s/$/\n/
-  w /dev/stderr
-  z
+  x
+  /[^\n\x00]$/ {
+    z
+    s/^/"Hold space must end with a new line or NUL character"/
+    b json_pp___UNREACHABLE
+  }
+  /\x00$/ {
+    x
+    s/.*/\x1b[0mError when parsing environment: \0\n/
+    # The duplicated code is assumed: a weird output bug occured when this instruction is not in the same scope
+    w /dev/stderr
+    # If outside the scope it triggers the next conditional statement
+    z
+  }
+  /\n$/ {
+    x
+    s/^/\x1b[0mError when parsing environment: /
+    # The duplicated code is assumed: a weird output bug occured when this instruction is not in the same scope
+    w /dev/stderr
+    z
+  }
   Q 7
 
 : json_pp___SUCCESS
