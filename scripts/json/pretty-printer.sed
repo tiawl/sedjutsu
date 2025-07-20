@@ -3,7 +3,8 @@
 #   This script can be used to emulate some `jq`, `json_pp` or `json_xs`      #
 #   features.                                                                 #
 #                                                                             #
-#   You can configure this script with these environment variables:           #
+#   You can configure this script behavior with these environment             #
+#   variables:                                                                #
 #   - SEDJUTSU_INDENT: use the given number of spaces (between 1 and 8)       #
 #     for indentation (default: 4)                                            #
 #   - SEDJUTSU_MONOCHROME: disable color whatever its value                   #
@@ -39,8 +40,8 @@
 
 # Init the holdspace with these variables:
 # - an empty workflow stack
-# - the indentation level
 # - env vars
+# - the indentation level
 # - row
 # - col
 : init_holdspace
@@ -54,30 +55,30 @@
   }
   # When set, SEDJUTSU_MONOCHROME disables color by using default escape sequences everywhere
   s/^\([1-8]\):y:.*/\1:0;39:0;39:0;39:0;39:0;39:0;39:0;39:0;39/
-  /^[1-8]\(:[01];\(3[0-79]\|9[0-7]\)\)\{8\}/ ! {
+  /^[1-8]\(:[0-57-9];\(3[0-79]\|9[0-7]\)\)\{8\}/ ! {
     z
-    s/^/SEDJUTSU_COLORS must be a colon-delimited list of 8 partial terminal escape sequences matching this pattern "[01];(3[0-79]|9[0-7])" and in this order: null:false:true:numbers:strings:arrays:objects:keys/
+    s/^/SEDJUTSU_COLORS must be a colon-delimited list of 8 partial terminal escape sequences matching this pattern "[0-57-9];(3[0-79]|9[0-7])" and in this order: null:false:true:numbers:strings:arrays:objects:keys/
     b json_pp___ENV_FAILURE
   }
-  t init_holdspace_check_env_and_reset_conditional_branching
-  : init_holdspace_check_env_and_reset_conditional_branching
-    s/^1:/\n\n :/
+  t init_holdspace_reset_conditional_branching
+  : init_holdspace_reset_conditional_branching
+    s/^1:/\n :/
     t init_holdspace_end
-    s/^2:/\n\n  :/
+    s/^2:/\n  :/
     t init_holdspace_end
-    s/^3:/\n\n   :/
+    s/^3:/\n   :/
     t init_holdspace_end
-    s/^4:/\n\n    :/
+    s/^4:/\n    :/
     t init_holdspace_end
-    s/^5:/\n\n     :/
+    s/^5:/\n     :/
     t init_holdspace_end
-    s/^6:/\n\n      :/
+    s/^6:/\n      :/
     t init_holdspace_end
-    s/^7:/\n\n       :/
+    s/^7:/\n       :/
     t init_holdspace_end
-    s/^8:/\n\n        :/
+    s/^8:/\n        :/
     : init_holdspace_end
-      s/$/\n1\n1/
+      s/$/\n\n1\n1/
       x
       b json_pp__json
 
@@ -122,14 +123,17 @@
     b json_pp___number
   }
   /^true/ {
+    # TODO: format the output
     s/....//
     b incr4_col
   }
   /^false/ {
+    # TODO: format the output
     s/.....//
     b incr5_col
   }
   /^null/ {
+    # TODO: format the output
     s/....//
     b incr4_col
   }
@@ -142,6 +146,9 @@
 ###     '{' members '}'
 : json_pp___object
   /^{[\x20\x0a\x0d\x09]*}/ {
+    # TODO: increment indent level
+    # TODO: format the output
+    # TODO: print
     s/.//
     x
     s/^/o1o2/
@@ -151,6 +158,9 @@
       b json_pp___ws
     : json_pp___object_2
       /^}/ {
+        # TODO: decrement indent level
+        # TODO: format the output
+        # TODO: print
         s/.//
         b incr_col
       }
@@ -159,6 +169,9 @@
       b json_pp___PARSING_FAILURE
   }
   /^{/ {
+    # TODO: increment indent level
+    # TODO: format the output
+    # TODO: print
     s/.//
     x
     s/^/o3o4/
@@ -168,6 +181,9 @@
       b json_pp___members
     : json_pp___object_4
       /^}/ {
+        # TODO: decrement indent level
+        # TODO: format the output
+        # TODO: print
         s/.//
         b incr_col
       }
@@ -187,6 +203,8 @@
   b json_pp___member
   : json_pp___members_1
     /^,/ {
+      # TODO: format the output
+      # TODO: print
       s/.//
       x
       s/^/M2/
@@ -210,6 +228,7 @@
     b json_pp___ws
   : json_pp___member_3
     /^:/ {
+      # TODO: format the output
       s/.//
       b incr_col
     }
@@ -224,6 +243,9 @@
 ###     '[' elements ']'
 : json_pp___array
   /^\[[\x20\x0a\x0d\x09]*]/ {
+    # TODO: increment indent level
+    # TODO: format the output
+    # TODO: print
     s/.//
     x
     s/^/a1a2/
@@ -233,6 +255,9 @@
       b json_pp___ws
     : json_pp___array_2
       /^]/ {
+        # TODO: decrement indent level
+        # TODO: format the output
+        # TODO: print
         s/.//
         b incr_col
       }
@@ -241,6 +266,9 @@
       b json_pp___PARSING_FAILURE
   }
   /^\[/ {
+    # TODO: increment indent level
+    # TODO: format the output
+    # TODO: print
     s/.//
     x
     s/^/a3a4/
@@ -250,6 +278,9 @@
       b json_pp___elements
     : json_pp___array_4
       /^]/ {
+        # TODO: decrement indent level
+        # TODO: format the output
+        # TODO: print
         s/.//
         b incr_col
       }
@@ -269,6 +300,8 @@
   b json_pp___element
   : json_pp___elements_1
     /^,/ {
+      # TODO: format the output
+      # TODO: print
       s/.//
       x
       s/^/E2/
@@ -298,6 +331,7 @@
   s/^/s1s2/
   x
   /^"/ {
+    # TODO: format the output
     s/.//
     b incr_col
   }
@@ -308,6 +342,7 @@
     b json_pp___characters
   : json_pp___string_2
     /^"/ {
+      # TODO: format the output
       s/.//
       b incr_col
     }
@@ -334,6 +369,7 @@
 ###     '\' escape
 : json_pp___character
   /^\\/ {
+    # TODO: format the output
     s/.//
     x
     s/^/c1/
@@ -347,6 +383,7 @@
     s/^/Invalid character encountered/
     b json_pp___PARSING_FAILURE
   }
+  # TODO: format the output
   s/.//
   b incr_col
 
@@ -362,6 +399,7 @@
 ###     'u' hex hex hex hex
 : json_pp___escape
   /^u/ {
+    # TODO: format the output
     s/.//
     x
     s/^/\\1\\2\\3\\4/
@@ -377,6 +415,7 @@
       b json_pp___hex
   }
   /^["\\/bfnrt]/ {
+    # TODO: format the output
     s/.//
     b incr_col
   }
@@ -390,6 +429,7 @@
 ###     'a' . 'f'
 : json_pp___hex
   /^[A-Fa-f]/ {
+    # TODO: format the output
     s/.//
     b incr_col
   }
@@ -419,6 +459,7 @@
 ###     '-' onenine digits
 : json_pp___integer
   /^-/ {
+    # TODO: format the output
     s/.//
     x
     s/^/i1/
@@ -459,6 +500,7 @@
 ###     onenine
 : json_pp___digit
   /^0/ {
+    # TODO: format the output
     s/.//
     b incr_col
   }
@@ -473,6 +515,7 @@
 ###     '1' . '9'
 : json_pp___onenine
   /^[1-9]/ {
+    # TODO: format the output
     s/.//
     b incr_col
   }
@@ -485,6 +528,7 @@
 ###     '.' digits
 : json_pp___fraction
   /^\./ {
+    # TODO: format the output
     s/.//
     x
     s/^/f1/
@@ -501,6 +545,7 @@
 ###     'e' sign digits
 : json_pp___exponent
   /^[eE]/ {
+    # TODO: format the output
     s/.//
     x
     s/^/x1x2/
@@ -519,6 +564,7 @@
 ###     '-'
 : json_pp___sign
   /^[-+]/ {
+    # TODO: format the output
     s/.//
     b incr_col
   }
@@ -532,6 +578,7 @@
 ###     '0009' ws
 : json_pp___ws
   /^\x0a/ {
+    # TODO: format the output
     s/.//
     x
     s/^/w1/
@@ -541,6 +588,7 @@
       b json_pp___ws
   }
   /^[\x20\x0d\x09]/ {
+    # TODO: format the output
     s/.//
     x
     s/^/w2/
