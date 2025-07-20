@@ -46,8 +46,12 @@
 # - row
 # - col
 : init_holdspace
+  # Depending of the `-z`/`--null-data` option usage, the `D`, `G`, `H`, `N` and `P` commands work with new line or NUL characters. This script must know which one of these characters these commands are using
+  G
+  h
+  s/.$//
   x
-  s/^/printf '%s:%s%s' "${SEDJUTSU_INDENT:-4}" "${SEDJUTSU_MONOCHROME+y:}" "${SEDJUTSU_COLORS:-0;90:0;39:0;39:0;39:0;32:1;39:1;39:1;34}"/
+  s/.*\([\n\x00]\)$/printf '%s:%s%s\1' "${SEDJUTSU_INDENT:-4}" "${SEDJUTSU_MONOCHROME+y:}" "${SEDJUTSU_COLORS:-0;90:0;39:0;39:0;39:0;32:1;39:1;39:1;34}"/
   e
   /^[1-8]:/ ! {
     z
@@ -79,7 +83,7 @@
     t init_holdspace_end
     s/^8:/        :/
     : init_holdspace_end
-      s/.*/\n\0\n\n\0\n1\n1/
+      s/\(.*\)\([\n\x00]\)$/\2\1\2\2\1\21\21\2/
       x
       b json_pp___json
 
@@ -121,13 +125,33 @@
     x
     s/^/v1/
     # Format the output for the next line to print
-    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{3\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2m\1\2\3/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{3\}\(\x00[0-9]\+\)\{2\}\x00$/\\033[\1m\0/
+    }
+    /\n$/ {
+      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{3\}\(\n[0-9]\+\)\{2\}\n$/\\033[\1m\0/
+    }
     x
     b json_pp___string
     : json_pp___value_1
       x
       # Format the output for the next line to print
-      s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/\\033[0m\1/
+      /[^\n\x00]$/ {
+        z
+        s/^/"Hold space must end with a new line or NUL character"/
+        b json_pp___UNREACHABLE
+      }
+      /\x00$/ {
+        s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/\\033[0m\0/
+      }
+      /\n$/ {
+        s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/\\033[0m\0/
+      }
       x
       b json_pp___RETURN
   }
@@ -138,7 +162,17 @@
     s/....//
     x
     # Format the output for the next line to print
-    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{5\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2mtrue\\033[0m\1\2\3/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{5\}\(\x00[0-9]\+\)\{2\}\x00$/\\033[\1mtrue\\033[0m\0/
+    }
+    /\n$/ {
+      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{5\}\(\n[0-9]\+\)\{2\}\n$/\\033[\1mtrue\\033[0m\0/
+    }
     x
     b incr4_col
   }
@@ -146,7 +180,17 @@
     s/.....//
     x
     # Format the output for the next line to print
-    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{6\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2mfalse\\033[0m\1\2\3/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{6\}\(\x00[0-9]\+\)\{2\}\x00$/\\033[\1mfalse\\033[0m\0/
+    }
+    /\n$/ {
+      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{6\}\(\n[0-9]\+\)\{2\}\n$/\\033[\1mfalse\\033[0m\0/
+    }
     x
     b incr5_col
   }
@@ -154,7 +198,17 @@
     s/....//
     x
     # Format the output for the next line to print
-    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{7\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2mnull\\033[0m\1\2\3/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{7\}\(\x00[0-9]\+\)\{2\}\x00$/\\033[\1mnull\\033[0m\0/
+    }
+    /\n$/ {
+      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{7\}\(\n[0-9]\+\)\{2\}\n$/\\033[\1mnull\\033[0m\0/
+    }
     x
     b incr4_col
   }
@@ -171,7 +225,17 @@
     x
     s/^/o1o2/
     # Format the output for the next line to print
-    s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m{}\\033[0m\1\2\3/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00[0-9]\+\)\{2\}\x00$/\\033[\1m{}\\033[0m\0/
+    }
+    /\n$/ {
+      s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\n[0-9]\+\)\{2\}\n$/\\033[\1m{}\\033[0m\0/
+    }
     x
     b incr_col
     : json_pp___object_1
@@ -190,13 +254,33 @@
     x
     s/^/o3o4o5o6/
     # Format the output for the next line to print
-    s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m{\\033[0m\1\2\3/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00[0-9]\+\)\{2\}\x00$/\\033[\1m{\\033[0m\0/
+    }
+    /\n$/ {
+      s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\n[0-9]\+\)\{2\}\n$/\\033[\1m{\\033[0m\0/
+    }
     x
     b json_pp___PRINT
     : json_pp___object_3
       x
       # Increment the indent level
-      s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)/\1\2\3\2/
+      /[^\n\x00]$/ {
+        z
+        s/^/"Hold space must end with a new line or NUL character"/
+        b json_pp___UNREACHABLE
+      }
+      /\x00$/ {
+        s/^[^\x00]*\x00\( \+\):[^\x00]*\x00/\0\1/
+      }
+      /\n$/ {
+        s/^[^\n]*\n\( \+\):[^\n]*\n/\0\1/
+      }
       x
       b incr_col
     : json_pp___object_4
@@ -207,10 +291,23 @@
         b json_pp___PRINT
         : json_pp___object_6
           x
-          # Decrement the indent level
-          s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
-          # Format the output for the next line to print
-          s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m}\\033[0m\1\2\3/
+          /[^\n\x00]$/ {
+            z
+            s/^/"Hold space must end with a new line or NUL character"/
+            b json_pp___UNREACHABLE
+          }
+          /\x00$/ {
+            # Decrement the indent level
+            s/^\([^\x00]*\x00\)\( \+\)\(:[^\x00]*\x00\)\2/\1\2\3/
+            # Format the output for the next line to print
+            s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00[0-9]\+\)\{2\}\x00$/\\033[\1m}\\033[0m\0/
+          }
+          /\n$/ {
+            # Decrement the indent level
+            s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
+            # Format the output for the next line to print
+            s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\n[0-9]\+\)\{2\}\n$/\\033[\1m}\\033[0m\0/
+          }
           x
           b incr_col
       }
@@ -234,7 +331,17 @@
       x
       s/^/M2M3/
       # Format the output for the next line to print
-      s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m,\\033[0m\1\2\3/
+      /[^\n\x00]$/ {
+        z
+        s/^/"Hold space must end with a new line or NUL character"/
+        b json_pp___UNREACHABLE
+      }
+      /\x00$/ {
+        s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00[0-9]\+\)\{2\}\x00$/\\033[\1m,\\033[0m\0/
+      }
+      /\n$/ {
+        s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\n[0-9]\+\)\{2\}\n$/\\033[\1m,\\033[0m\0/
+      }
       x
       b json_pp___PRINT
       : json_pp___members_2
@@ -254,7 +361,17 @@
   : json_pp___member_1
     x
     # Format the output for the next line to print
-    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(\n[0-9]\+\)\{2\}\)$/\\033[\2m\1\2\3/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/\x00[^\x00]\+:\([^:]\+\)\(\x00[0-9]\+\)\{2\}\x00$/\\033[\1m\0/
+    }
+    /\n$/ {
+      s/\n[^\n]\+:\([^:]\+\)\(\n[0-9]\+\)\{2\}\n$/\\033[\1m\0/
+    }
     x
     b json_pp___string
   : json_pp___member_2
@@ -268,7 +385,17 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m: \\033[0m\1\2\3/
+      /[^\n\x00]$/ {
+        z
+        s/^/"Hold space must end with a new line or NUL character"/
+        b json_pp___UNREACHABLE
+      }
+      /\x00$/ {
+        s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00[0-9]\+\)\{2\}\x00$/\\033[\1m: \\033[0m\0/
+      }
+      /\n$/ {
+        s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\n[0-9]\+\)\{2\}\n$/\\033[\1m: \\033[0m\0/
+      }
       x
       b incr_col
     }
@@ -287,7 +414,17 @@
     x
     s/^/a1a2/
     # Format the output for the next line to print
-    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2m[]\\033[0m\1\2\3/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00[0-9]\+\)\{2\}\x00$/\\033[\1m[]\\033[0m\0/
+    }
+    /\n$/ {
+      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\n$/\\033[\1m[]\\033[0m\0/
+    }
     x
     b incr_col
     : json_pp___array_1
@@ -306,13 +443,33 @@
     x
     s/^/a3a4a5a6/
     # Format the output for the next line to print
-    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2m[\\033[0m\1\2\3/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00[0-9]\+\)\{2\}\x00$/\\033[\1m[\\033[0m\0/
+    }
+    /\n$/ {
+      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\n$/\\033[\1m[\\033[0m\0/
+    }
     x
     b json_pp___PRINT
     : json_pp___array_3
       x
       # Increment the indent level
-      s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)/\1\2\3\2/
+      /[^\n\x00]$/ {
+        z
+        s/^/"Hold space must end with a new line or NUL character"/
+        b json_pp___UNREACHABLE
+      }
+      /\x00$/ {
+        s/^[^\x00]*\x00\( \+\):[^\x00]*\x00/\0\1/
+      }
+      /\n$/ {
+        s/^[^\n]*\n\( \+\):[^\n]*\n/\0\1/
+      }
       x
       b incr_col
     : json_pp___array_4
@@ -323,10 +480,23 @@
         b json_pp___PRINT
         : json_pp___array_6
           x
-          # Decrement the indent level
-          s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
-          # Format the output for the next line to print
-          s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\)$/\\033]\2m[\\033[0m\1\2\3/
+          /[^\n\x00]$/ {
+            z
+            s/^/"Hold space must end with a new line or NUL character"/
+            b json_pp___UNREACHABLE
+          }
+          /\x00$/ {
+            # Decrement the indent level
+            s/^\([^\x00]*\x00\)\( \+\)\(:[^\x00]*\x00\)\2/\1\2\3/
+            # Format the output for the next line to print
+            s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00[0-9]\+\)\{2\}\x00$/\\033]\1m[\\033[0m\0/
+          }
+          /\n$/ {
+            # Decrement the indent level
+            s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
+            # Format the output for the next line to print
+            s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\n$/\\033]\1m[\\033[0m\0/
+          }
           x
           b incr_col
       }
@@ -350,7 +520,17 @@
       x
       s/^/E2/
       # Format the output for the next line to print
-      s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2m,\\033[0m\1\2\3/
+      /[^\n\x00]$/ {
+        z
+        s/^/"Hold space must end with a new line or NUL character"/
+        b json_pp___UNREACHABLE
+      }
+      /\x00$/ {
+        s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00[0-9]\+\)\{2\}\x00$/\\033[\1m,\\033[0m\0/
+      }
+      /\n$/ {
+        s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\n$/\\033[\1m,\\033[0m\0/
+      }
       x
       b json_pp___PRINT
       : json_pp___elements_2
@@ -382,7 +562,17 @@
     s/.//
     x
     # Format the output for the next line to print
-    s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/"\1/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/"\0/
+    }
+    /\n$/ {
+      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/"\0/
+    }
     x
     b incr_col
   }
@@ -396,7 +586,17 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/"\1/
+      /[^\n\x00]$/ {
+        z
+        s/^/"Hold space must end with a new line or NUL character"/
+        b json_pp___UNREACHABLE
+      }
+      /\x00$/ {
+        s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/"\0/
+      }
+      /\n$/ {
+        s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/"\0/
+      }
       x
       b incr_col
     }
@@ -427,7 +627,12 @@
     x
     s/^/c1/
     # Format the output for the next line to print
-    s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/\\\1/
+    /\x00$/
+      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/\\\0/
+    }
+    /\n$/
+      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/\\\0/
+    }
     x
     b incr_col
     : json_pp___character_1
@@ -438,11 +643,30 @@
     s/^/Invalid character encountered/
     b json_pp___PARSING_FAILURE
   }
-  H
-  s/.//
   x
-  # Format the output for the next line to print
-  s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\)\n\(.\).*/\1\5\3/
+  /[^\n\x00]$/ {
+    z
+    s/^/"Hold space must end with a new line or NUL character"/
+    b json_pp___UNREACHABLE
+  }
+  /\x00$/ {
+    s/.$//
+    x
+    H
+    s/.//
+    x
+    # Format the output for the next line to print
+    s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[^0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+  }
+  /\n$/ {
+    s/.$//
+    x
+    H
+    s/.//
+    x
+    # Format the output for the next line to print
+    s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+  }
   x
   b incr_col
 
@@ -462,7 +686,17 @@
     x
     s/^/\\1\\2\\3\\4/
     # Format the output for the next line to print
-    s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/u\1/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/u\0/
+    }
+    /\n$/ {
+      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/u\0/
+    }
     x
     b incr_col
     : json_pp___escape_1
@@ -475,11 +709,30 @@
       b json_pp___hex
   }
   /^["\\/bfnrt]/ {
-    H
-    s/.//
     x
-    # Format the output for the next line to print
-    s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\)\n\(.\).*/\1\5\3/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/.$//
+      x
+      H
+      s/.//
+      x
+      # Format the output for the next line to print
+      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[^0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+    }
+    /\n$/ {
+      s/.$//
+      x
+      H
+      s/.//
+      x
+      # Format the output for the next line to print
+      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+    }
     x
     b incr_col
   }
@@ -493,11 +746,30 @@
 ###     'a' . 'f'
 : json_pp___hex
   /^[A-Fa-f]/ {
-    H
-    s/.//
     x
-    # Format the output for the next line to print
-    s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\)\n\(.\).*/\1\5\3/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/.$//
+      x
+      H
+      s/.//
+      x
+      # Format the output for the next line to print
+      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[^0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+    }
+    /\n$/ {
+      s/.$//
+      x
+      H
+      s/.//
+      x
+      # Format the output for the next line to print
+      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+    }
     x
     b incr_col
   }
@@ -514,7 +786,17 @@
   x
   s/^/n1n2n3/
   # Format the output for the next line to print
-  s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{4\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2m\1\2\3/
+  /[^\n\x00]$/ {
+    z
+    s/^/"Hold space must end with a new line or NUL character"/
+    b json_pp___UNREACHABLE
+  }
+  /\x00$/ {
+    s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{4\}\(\x00[0-9]\+\)\{2\}\x00$/\\033[\1m\0/
+  }
+  /\n$/ {
+    s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{4\}\(\n[0-9]\+\)\{2\}\n$/\\033[\1m\0/
+  }
   x
   b json_pp___integer
   : json_pp___number_1
@@ -524,7 +806,17 @@
   : json_pp___number_3
     x
     # Format the output for the next line to print
-    s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/\\033[0m\1/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/\\033[0m\0/
+    }
+    /\n$/ {
+      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/\\033[0m\0/
+    }
     x
     b json_pp___RETURN
 
@@ -539,7 +831,17 @@
     x
     s/^/i1/
     # Format the output for the next line to print
-    s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/-\1/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/-\0/
+    }
+    /\n$/ {
+      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/-\0/
+    }
     x
     b incr_col
   }
@@ -580,7 +882,17 @@
     s/.//
     x
     # Format the output for the next line to print
-    s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/-\1/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/-\0/
+    }
+    /\n$/ {
+      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/-\0/
+    }
     x
     b incr_col
   }
@@ -595,11 +907,30 @@
 ###     '1' . '9'
 : json_pp___onenine
   /^[1-9]/ {
-    H
-    s/.//
     x
-    # Format the output for the next line to print
-    s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\)\n\(.\).*/\1\5\3/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/.$//
+      x
+      H
+      s/.//
+      x
+      # Format the output for the next line to print
+      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[^0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+    }
+    /\n$/ {
+      s/.$//
+      x
+      H
+      s/.//
+      x
+      # Format the output for the next line to print
+      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+    }
     x
     b incr_col
   }
@@ -616,7 +947,17 @@
     x
     s/^/f1/
     # Format the output for the next line to print
-    s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/.\1/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/.\0/
+    }
+    /\n$/ {
+      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/.\0/
+    }
     x
     b incr_col
     : json_pp___fraction_1
@@ -630,12 +971,31 @@
 ###     'e' sign digits
 : json_pp___exponent
   /^[eE]/ {
-    H
-    s/.//
     x
     s/^/x1x2/
-    # Format the output for the next line to print
-    s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\)\n\(.\).*/\1\5\3/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/.$//
+      x
+      H
+      s/.//
+      x
+      # Format the output for the next line to print
+      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[^0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+    }
+    /\n$/ {
+      s/.$//
+      x
+      H
+      s/.//
+      x
+      # Format the output for the next line to print
+      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+    }
     x
     b incr_col
     : json_pp___exponent_1
@@ -651,11 +1011,30 @@
 ###     '-'
 : json_pp___sign
   /^[-+]/ {
-    H
-    s/.//
     x
-    # Format the output for the next line to print
-    s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\)\n\(.\).*/\1\5\3/
+    /[^\n\x00]$/ {
+      z
+      s/^/"Hold space must end with a new line or NUL character"/
+      b json_pp___UNREACHABLE
+    }
+    /\x00$/ {
+      s/.$//
+      x
+      H
+      s/.//
+      x
+      # Format the output for the next line to print
+      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[^0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+    }
+    /\n$/ {
+      s/.$//
+      x
+      H
+      s/.//
+      x
+      # Format the output for the next line to print
+      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+    }
     x
     b incr_col
   }
@@ -691,148 +1070,149 @@
 : incr_col
   x
   : incr_col_nines2underscores
-    s/9\(_*\)$/_\1/
+    s/9\(_*[\n\x00]\)$/_\1/
     t incr_col_nines2underscores
   : incr_col_lastdigit
-    s/\n\(_*\)$/\n1\1/
+    s/\([\n\x00]\)\(_*[\n\x00]\)$/\11\2/
     t incr_col_underscores2zeroes
-    s/8\(_*\)$/9\1/
+    s/8\(_*[\n\x00]\)$/9\1/
     t incr_col_underscores2zeroes
-    s/7\(_*\)$/8\1/
+    s/7\(_*[\n\x00]\)$/8\1/
     t incr_col_underscores2zeroes
-    s/6\(_*\)$/7\1/
+    s/6\(_*[\n\x00]\)$/7\1/
     t incr_col_underscores2zeroes
-    s/5\(_*\)$/6\1/
+    s/5\(_*[\n\x00]\)$/6\1/
     t incr_col_underscores2zeroes
-    s/4\(_*\)$/5\1/
+    s/4\(_*[\n\x00]\)$/5\1/
     t incr_col_underscores2zeroes
-    s/3\(_*\)$/4\1/
+    s/3\(_*[\n\x00]\)$/4\1/
     t incr_col_underscores2zeroes
-    s/2\(_*\)$/3\1/
+    s/2\(_*[\n\x00]\)$/3\1/
     t incr_col_underscores2zeroes
-    s/1\(_*\)$/2\1/
+    s/1\(_*[\n\x00]\)$/2\1/
     t incr_col_underscores2zeroes
-    s/0\(_*\)$/1\1/
+    s/0\(_*[\n\x00]\)$/1\1/
   : incr_col_underscores2zeroes
-    s/_\(_*\)$/0\1/
+    s/_\(_*[\n\x00]\)$/0\1/
     t incr_col_underscores2zeroes
   x
   b json_pp___RETURN
 
 : incr_row
   x
-  s/\n[^\n]\+$//
+  s/[0-9]\+[\n\x00]$//
   s/^/ir/
   x
   b incr_col
   : incr_row_1
     x
-    s/$/\n1/
+    s/[\n\x00]$/\01\0/
     x
   b json_pp___RETURN
 
 : incr4_col
   x
-  s/9$/D/
-  s/8$/C/
-  s/7$/B/
-  s/6$/A/
+  s/9\([\n\x00]\)$/D\1/
+  s/8\([\n\x00]\)$/C\1/
+  s/7\([\n\x00]\)$/B\1/
+  s/6\([\n\x00]\)$/A\1/
   : incr4_col_nines2As
-    s/9\(A*[ABCD]\)$/A\1/
+    s/9\(A*[ABCD][\n\x00]\)$/A\1/
     t incr4_col_nines2As
   : incr4_col_ge10
-    s/\n\(A*[ABCD]\)$/\n1\1/
+    s/\([\n\x00]\)\(A*[ABCD][\n\x00]\)$/\11\2/
     t incr4_col_lastdigit
-    s/8\(A*[ABCD]\)$/9\1/
+    s/8\(A*[ABCD][\n\x00]\)$/9\1/
     t incr4_col_lastdigit
-    s/7\(A*[ABCD]\)$/8\1/
+    s/7\(A*[ABCD][\n\x00]\)$/8\1/
     t incr4_col_lastdigit
-    s/6\(A*[ABCD]\)$/7\1/
+    s/6\(A*[ABCD][\n\x00]\)$/7\1/
     t incr4_col_lastdigit
-    s/5\(A*[ABCD]\)$/6\1/
+    s/5\(A*[ABCD][\n\x00]\)$/6\1/
     t incr4_col_lastdigit
-    s/4\(A*[ABCD]\)$/5\1/
+    s/4\(A*[ABCD][\n\x00]\)$/5\1/
     t incr4_col_lastdigit
-    s/3\(A*[ABCD]\)$/4\1/
+    s/3\(A*[ABCD][\n\x00]\)$/4\1/
     t incr4_col_lastdigit
-    s/2\(A*[ABCD]\)$/3\1/
+    s/2\(A*[ABCD][\n\x00]\)$/3\1/
     t incr4_col_lastdigit
-    s/1\(A*[ABCD]\)$/2\1/
+    s/1\(A*[ABCD][\n\x00]\)$/2\1/
     t incr4_col_lastdigit
-    s/0\(A*[ABCD]\)$/1\1/
+    s/0\(A*[ABCD][\n\x00]\)$/1\1/
   : incr4_col_lastdigit
-    s/5$/9/
+    s/5\([\n\x00]\)$/9\1/
     t incr4_col_letters2numbers
-    s/4$/8/
+    s/4\([\n\x00]\)$/8\1/
     t incr4_col_letters2numbers
-    s/3$/7/
+    s/3\([\n\x00]\)$/7\1/
     t incr4_col_letters2numbers
-    s/2$/6/
+    s/2\([\n\x00]\)$/6\1/
     t incr4_col_letters2numbers
-    s/1$/5/
+    s/1\([\n\x00]\)$/5\1/
     t incr4_col_letters2numbers
-    s/0$/4/
+    s/0\([\n\x00]\)$/4\1/
   : incr4_col_letters2numbers
-    s/A\(A*[BCD]\?\)/0\1/
+    s/A\(A*[BCD]\?[\n\x00]\)$/0\1/
     t incr4_col_letters2numbers
-    s/B$/1/
-    s/C$/2/
-    s/D$/3/
+    s/B\([\n\x00]\)$/1\1/
+    s/C\([\n\x00]\)$/2\1/
+    s/D\([\n\x00]\)$/3\1/
   x
   b json_pp___RETURN
 
 : incr5_col
   x
-  s/9$/E/
-  s/8$/D/
-  s/7$/C/
-  s/6$/B/
-  s/5$/A/
+  s/9\([\n\x00]\)$/E\1/
+  s/8\([\n\x00]\)$/D\1/
+  s/7\([\n\x00]\)$/C\1/
+  s/6\([\n\x00]\)$/B\1/
+  s/5\([\n\x00]\)$/A\1/
   : incr5_col_nines2As
-    s/9\(A*[ABCDE]\)$/A\1/
+    s/9\(A*[ABCDE][\n\x00]\)$/A\1/
     t incr5_col_nines2As
   : incr5_col_ge10
-    s/\n\(A*[ABCDE]\)$/\n1\1/
+    s/\([\n\x00]\)\(A*[ABCDE][\n\x00]\)$/\11\2/
     t incr5_col_lastdigit
-    s/8\(A*[ABCDE]\)$/9\1/
+    s/8\(A*[ABCDE][\n\x00]\)$/9\1/
     t incr5_col_lastdigit
-    s/7\(A*[ABCDE]\)$/8\1/
+    s/7\(A*[ABCDE][\n\x00]\)$/8\1/
     t incr5_col_lastdigit
-    s/6\(A*[ABCDE]\)$/7\1/
+    s/6\(A*[ABCDE][\n\x00]\)$/7\1/
     t incr5_col_lastdigit
-    s/5\(A*[ABCDE]\)$/6\1/
+    s/5\(A*[ABCDE][\n\x00]\)$/6\1/
     t incr5_col_lastdigit
-    s/4\(A*[ABCDE]\)$/5\1/
+    s/4\(A*[ABCDE][\n\x00]\)$/5\1/
     t incr5_col_lastdigit
-    s/3\(A*[ABCDE]\)$/4\1/
+    s/3\(A*[ABCDE][\n\x00]\)$/4\1/
     t incr5_col_lastdigit
-    s/2\(A*[ABCDE]\)$/3\1/
+    s/2\(A*[ABCDE][\n\x00]\)$/3\1/
     t incr5_col_lastdigit
-    s/1\(A*[ABCDE]\)$/2\1/
+    s/1\(A*[ABCDE][\n\x00]\)$/2\1/
     t incr5_col_lastdigit
-    s/0\(A*[ABCDE]\)$/1\1/
+    s/0\(A*[ABCDE][\n\x00]\)$/1\1/
   : incr5_col_lastdigit
-    s/4$/9/
+    s/4\([\n\x00]\)$/9\1/
     t incr5_col_letters2numbers
-    s/3$/8/
+    s/3\([\n\x00]\)$/8\1/
     t incr5_col_letters2numbers
-    s/2$/7/
+    s/2\([\n\x00]\)$/7\1/
     t incr5_col_letters2numbers
-    s/1$/6/
+    s/1\([\n\x00]\)$/6\1/
     t incr5_col_letters2numbers
-    s/0$/5/
+    s/0\([\n\x00]\)$/5\1/
   : incr5_col_letters2numbers
-    s/A\(A*[BCDE]\?\)/0\1/
+    s/A\(A*[BCDE]\?[\n\x00]\)$/0\1/
     t incr5_col_letters2numbers
-    s/B$/1/
-    s/C$/2/
-    s/D$/3/
-    s/E$/4/
+    s/B\([\n\x00]\)$/1\1/
+    s/C\([\n\x00]\)$/2\1/
+    s/D\([\n\x00]\)$/3\1/
+    s/E\([\n\x00]\)$/4\1/
   x
   b json_pp___RETURN
 
 : json_pp___PRINT
   # Save the hold and pattern spaces
+  # TODO: deal with this command
   H
   g
   # Select the formatted line to print
@@ -843,6 +1223,7 @@
   s/^\([^\n]*\n\)\{6\}//
   # Restore the hold space to its state before the print and reset the line to format
   x
+  # TODO: do not forget the last \n character !!!
   s/^\(\([^\n]*\n\)\{2\} \+\)[^\n]*\n\([^\n]*\(\n[0-9]\+\)\{2\}\)\n.*/\1\3/
   x
   b json_pp___RETURN
@@ -1092,6 +1473,7 @@
   Q 5
 
 : json_pp___PARSING_FAILURE
+  # TODO: deal with this command
   H
   x
   s/^[^\n]*\n\([0-9]\+\)\n\([0-9]\+\)/JSON parsing error at ROW \1, COL \2: /

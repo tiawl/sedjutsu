@@ -593,7 +593,7 @@
     t incr4_col_letters2numbers
     s/0$/4/
   : incr4_col_letters2numbers
-    s/A\(A*[BCD]\?\)/0\1/
+    s/A\(A*[BCD]\?\)$/0\1/
     t incr4_col_letters2numbers
     s/B$/1/
     s/C$/2/
@@ -642,7 +642,7 @@
     t incr5_col_letters2numbers
     s/0$/5/
   : incr5_col_letters2numbers
-    s/A\(A*[BCDE]\?\)/0\1/
+    s/A\(A*[BCDE]\?\)$/0\1/
     t incr5_col_letters2numbers
     s/B$/1/
     s/C$/2/
@@ -856,6 +856,7 @@
   Q 5
 
 : json_validator___FAILURE
+  # TODO
   H
   x
   s/^[^\n]*\n\([0-9]\+\)\n\([0-9]\+\)/JSON parsing error at ROW \1, COL \2: /
