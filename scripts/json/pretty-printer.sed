@@ -41,7 +41,8 @@
 # Init the holdspace with these variables:
 # - an empty workflow stack
 # - env vars
-# - the indentation level
+# - the next line to print
+# - env vars (yes, again: [1] env vars are readonly, so there is no risk of a potential sync error between the 2 locations, [2] having a copy here, allow us to remove part of the complexity from (already too) complex regex patterns later)
 # - row
 # - col
 : init_holdspace
@@ -62,23 +63,23 @@
   }
   t init_holdspace_reset_conditional_branching
   : init_holdspace_reset_conditional_branching
-    s/^1:/\n :/
+    s/^1:/ :/
     t init_holdspace_end
-    s/^2:/\n  :/
+    s/^2:/  :/
     t init_holdspace_end
-    s/^3:/\n   :/
+    s/^3:/   :/
     t init_holdspace_end
-    s/^4:/\n    :/
+    s/^4:/    :/
     t init_holdspace_end
-    s/^5:/\n     :/
+    s/^5:/     :/
     t init_holdspace_end
-    s/^6:/\n      :/
+    s/^6:/      :/
     t init_holdspace_end
-    s/^7:/\n       :/
+    s/^7:/       :/
     t init_holdspace_end
-    s/^8:/\n        :/
+    s/^8:/        :/
     : init_holdspace_end
-      s/$/\n\n1\n1/
+      s/.*/\n\0\n\n\0\n1\n1/
       x
       b json_pp__json
 
@@ -123,18 +124,27 @@
     b json_pp___number
   }
   /^true/ {
-    # TODO: format the output
     s/....//
+    x
+    # Format the output for the next line to print
+    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{5\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2mtrue\\033[0m\1\2\3/
+    x
     b incr4_col
   }
   /^false/ {
-    # TODO: format the output
     s/.....//
+    x
+    # Format the output for the next line to print
+    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{6\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2mfalse\\033[0m\1\2\3/
+    x
     b incr5_col
   }
   /^null/ {
-    # TODO: format the output
     s/....//
+    x
+    # Format the output for the next line to print
+    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{7\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2mnull\\033[0m\1\2\3/
+    x
     b incr4_col
   }
   z
@@ -146,22 +156,28 @@
 ###     '{' members '}'
 : json_pp___object
   /^{[\x20\x0a\x0d\x09]*}/ {
-    # TODO: increment indent level
-    # TODO: format the output
     # TODO: print
     s/.//
     x
     s/^/o1o2/
+    # Increment the indent level
+    s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)/\1\2\3\2/
+    # Format the output for the next line to print
+    s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m{\\033[0m\1\2\3/
     x
     b incr_col
     : json_pp___object_1
       b json_pp___ws
     : json_pp___object_2
       /^}/ {
-        # TODO: decrement indent level
-        # TODO: format the output
         # TODO: print
         s/.//
+        x
+        # Decrement the indent level
+        s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
+        # Format the output for the next line to print
+        s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m}\\033[0m\1\2\3/
+        x
         b incr_col
       }
       z
@@ -169,22 +185,28 @@
       b json_pp___PARSING_FAILURE
   }
   /^{/ {
-    # TODO: increment indent level
-    # TODO: format the output
     # TODO: print
     s/.//
     x
     s/^/o3o4/
+    # Increment the indent level
+    s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)/\1\2\3\2/
+    # Format the output for the next line to print
+    s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m{\\033[0m\1\2\3/
     x
     b incr_col
     : json_pp___object_3
       b json_pp___members
     : json_pp___object_4
       /^}/ {
-        # TODO: decrement indent level
-        # TODO: format the output
         # TODO: print
         s/.//
+        x
+        # Decrement the indent level
+        s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
+        # Format the output for the next line to print
+        s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m}\\033[0m\1\2\3/
+        x
         b incr_col
       }
       z
@@ -203,11 +225,12 @@
   b json_pp___member
   : json_pp___members_1
     /^,/ {
-      # TODO: format the output
       # TODO: print
       s/.//
       x
       s/^/M2/
+      # Format the output for the next line to print
+      s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m,\\033[0m\1\2\3/
       x
       b incr_col
     }
@@ -223,13 +246,17 @@
   x
   b json_pp___ws
   : json_pp___member_1
+    # TODO: add key color
     b json_pp___string
   : json_pp___member_2
     b json_pp___ws
   : json_pp___member_3
     /^:/ {
-      # TODO: format the output
       s/.//
+      x
+      # Format the output for the next line to print
+      s/\(\n[^\n]\+:\)\([^:]\+\)\(:[^:]\+\(\n[0-9]\+\)\{2\}\)$/\\033[\2m: \\033[0m\1\2\3/
+      x
       b incr_col
     }
     z
@@ -243,22 +270,28 @@
 ###     '[' elements ']'
 : json_pp___array
   /^\[[\x20\x0a\x0d\x09]*]/ {
-    # TODO: increment indent level
-    # TODO: format the output
     # TODO: print
     s/.//
     x
     s/^/a1a2/
+    # Increment the indent level
+    s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)/\1\2\3\2/
+    # Format the output for the next line to print
+    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2m[\\033[0m\1\2\3/
     x
     b incr_col
     : json_pp___array_1
       b json_pp___ws
     : json_pp___array_2
       /^]/ {
-        # TODO: decrement indent level
-        # TODO: format the output
         # TODO: print
         s/.//
+        x
+        # Decrement the indent level
+        s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
+        # Format the output for the next line to print
+        s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\)$/\\033]\2m[\\033[0m\1\2\3/
+        x
         b incr_col
       }
       z
@@ -266,22 +299,28 @@
       b json_pp___PARSING_FAILURE
   }
   /^\[/ {
-    # TODO: increment indent level
-    # TODO: format the output
     # TODO: print
     s/.//
     x
     s/^/a3a4/
+    # Increment the indent level
+    s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)/\1\2\3\2/
+    # Format the output for the next line to print
+    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2m[\\033[0m\1\2\3/
     x
     b incr_col
     : json_pp___array_3
       b json_pp___elements
     : json_pp___array_4
       /^]/ {
-        # TODO: decrement indent level
-        # TODO: format the output
         # TODO: print
         s/.//
+        x
+        # Decrement the indent level
+        s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
+        # Format the output for the next line to print
+        s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\)$/\\033]\2m[\\033[0m\1\2\3/
+        x
         b incr_col
       }
       z
@@ -300,11 +339,12 @@
   b json_pp___element
   : json_pp___elements_1
     /^,/ {
-      # TODO: format the output
       # TODO: print
       s/.//
       x
       s/^/E2/
+      # Format the output for the next line to print
+      s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2m,\\033[0m\1\2\3/
       x
       b incr_col
     }
@@ -331,8 +371,11 @@
   s/^/s1s2/
   x
   /^"/ {
-    # TODO: format the output
     s/.//
+    x
+    # Format the output for the next line to print
+    s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{3\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2m"\1\2\3/
+    x
     b incr_col
   }
   z
@@ -342,8 +385,11 @@
     b json_pp___characters
   : json_pp___string_2
     /^"/ {
-      # TODO: format the output
       s/.//
+      x
+      # Format the output for the next line to print
+      s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/"\\033[0m\1/
+      x
       b incr_col
     }
     z
@@ -369,10 +415,11 @@
 ###     '\' escape
 : json_pp___character
   /^\\/ {
-    # TODO: format the output
     s/.//
     x
     s/^/c1/
+    # Format the output for the next line to print
+    s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/\\\1/
     x
     b incr_col
     : json_pp___character_1
@@ -383,8 +430,12 @@
     s/^/Invalid character encountered/
     b json_pp___PARSING_FAILURE
   }
-  # TODO: format the output
+  H
   s/.//
+  x
+  # Format the output for the next line to print
+  s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\)\n\(.\).*/\1\5\3/
+  x
   b incr_col
 
 ### escape
@@ -399,10 +450,11 @@
 ###     'u' hex hex hex hex
 : json_pp___escape
   /^u/ {
-    # TODO: format the output
     s/.//
     x
     s/^/\\1\\2\\3\\4/
+    # Format the output for the next line to print
+    s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/u\1/
     x
     b incr_col
     : json_pp___escape_1
@@ -415,8 +467,12 @@
       b json_pp___hex
   }
   /^["\\/bfnrt]/ {
-    # TODO: format the output
+    H
     s/.//
+    x
+    # Format the output for the next line to print
+    s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\)\n\(.\).*/\1\5\3/
+    x
     b incr_col
   }
   z
@@ -429,8 +485,12 @@
 ###     'a' . 'f'
 : json_pp___hex
   /^[A-Fa-f]/ {
-    # TODO: format the output
+    H
     s/.//
+    x
+    # Format the output for the next line to print
+    s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\)\n\(.\).*/\1\5\3/
+    x
     b incr_col
   }
   /^[0-9]/ {
@@ -444,13 +504,21 @@
 ###     integer fraction exponent
 : json_pp___number
   x
-  s/^/n1n2/
+  s/^/n1n2n3/
+  # Format the output for the next line to print
+  s/\(\n[^\n]\+:\)\([^:]\+\)\(\(:[^:]\+\)\{4\}\(\n[0-9]\+\)\{2\}\)$/\\033[\2m\1\2\3/
   x
   b json_pp___integer
   : json_pp___number_1
     b json_pp___fraction
   : json_pp___number_2
     b json_pp___exponent
+  : json_pp___number_3
+    x
+    # Format the output for the next line to print
+    s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/\\033[0m\1/
+    x
+    b json_pp___RETURN
 
 ### integer
 ###     digit
@@ -459,10 +527,11 @@
 ###     '-' onenine digits
 : json_pp___integer
   /^-/ {
-    # TODO: format the output
     s/.//
     x
     s/^/i1/
+    # Format the output for the next line to print
+    s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/-\1/
     x
     b incr_col
   }
@@ -500,8 +569,11 @@
 ###     onenine
 : json_pp___digit
   /^0/ {
-    # TODO: format the output
     s/.//
+    x
+    # Format the output for the next line to print
+    s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/-\1/
+    x
     b incr_col
   }
   /^[1-9]/ {
@@ -515,8 +587,12 @@
 ###     '1' . '9'
 : json_pp___onenine
   /^[1-9]/ {
-    # TODO: format the output
+    H
     s/.//
+    x
+    # Format the output for the next line to print
+    s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\)\n\(.\).*/\1\5\3/
+    x
     b incr_col
   }
   z
@@ -528,10 +604,11 @@
 ###     '.' digits
 : json_pp___fraction
   /^\./ {
-    # TODO: format the output
     s/.//
     x
     s/^/f1/
+    # Format the output for the next line to print
+    s/\(\n[^\n]*\(\n[0-9]\+\)\{2\}\)$/.\1/
     x
     b incr_col
     : json_pp___fraction_1
@@ -545,10 +622,12 @@
 ###     'e' sign digits
 : json_pp___exponent
   /^[eE]/ {
-    # TODO: format the output
+    H
     s/.//
     x
     s/^/x1x2/
+    # Format the output for the next line to print
+    s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\)\n\(.\).*/\1\5\3/
     x
     b incr_col
     : json_pp___exponent_1
@@ -564,8 +643,12 @@
 ###     '-'
 : json_pp___sign
   /^[-+]/ {
-    # TODO: format the output
+    H
     s/.//
+    x
+    # Format the output for the next line to print
+    s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[^0-9]\+\)\{2\}\)\n\(.\).*/\1\5\3/
+    x
     b incr_col
   }
   b json_pp___RETURN
@@ -578,7 +661,6 @@
 ###     '0009' ws
 : json_pp___ws
   /^\x0a/ {
-    # TODO: format the output
     s/.//
     x
     s/^/w1/
@@ -588,7 +670,6 @@
       b json_pp___ws
   }
   /^[\x20\x0d\x09]/ {
-    # TODO: format the output
     s/.//
     x
     s/^/w2/
@@ -865,6 +946,11 @@
     x
     b json_pp___number_2
   }
+  /^n3/ {
+    s/..//
+    x
+    b json_pp___number_3
+  }
   /^o1/ {
     s/..//
     x
@@ -963,7 +1049,4 @@
   Q 7
 
 : json_pp___SUCCESS
-  z
-  s/^/JSON parsing succeed\n/
-  p
   z
