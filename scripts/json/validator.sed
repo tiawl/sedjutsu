@@ -28,7 +28,7 @@
 #                                                                             #
 ###############################################################################
 
-# Init the holdspace with these following variables:
+# Init the holdspace with these variables:
 # - an empty workflow stack
 # - row
 # - col
@@ -36,6 +36,7 @@
   x
   s/^/\n1\n1/
   x
+  b json_validator___json
 
 #
 # JSON grammar in McKeeman Form
@@ -98,7 +99,7 @@
 ###     '{' members '}'
 : json_validator___object
   /^{[\x20\x0a\x0d\x09]*}/ {
-    s/^{//
+    s/.//
     x
     s/^/o1o2/
     x
@@ -115,7 +116,7 @@
       b json_validator___FAILURE
   }
   /^{/ {
-    s/^{//
+    s/.//
     x
     s/^/o3o4/
     x
@@ -180,7 +181,7 @@
 ###     '[' elements ']'
 : json_validator___array
   /^\[[\x20\x0a\x0d\x09]*]/ {
-    s/^\[//
+    s/.//
     x
     s/^/a1a2/
     x
@@ -197,7 +198,7 @@
       b json_validator___FAILURE
   }
   /^\[/ {
-    s/^\[//
+    s/.//
     x
     s/^/a3a4/
     x
@@ -654,197 +655,197 @@
 : json_validator___RETURN
   x
   /^a1/ {
-    s/^a1//
+    s/..//
     x
     b json_validator___array_1
   }
   /^a2/ {
-    s/^a2//
+    s/..//
     x
     b json_validator___array_2
   }
   /^a3/ {
-    s/^a3//
+    s/..//
     x
     b json_validator___array_3
   }
   /^a4/ {
-    s/^a4//
+    s/..//
     x
     b json_validator___array_4
   }
   /^C1/ {
-    s/^C1//
+    s/..//
     x
     b json_validator___characters_1
   }
   /^c1/ {
-    s/^c1//
+    s/..//
     x
     b json_validator___character_1
   }
   /^D1/ {
-    s/^D1//
+    s/..//
     x
     b json_validator___digits_1
   }
   /^E1/ {
-    s/^E1//
+    s/..//
     x
     b json_validator___elements_1
   }
   /^E2/ {
-    s/^E2//
+    s/..//
     x
     b json_validator___elements_2
   }
   /^e1/ {
-    s/^e1//
+    s/..//
     x
     b json_validator___element_1
   }
   /^e2/ {
-    s/^e2//
+    s/..//
     x
     b json_validator___element_2
   }
   /^f1/ {
-    s/^f1//
+    s/..//
     x
     b json_validator___fraction_1
   }
   /^i1/ {
-    s/^i1//
+    s/..//
     x
     b json_validator___integer_1
   }
   /^i2/ {
-    s/^i2//
+    s/..//
     x
     b json_validator___integer_2
   }
   /^ir/ {
-    s/^ir//
+    s/..//
     x
     b incr_row_1
   }
   /^j1/ {
-    s/^j1//
+    s/..//
     x
     b json_validator___json_1
   }
   /^M1/ {
-    s/^M1//
+    s/..//
     x
     b json_validator___members_1
   }
   /^M2/ {
-    s/^M2//
+    s/..//
     x
     b json_validator___members_2
   }
   /^m1/ {
-    s/^m1//
+    s/..//
     x
     b json_validator___member_1
   }
   /^m2/ {
-    s/^m2//
+    s/..//
     x
     b json_validator___member_2
   }
   /^m3/ {
-    s/^m3//
+    s/..//
     x
     b json_validator___member_3
   }
   /^m4/ {
-    s/^m4//
+    s/..//
     x
     b json_validator___member_4
   }
   /^n1/ {
-    s/^n1//
+    s/..//
     x
     b json_validator___number_1
   }
   /^n2/ {
-    s/^n2//
+    s/..//
     x
     b json_validator___number_2
   }
   /^o1/ {
-    s/^o1//
+    s/..//
     x
     b json_validator___object_1
   }
   /^o2/ {
-    s/^o2//
+    s/..//
     x
     b json_validator___object_2
   }
   /^o3/ {
-    s/^o3//
+    s/..//
     x
     b json_validator___object_3
   }
   /^o4/ {
-    s/^o4//
+    s/..//
     x
     b json_validator___object_4
   }
   /^s1/ {
-    s/^s1//
+    s/..//
     x
     b json_validator___string_1
   }
   /^s2/ {
-    s/^s2//
+    s/..//
     x
     b json_validator___string_2
   }
   /^x1/ {
-    s/^x1//
+    s/..//
     x
     b json_validator___exponent_1
   }
   /^x2/ {
-    s/^x2//
+    s/..//
     x
     b json_validator___exponent_2
   }
   /^w1/ {
-    s/^w1//
+    s/..//
     x
     b json_validator___ws_1
   }
   /^w2/ {
-    s/^w2//
+    s/..//
     x
     b json_validator___ws_2
   }
   /^\\1/ {
-    s/^\\1//
+    s/..//
     x
     b json_validator___escape_1
   }
   /^\\2/ {
-    s/^\\2//
+    s/..//
     x
     b json_validator___escape_2
   }
   /^\\3/ {
-    s/^\\3//
+    s/..//
     x
     b json_validator___escape_3
   }
   /^\\4/ {
-    s/^\\4//
+    s/..//
     x
     b json_validator___escape_4
   }
-  x
-  s/.*/"Unknown return code"/
+  z
+  s/^/"Unknown return code"/
   b json_validator___UNREACHABLE
 
 : json_validator___UNREACHABLE
@@ -864,6 +865,7 @@
   Q 6
 
 : json_validator___SUCCESS
-  s/.*/JSON parsing succeed\n/
+  z
+  s/^/JSON parsing succeed\n/
   p
   z

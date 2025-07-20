@@ -6,8 +6,8 @@
 #   You can configure this script with these environment variables:           #
 #   - SEDJUTSU_INDENT: use the given number of spaces (between 1 and 8)       #
 #     for indentation (default: 4)                                            #
-#   - SEDJUTSU_MONOCHROME: disable color                                      #
-#   - SEDJUTSU_COLORS: use it like JQ_COLORS (for more details, see:          #
+#   - SEDJUTSU_MONOCHROME: disable color whatever its value                   #
+#   - SEDJUTSU_COLORS: work like JQ_COLORS does (for more details, see:       #
 #     https://jqlang.org/manual/#colors)                                      #
 #   If SEDJUTSU_MONOCHROME and SEDJUTSU_COLORS are set when the script run,   #
 #   coloring is disabled.                                                     #
@@ -37,48 +37,49 @@
 #                                                                             #
 ###############################################################################
 
-# Init the holdspace with these following variables:
+# Init the holdspace with these variables:
 # - an empty workflow stack
-# - col
+# - the indentation level
+# - env vars
 # - row
-# - current indentation level
-# - options
-# - final output
+# - col
 : init_holdspace
   x
-  s/^/printf '%s:%s%s\\n' "${SEDJUTSU_INDENT:-4}" "${SEDJUTSU_MONOCHROME+y:}" "${SEDJUTSU_COLORS:-0;90:0;39:0;39:0;39:0;32:1;39:1;39:1;34}"/
+  s/^/printf '%s:%s%s' "${SEDJUTSU_INDENT:-4}" "${SEDJUTSU_MONOCHROME+y:}" "${SEDJUTSU_COLORS:-0;90:0;39:0;39:0;39:0;32:1;39:1;39:1;34}"/
   e
   /^[1-8]:/ ! {
     z
-    s/^/SEDJUTSU_INDENT environment variable must be an integer between 1 and 8/
-    b json_pp___BADOPTION_FAILURE
+    s/^/SEDJUTSU_INDENT must be an integer between 1 and 8/
+    b json_pp___ENV_FAILURE
   }
   # When set, SEDJUTSU_MONOCHROME disables color by using default escape sequences everywhere
-  s/^\([1-8]\):y:.*\n/\1:0;39:0;39:0;39:0;39:0;39:0;39:0;39:0;39\n/
+  s/^\([1-8]\):y:.*/\1:0;39:0;39:0;39:0;39:0;39:0;39:0;39:0;39/
   /^[1-8]\(:[01];\(3[0-79]\|9[0-7]\)\)\{8\}/ ! {
     z
-    s/^/SEDJUTSU_COLORS environment variable must be a colon-delimited list of 8 partial terminal escape sequences matching this pattern "[01];(3[0-79]|9[0-7])" and in this order: null:false:true:numbers:strings:arrays:objects:keys/
-    b json_pp___BADOPTION_FAILURE
+    s/^/SEDJUTSU_COLORS must be a colon-delimited list of 8 partial terminal escape sequences matching this pattern "[01];(3[0-79]|9[0-7])" and in this order: null:false:true:numbers:strings:arrays:objects:keys/
+    b json_pp___ENV_FAILURE
   }
-  t init_holdspace_check_options_and_reset_conditional_branching
-  : init_holdspace_check_options_and_reset_conditional_branching
-    s/^1:/\n1\n1\n\n :/
+  t init_holdspace_check_env_and_reset_conditional_branching
+  : init_holdspace_check_env_and_reset_conditional_branching
+    s/^1:/\n\n :/
     t init_holdspace_end
-    s/^2:/\n1\n1\n\n  :/
+    s/^2:/\n\n  :/
     t init_holdspace_end
-    s/^3:/\n1\n1\n\n   :/
+    s/^3:/\n\n   :/
     t init_holdspace_end
-    s/^4:/\n1\n1\n\n    :/
+    s/^4:/\n\n    :/
     t init_holdspace_end
-    s/^5:/\n1\n1\n\n     :/
+    s/^5:/\n\n     :/
     t init_holdspace_end
-    s/^6:/\n1\n1\n\n      :/
+    s/^6:/\n\n      :/
     t init_holdspace_end
-    s/^7:/\n1\n1\n\n       :/
+    s/^7:/\n\n       :/
     t init_holdspace_end
-    s/^8:/\n1\n1\n\n        :/
+    s/^8:/\n\n        :/
     : init_holdspace_end
+      s/$/\n1\n1/
       x
+      b json_pp__json
 
 #
 # JSON grammar in McKeeman Form
@@ -141,7 +142,7 @@
 ###     '{' members '}'
 : json_pp___object
   /^{[\x20\x0a\x0d\x09]*}/ {
-    s/^{//
+    s/.//
     x
     s/^/o1o2/
     x
@@ -158,7 +159,7 @@
       b json_pp___PARSING_FAILURE
   }
   /^{/ {
-    s/^{//
+    s/.//
     x
     s/^/o3o4/
     x
@@ -223,7 +224,7 @@
 ###     '[' elements ']'
 : json_pp___array
   /^\[[\x20\x0a\x0d\x09]*]/ {
-    s/^\[//
+    s/.//
     x
     s/^/a1a2/
     x
@@ -240,7 +241,7 @@
       b json_pp___PARSING_FAILURE
   }
   /^\[/ {
-    s/^\[//
+    s/.//
     x
     s/^/a3a4/
     x
@@ -553,143 +554,143 @@
 : incr_col
   x
   : incr_col_nines2underscores
-    s/^\([^\n]*\n[0-9]*\)9\(_*\n\)/\1_\2/
+    s/9\(_*\)$/_\1/
     t incr_col_nines2underscores
   : incr_col_lastdigit
-    s/^\([^\n]*\n\)\(_*\n\)/\11\2/
+    s/\n\(_*\)$/\n1\1/
     t incr_col_underscores2zeroes
-    s/^\([^\n]*\n[0-9]*\)8\(_*\n\)/\19\2/
+    s/8\(_*\)$/9\1/
     t incr_col_underscores2zeroes
-    s/^\([^\n]*\n[0-9]*\)7\(_*\n\)/\18\2/
+    s/7\(_*\)$/8\1/
     t incr_col_underscores2zeroes
-    s/^\([^\n]*\n[0-9]*\)6\(_*\n\)/\17\2/
+    s/6\(_*\)$/7\1/
     t incr_col_underscores2zeroes
-    s/^\([^\n]*\n[0-9]*\)5\(_*\n\)/\16\2/
+    s/5\(_*\)$/6\1/
     t incr_col_underscores2zeroes
-    s/^\([^\n]*\n[0-9]*\)4\(_*\n\)/\15\2/
+    s/4\(_*\)$/5\1/
     t incr_col_underscores2zeroes
-    s/^\([^\n]*\n[0-9]*\)3\(_*\n\)/\14\2/
+    s/3\(_*\)$/4\1/
     t incr_col_underscores2zeroes
-    s/^\([^\n]*\n[0-9]*\)2\(_*\n\)/\13\2/
+    s/2\(_*\)$/3\1/
     t incr_col_underscores2zeroes
-    s/^\([^\n]*\n[0-9]*\)1\(_*\n\)/\12\2/
+    s/1\(_*\)$/2\1/
     t incr_col_underscores2zeroes
-    s/^\([^\n]*\n[0-9]*\)0\(_*\n\)/\11\2/
+    s/0\(_*\)$/1\1/
   : incr_col_underscores2zeroes
-    s/^\([^\n]*\n[0-9]*\)_\(_*\n\)/\10\2/
+    s/_\(_*\)$/0\1/
     t incr_col_underscores2zeroes
   x
   b json_pp___RETURN
 
 : incr_row
   x
-  s/^\([^\n]*\n\)[0-9]*\n/\1/
+  s/\n[^\n]\+$//
   s/^/ir/
   x
   b incr_col
   : incr_row_1
     x
-    s/^\([^\n]*\n\)/\11\n/
+    s/$/\n1/
     x
   b json_pp___RETURN
 
 : incr4_col
   x
-  s/^\([^\n]*\n[0-9]*\)9\n/\1D\n/
-  s/^\([^\n]*\n[0-9]*\)8\n/\1C\n/
-  s/^\([^\n]*\n[0-9]*\)7\n/\1B\n/
-  s/^\([^\n]*\n[0-9]*\)6\n/\1A\n/
+  s/9$/D/
+  s/8$/C/
+  s/7$/B/
+  s/6$/A/
   : incr4_col_nines2As
-    s/^\([^\n]*\n[0-9]*\)9\(A*[ABCD]\n\)/\1A\2/
+    s/9\(A*[ABCD]\)$/A\1/
     t incr4_col_nines2As
   : incr4_col_ge10
-    s/^\([^\n]*\n\)\(A*[ABCD]\n\)/\11\2/
+    s/\n\(A*[ABCD]\)$/\n1\1/
     t incr4_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)8\(A*[ABCD]\n\)/\19\2/
+    s/8\(A*[ABCD]\)$/9\1/
     t incr4_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)7\(A*[ABCD]\n\)/\18\2/
+    s/7\(A*[ABCD]\)$/8\1/
     t incr4_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)6\(A*[ABCD]\n\)/\17\2/
+    s/6\(A*[ABCD]\)$/7\1/
     t incr4_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)5\(A*[ABCD]\n\)/\16\2/
+    s/5\(A*[ABCD]\)$/6\1/
     t incr4_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)4\(A*[ABCD]\n\)/\15\2/
+    s/4\(A*[ABCD]\)$/5\1/
     t incr4_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)3\(A*[ABCD]\n\)/\14\2/
+    s/3\(A*[ABCD]\)$/4\1/
     t incr4_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)2\(A*[ABCD]\n\)/\13\2/
+    s/2\(A*[ABCD]\)$/3\1/
     t incr4_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)1\(A*[ABCD]\n\)/\12\2/
+    s/1\(A*[ABCD]\)$/2\1/
     t incr4_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)0\(A*[ABCD]\n\)/\11\2/
+    s/0\(A*[ABCD]\)$/1\1/
   : incr4_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)5\n/\19\n/
+    s/5$/9/
     t incr4_col_letters2numbers
-    s/^\([^\n]*\n[0-9]*\)4\n/\18\n/
+    s/4$/8/
     t incr4_col_letters2numbers
-    s/^\([^\n]*\n[0-9]*\)3\n/\17\n/
+    s/3$/7/
     t incr4_col_letters2numbers
-    s/^\([^\n]*\n[0-9]*\)2\n/\16\n/
+    s/2$/6/
     t incr4_col_letters2numbers
-    s/^\([^\n]*\n[0-9]*\)1\n/\15\n/
+    s/1$/5/
     t incr4_col_letters2numbers
-    s/^\([^\n]*\n[0-9]*\)0\n/\14\n/
+    s/0$/4/
   : incr4_col_letters2numbers
-    s/^\([^\n]*\n[0-9]*\)A\(A*[BCD]\?\)/\10\2/
+    s/A\(A*[BCD]\?\)/0\1/
     t incr4_col_letters2numbers
-    s/^\([^\n]*\n[0-9]*\)B\n/\11\n/
-    s/^\([^\n]*\n[0-9]*\)C\n/\12\n/
-    s/^\([^\n]*\n[0-9]*\)D\n/\13\n/
+    s/B$/1/
+    s/C$/2/
+    s/D$/3/
   x
   b json_pp___RETURN
 
 : incr5_col
   x
-  s/^\([^\n]*\n[0-9]*\)9\n/\1E\n/
-  s/^\([^\n]*\n[0-9]*\)8\n/\1D\n/
-  s/^\([^\n]*\n[0-9]*\)7\n/\1C\n/
-  s/^\([^\n]*\n[0-9]*\)6\n/\1B\n/
-  s/^\([^\n]*\n[0-9]*\)5\n/\1A\n/
+  s/9$/E/
+  s/8$/D/
+  s/7$/C/
+  s/6$/B/
+  s/5$/A/
   : incr5_col_nines2As
-    s/^\([^\n]*\n[0-9]*\)9\(A*[ABCDE]\n\)/\1A\2/
+    s/9\(A*[ABCDE]\)$/A\1/
     t incr5_col_nines2As
   : incr5_col_ge10
-    s/^\([^\n]*\n\)\(A*[ABCDE]\n\)/\11\2/
+    s/\n\(A*[ABCDE]\)$/\n1\1/
     t incr5_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)8\(A*[ABCDE]\n\)/\19\2/
+    s/8\(A*[ABCDE]\)$/9\1/
     t incr5_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)7\(A*[ABCDE]\n\)/\18\2/
+    s/7\(A*[ABCDE]\)$/8\1/
     t incr5_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)6\(A*[ABCDE]\n\)/\17\2/
+    s/6\(A*[ABCDE]\)$/7\1/
     t incr5_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)5\(A*[ABCDE]\n\)/\16\2/
+    s/5\(A*[ABCDE]\)$/6\1/
     t incr5_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)4\(A*[ABCDE]\n\)/\15\2/
+    s/4\(A*[ABCDE]\)$/5\1/
     t incr5_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)3\(A*[ABCDE]\n\)/\14\2/
+    s/3\(A*[ABCDE]\)$/4\1/
     t incr5_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)2\(A*[ABCDE]\n\)/\13\2/
+    s/2\(A*[ABCDE]\)$/3\1/
     t incr5_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)1\(A*[ABCDE]\n\)/\12\2/
+    s/1\(A*[ABCDE]\)$/2\1/
     t incr5_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)0\(A*[ABCDE]\n\)/\11\2/
+    s/0\(A*[ABCDE]\)$/1\1/
   : incr5_col_lastdigit
-    s/^\([^\n]*\n[0-9]*\)4\n/\19\n/
+    s/4$/9/
     t incr5_col_letters2numbers
-    s/^\([^\n]*\n[0-9]*\)3\n/\18\n/
+    s/3$/8/
     t incr5_col_letters2numbers
-    s/^\([^\n]*\n[0-9]*\)2\n/\17\n/
+    s/2$/7/
     t incr5_col_letters2numbers
-    s/^\([^\n]*\n[0-9]*\)1\n/\16\n/
+    s/1$/6/
     t incr5_col_letters2numbers
-    s/^\([^\n]*\n[0-9]*\)0\n/\15\n/
+    s/0$/5/
   : incr5_col_letters2numbers
-    s/^\([^\n]*\n[0-9]*\)A\(A*[BCDE]\?\)/\10\2/
+    s/A\(A*[BCDE]\?\)/0\1/
     t incr5_col_letters2numbers
-    s/^\([^\n]*\n[0-9]*\)B\n/\11\n/
-    s/^\([^\n]*\n[0-9]*\)C\n/\12\n/
-    s/^\([^\n]*\n[0-9]*\)D\n/\13\n/
-    s/^\([^\n]*\n[0-9]*\)E\n/\14\n/
+    s/B$/1/
+    s/C$/2/
+    s/D$/3/
+    s/E$/4/
   x
   b json_pp___RETURN
 
@@ -697,197 +698,197 @@
 : json_pp___RETURN
   x
   /^a1/ {
-    s/^a1//
+    s/..//
     x
     b json_pp___array_1
   }
   /^a2/ {
-    s/^a2//
+    s/..//
     x
     b json_pp___array_2
   }
   /^a3/ {
-    s/^a3//
+    s/..//
     x
     b json_pp___array_3
   }
   /^a4/ {
-    s/^a4//
+    s/..//
     x
     b json_pp___array_4
   }
   /^C1/ {
-    s/^C1//
+    s/..//
     x
     b json_pp___characters_1
   }
   /^c1/ {
-    s/^c1//
+    s/..//
     x
     b json_pp___character_1
   }
   /^D1/ {
-    s/^D1//
+    s/..//
     x
     b json_pp___digits_1
   }
   /^E1/ {
-    s/^E1//
+    s/..//
     x
     b json_pp___elements_1
   }
   /^E2/ {
-    s/^E2//
+    s/..//
     x
     b json_pp___elements_2
   }
   /^e1/ {
-    s/^e1//
+    s/..//
     x
     b json_pp___element_1
   }
   /^e2/ {
-    s/^e2//
+    s/..//
     x
     b json_pp___element_2
   }
   /^f1/ {
-    s/^f1//
+    s/..//
     x
     b json_pp___fraction_1
   }
   /^i1/ {
-    s/^i1//
+    s/..//
     x
     b json_pp___integer_1
   }
   /^i2/ {
-    s/^i2//
+    s/..//
     x
     b json_pp___integer_2
   }
   /^ir/ {
-    s/^ir//
+    s/..//
     x
     b incr_row_1
   }
   /^j1/ {
-    s/^j1//
+    s/..//
     x
     b json_pp___json_1
   }
   /^M1/ {
-    s/^M1//
+    s/..//
     x
     b json_pp___members_1
   }
   /^M2/ {
-    s/^M2//
+    s/..//
     x
     b json_pp___members_2
   }
   /^m1/ {
-    s/^m1//
+    s/..//
     x
     b json_pp___member_1
   }
   /^m2/ {
-    s/^m2//
+    s/..//
     x
     b json_pp___member_2
   }
   /^m3/ {
-    s/^m3//
+    s/..//
     x
     b json_pp___member_3
   }
   /^m4/ {
-    s/^m4//
+    s/..//
     x
     b json_pp___member_4
   }
   /^n1/ {
-    s/^n1//
+    s/..//
     x
     b json_pp___number_1
   }
   /^n2/ {
-    s/^n2//
+    s/..//
     x
     b json_pp___number_2
   }
   /^o1/ {
-    s/^o1//
+    s/..//
     x
     b json_pp___object_1
   }
   /^o2/ {
-    s/^o2//
+    s/..//
     x
     b json_pp___object_2
   }
   /^o3/ {
-    s/^o3//
+    s/..//
     x
     b json_pp___object_3
   }
   /^o4/ {
-    s/^o4//
+    s/..//
     x
     b json_pp___object_4
   }
   /^s1/ {
-    s/^s1//
+    s/..//
     x
     b json_pp___string_1
   }
   /^s2/ {
-    s/^s2//
+    s/..//
     x
     b json_pp___string_2
   }
   /^x1/ {
-    s/^x1//
+    s/..//
     x
     b json_pp___exponent_1
   }
   /^x2/ {
-    s/^x2//
+    s/..//
     x
     b json_pp___exponent_2
   }
   /^w1/ {
-    s/^w1//
+    s/..//
     x
     b json_pp___ws_1
   }
   /^w2/ {
-    s/^w2//
+    s/..//
     x
     b json_pp___ws_2
   }
   /^\\1/ {
-    s/^\\1//
+    s/..//
     x
     b json_pp___escape_1
   }
   /^\\2/ {
-    s/^\\2//
+    s/..//
     x
     b json_pp___escape_2
   }
   /^\\3/ {
-    s/^\\3//
+    s/..//
     x
     b json_pp___escape_3
   }
   /^\\4/ {
-    s/^\\4//
+    s/..//
     x
     b json_pp___escape_4
   }
-  x
-  s/.*/"Unknown return code"/
+  z
+  s/^/"Unknown return code"/
   b json_pp___UNREACHABLE
 
 : json_pp___UNREACHABLE
@@ -906,14 +907,15 @@
   z
   Q 6
 
-: json_pp___BADOPTION_FAILURE
-  s/^/Error when parsion options: /
+: json_pp___ENV_FAILURE
+  s/^/Error when parsing environment: /
   s/$/\n/
   w /dev/stderr
   z
   Q 7
 
 : json_pp___SUCCESS
-  s/.*/JSON parsing succeed\n/
+  z
+  s/^/JSON parsing succeed\n/
   p
   z
