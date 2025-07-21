@@ -26,17 +26,24 @@
 #      because `sed` does not operate on empty files. An empty file should    #
 #      result in a parsing error.                                             #
 #                                                                             #
-#   3) A JSON object with a duplicated key is accepted                        #
+#   3) If your input contains bytes `sed` does not handle properly, this      #
+#      script will fail (for example: `\xe9`)                                 #
 #                                                                             #
 ###############################################################################
+
+# TODO: Error for JSON objects with duplicated keys
 
 # Init the holdspace with these variables:
 # - an empty workflow stack
 # - row
 # - col
 : init_holdspace
+  # Depending of the `-z`/`--null-data` option usage, the `D`, `G`, `H`, `N` and `P` sed commands work with new line or NUL characters. This script must know which one of these characters these commands are using
+  G
+  h
+  s/.$//
   x
-  s/^/\n1\n1/
+  s/.*\(.\)$/\11\11\1/
   x
   b json_validator___json
 
@@ -513,143 +520,143 @@
 : incr_col
   x
   : incr_col_nines2underscores
-    s/9\(_*\)$/_\1/
+    s/9\(_*[\n\x00]\)$/_\1/
     t incr_col_nines2underscores
   : incr_col_lastdigit
-    s/\n\(_*\)$/\n1\1/
+    s/\([\n\x00]\)\(_*[\n\x00]\)$/\11\2/
     t incr_col_underscores2zeroes
-    s/8\(_*\)$/9\1/
+    s/8\(_*[\n\x00]\)$/9\1/
     t incr_col_underscores2zeroes
-    s/7\(_*\)$/8\1/
+    s/7\(_*[\n\x00]\)$/8\1/
     t incr_col_underscores2zeroes
-    s/6\(_*\)$/7\1/
+    s/6\(_*[\n\x00]\)$/7\1/
     t incr_col_underscores2zeroes
-    s/5\(_*\)$/6\1/
+    s/5\(_*[\n\x00]\)$/6\1/
     t incr_col_underscores2zeroes
-    s/4\(_*\)$/5\1/
+    s/4\(_*[\n\x00]\)$/5\1/
     t incr_col_underscores2zeroes
-    s/3\(_*\)$/4\1/
+    s/3\(_*[\n\x00]\)$/4\1/
     t incr_col_underscores2zeroes
-    s/2\(_*\)$/3\1/
+    s/2\(_*[\n\x00]\)$/3\1/
     t incr_col_underscores2zeroes
-    s/1\(_*\)$/2\1/
+    s/1\(_*[\n\x00]\)$/2\1/
     t incr_col_underscores2zeroes
-    s/0\(_*\)$/1\1/
+    s/0\(_*[\n\x00]\)$/1\1/
   : incr_col_underscores2zeroes
-    s/_\(_*\)$/0\1/
+    s/_\(_*[\n\x00]\)$/0\1/
     t incr_col_underscores2zeroes
   x
   b json_validator___RETURN
 
 : incr_row
   x
-  s/\n[^\n]\+$//
+  s/[0-9]\+[\n\x00]$//
   s/^/ir/
   x
   b incr_col
   : incr_row_1
     x
-    s/$/\n1/
+    s/[\n\x00]$/\01\0/
     x
   b json_validator___RETURN
 
 : incr4_col
   x
-  s/9$/D/
-  s/8$/C/
-  s/7$/B/
-  s/6$/A/
+  s/9\([\n\x00]\)$/D\1/
+  s/8\([\n\x00]\)$/C\1/
+  s/7\([\n\x00]\)$/B\1/
+  s/6\([\n\x00]\)$/A\1/
   : incr4_col_nines2As
-    s/9\(A*[ABCD]\)$/A\1/
+    s/9\(A*[ABCD][\n\x00]\)$/A\1/
     t incr4_col_nines2As
   : incr4_col_ge10
-    s/\n\(A*[ABCD]\)$/\n1\1/
+    s/\([\n\x00]\)\(A*[ABCD][\n\x00]\)$/\11\2/
     t incr4_col_lastdigit
-    s/8\(A*[ABCD]\)$/9\1/
+    s/8\(A*[ABCD][\n\x00]\)$/9\1/
     t incr4_col_lastdigit
-    s/7\(A*[ABCD]\)$/8\1/
+    s/7\(A*[ABCD][\n\x00]\)$/8\1/
     t incr4_col_lastdigit
-    s/6\(A*[ABCD]\)$/7\1/
+    s/6\(A*[ABCD][\n\x00]\)$/7\1/
     t incr4_col_lastdigit
-    s/5\(A*[ABCD]\)$/6\1/
+    s/5\(A*[ABCD][\n\x00]\)$/6\1/
     t incr4_col_lastdigit
-    s/4\(A*[ABCD]\)$/5\1/
+    s/4\(A*[ABCD][\n\x00]\)$/5\1/
     t incr4_col_lastdigit
-    s/3\(A*[ABCD]\)$/4\1/
+    s/3\(A*[ABCD][\n\x00]\)$/4\1/
     t incr4_col_lastdigit
-    s/2\(A*[ABCD]\)$/3\1/
+    s/2\(A*[ABCD][\n\x00]\)$/3\1/
     t incr4_col_lastdigit
-    s/1\(A*[ABCD]\)$/2\1/
+    s/1\(A*[ABCD][\n\x00]\)$/2\1/
     t incr4_col_lastdigit
-    s/0\(A*[ABCD]\)$/1\1/
+    s/0\(A*[ABCD][\n\x00]\)$/1\1/
   : incr4_col_lastdigit
-    s/5$/9/
+    s/5\([\n\x00]\)$/9\1/
     t incr4_col_letters2numbers
-    s/4$/8/
+    s/4\([\n\x00]\)$/8\1/
     t incr4_col_letters2numbers
-    s/3$/7/
+    s/3\([\n\x00]\)$/7\1/
     t incr4_col_letters2numbers
-    s/2$/6/
+    s/2\([\n\x00]\)$/6\1/
     t incr4_col_letters2numbers
-    s/1$/5/
+    s/1\([\n\x00]\)$/5\1/
     t incr4_col_letters2numbers
-    s/0$/4/
+    s/0\([\n\x00]\)$/4\1/
   : incr4_col_letters2numbers
-    s/A\(A*[BCD]\?\)$/0\1/
+    s/A\(A*[BCD]\?[\n\x00]\)$/0\1/
     t incr4_col_letters2numbers
-    s/B$/1/
-    s/C$/2/
-    s/D$/3/
+    s/B\([\n\x00]\)$/1\1/
+    s/C\([\n\x00]\)$/2\1/
+    s/D\([\n\x00]\)$/3\1/
   x
   b json_validator___RETURN
 
 : incr5_col
   x
-  s/9$/E/
-  s/8$/D/
-  s/7$/C/
-  s/6$/B/
-  s/5$/A/
+  s/9\([\n\x00]\)$/E\1/
+  s/8\([\n\x00]\)$/D\1/
+  s/7\([\n\x00]\)$/C\1/
+  s/6\([\n\x00]\)$/B\1/
+  s/5\([\n\x00]\)$/A\1/
   : incr5_col_nines2As
-    s/9\(A*[ABCDE]\)$/A\1/
+    s/9\(A*[ABCDE][\n\x00]\)$/A\1/
     t incr5_col_nines2As
   : incr5_col_ge10
-    s/\n\(A*[ABCDE]\)$/\n1\1/
+    s/\([\n\x00]\)\(A*[ABCDE][\n\x00]\)$/\11\2/
     t incr5_col_lastdigit
-    s/8\(A*[ABCDE]\)$/9\1/
+    s/8\(A*[ABCDE][\n\x00]\)$/9\1/
     t incr5_col_lastdigit
-    s/7\(A*[ABCDE]\)$/8\1/
+    s/7\(A*[ABCDE][\n\x00]\)$/8\1/
     t incr5_col_lastdigit
-    s/6\(A*[ABCDE]\)$/7\1/
+    s/6\(A*[ABCDE][\n\x00]\)$/7\1/
     t incr5_col_lastdigit
-    s/5\(A*[ABCDE]\)$/6\1/
+    s/5\(A*[ABCDE][\n\x00]\)$/6\1/
     t incr5_col_lastdigit
-    s/4\(A*[ABCDE]\)$/5\1/
+    s/4\(A*[ABCDE][\n\x00]\)$/5\1/
     t incr5_col_lastdigit
-    s/3\(A*[ABCDE]\)$/4\1/
+    s/3\(A*[ABCDE][\n\x00]\)$/4\1/
     t incr5_col_lastdigit
-    s/2\(A*[ABCDE]\)$/3\1/
+    s/2\(A*[ABCDE][\n\x00]\)$/3\1/
     t incr5_col_lastdigit
-    s/1\(A*[ABCDE]\)$/2\1/
+    s/1\(A*[ABCDE][\n\x00]\)$/2\1/
     t incr5_col_lastdigit
-    s/0\(A*[ABCDE]\)$/1\1/
+    s/0\(A*[ABCDE][\n\x00]\)$/1\1/
   : incr5_col_lastdigit
-    s/4$/9/
+    s/4\([\n\x00]\)$/9\1/
     t incr5_col_letters2numbers
-    s/3$/8/
+    s/3\([\n\x00]\)$/8\1/
     t incr5_col_letters2numbers
-    s/2$/7/
+    s/2\([\n\x00]\)$/7\1/
     t incr5_col_letters2numbers
-    s/1$/6/
+    s/1\([\n\x00]\)$/6\1/
     t incr5_col_letters2numbers
-    s/0$/5/
+    s/0\([\n\x00]\)$/5\1/
   : incr5_col_letters2numbers
-    s/A\(A*[BCDE]\?\)$/0\1/
+    s/A\(A*[BCDE]\?[\n\x00]\)$/0\1/
     t incr5_col_letters2numbers
-    s/B$/1/
-    s/C$/2/
-    s/D$/3/
-    s/E$/4/
+    s/B\([\n\x00]\)$/1\1/
+    s/C\([\n\x00]\)$/2\1/
+    s/D\([\n\x00]\)$/3\1/
+    s/E\([\n\x00]\)$/4\1/
   x
   b json_validator___RETURN
 
@@ -851,23 +858,73 @@
   b json_validator___UNREACHABLE
 
 : json_validator___UNREACHABLE
-  s/^/Reached unreachable code in scripts\/json\/validator.sed: /
-  s/$/\n/
-  w /dev/stderr
-  z
+  x
+  /\x00$/ {
+    x
+    s/.*/\x1b[0mReached unreachable code in scripts\/json\/validator.sed: \0\n/
+    # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
+    w /dev/stderr
+    # If outside the scope it triggers the next conditional statement
+    z
+  }
+  /\n$/ {
+    x
+    s/^/\x1b[0mReached unreachable code in scripts\/json\/validator.sed: /
+    # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
+    w /dev/stderr
+    z
+  }
   Q 5
 
 : json_validator___FAILURE
-  H
   x
-  s/^[^\n]*\n\([0-9]\+\)\n\([0-9]\+\)[\n\x00]/JSON parsing error at ROW \1, COL \2: /
-  s/$/\n/
-  w /dev/stderr
-  z
+  /[^\n\x00]$/ {
+    z
+    s/^/"Hold space must end with a new line or NUL character"/
+    b json_validator___UNREACHABLE
+  }
+  /\x00$/ {
+    s/.$//
+    x
+    H
+    x
+    s/^[^\x00]*\x00\([0-9]\+\)\x00\([0-9]\+\)\x00\(.*\)/JSON parsing error at ROW \1, COL \2: \3\n/
+    # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
+    w /dev/stderr
+    z
+  }
+  /\n$/ {
+    s/.$//
+    x
+    H
+    x
+    s/^[^\n]*\n\([0-9]\+\)\n\([0-9]\+\)\n/JSON parsing error at ROW \1, COL \2: /
+    # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
+    w /dev/stderr
+    # If outside the scope it triggers the next conditional statement
+    z
+  }
   Q 6
 
 : json_validator___SUCCESS
-  z
-  s/^/JSON parsing succeed\n/
-  p
-  z
+  x
+  /[^\n\x00]$/ {
+    z
+    s/^/"Hold space must end with a new line or NUL character"/
+    b json_validator___UNREACHABLE
+  }
+  /\x00$/ {
+    x
+    z
+    s/^/JSON parsing succeed\n/
+    # If the next commands are outside this scope it triggers the next conditional statement
+    p
+    z
+  }
+  /\n$/ {
+    x
+    z
+    s/^/JSON parsing succeed/
+    p
+    z
+  }

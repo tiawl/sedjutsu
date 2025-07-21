@@ -36,9 +36,12 @@
 #      because `sed` does not operate on empty files. An empty file should    #
 #      result in a parsing error.                                             #
 #                                                                             #
-#   3) A JSON object with a duplicated key is accepted                        #
+#   3) If your input contains bytes `sed` does not handle properly, this      #
+#      script will fail (for example: `\xe9`)                                 #
 #                                                                             #
 ###############################################################################
+
+# TODO: Error for JSON objects with duplicated keys
 
 # Init the holdspace with these variables:
 # - an empty workflow stack
@@ -1522,10 +1525,22 @@
   b json_pp___UNREACHABLE
 
 : json_pp___UNREACHABLE
-  s/^/\x1b[0mReached unreachable code in scripts\/json\/pretty-printer.sed: /
-  s/$/\n/
-  w /dev/stderr
-  z
+  x
+  /\x00$/ {
+    x
+    s/.*/\x1b[0mReached unreachable code in scripts\/json\/pretty-printer.sed: \0\n/
+    # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
+    w /dev/stderr
+    # If outside the scope it triggers the next conditional statement
+    z
+  }
+  /\n$/ {
+    x
+    s/^/\x1b[0mReached unreachable code in scripts\/json\/pretty-printer.sed: /
+    # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
+    w /dev/stderr
+    z
+  }
   Q 5
 
 : json_pp___PARSING_FAILURE
@@ -1541,7 +1556,7 @@
     H
     x
     s/^\([^\x00]*\x00\)\{4\}\([0-9]\+\)\x00\([0-9]\+\)\x00\(.*\)/\x1b[0mJSON parsing error at ROW \2, COL \3: \4\n/
-    # The duplicated code is assumed: a weird output bug occured when this instruction is not in the same scope
+    # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
     w /dev/stderr
     # If outside the scope it triggers the next conditional statement
     z
@@ -1552,7 +1567,7 @@
     H
     x
     s/^\([^\n]*\n\)\{4\}\([0-9]\+\)\n\([0-9]\+\)\n/\x1b[0mJSON parsing error at ROW \2, COL \3: /
-    # The duplicated code is assumed: a weird output bug occured when this instruction is not in the same scope
+    # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
     w /dev/stderr
     z
   }
@@ -1568,7 +1583,7 @@
   /\x00$/ {
     x
     s/.*/\x1b[0mError when parsing environment: \0\n/
-    # The duplicated code is assumed: a weird output bug occured when this instruction is not in the same scope
+    # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
     w /dev/stderr
     # If outside the scope it triggers the next conditional statement
     z
@@ -1576,7 +1591,7 @@
   /\n$/ {
     x
     s/^/\x1b[0mError when parsing environment: /
-    # The duplicated code is assumed: a weird output bug occured when this instruction is not in the same scope
+    # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
     w /dev/stderr
     z
   }
