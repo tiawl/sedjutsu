@@ -1,6 +1,10 @@
 #! /usr/bin/env bash
 
 tests_json () {
+  # Necessary for UTF-8 support
+  LC_CTYPE=C
+  export LC_CTYPE
+
   local json sed json_d all basename script quiet
   json_d='data/json'
   script="${1}"
@@ -42,29 +46,6 @@ tests_json () {
     ( "${json_d}"'/n_multidigit_number_then_00.json' ) sed='sed' ;;
     ( "${json_d}"'/n_structure_no_data.json' )
       printf '[\033[38;5;2mOK\033[m] %s > n_structure_no_data.json\n     \033[38;5;5m=> SED does not operate on empty files\033[m\n' "${script}"
-      continue ;;
-    ( "${json_d}"'/n_structure_single_eacute.json' ) ;&
-    ( "${json_d}"'/n_structure_incomplete_UTF8_BOM.json' ) ;&
-    ( "${json_d}"'/n_structure_lone-invalid-utf-8.json' ) ;&
-    ( "${json_d}"'/n_string_invalid_utf8_after_escape.json' ) ;&
-    ( "${json_d}"'/n_string_invalid-utf-8-in-escape.json' ) ;&
-    ( "${json_d}"'/n_object_lone_continuation_byte_in_key_and_trailing_comma.json' ) ;&
-    ( "${json_d}"'/n_number_real_with_invalid_utf8_after_e.json' ) ;&
-    ( "${json_d}"'/n_number_invalid-utf-8-in-bigger-int.json' ) ;&
-    ( "${json_d}"'/n_number_invalid-utf-8-in-exponent.json' ) ;&
-    ( "${json_d}"'/n_number_invalid-utf-8-in-int.json' ) ;&
-    ( "${json_d}"'/n_array_invalid_utf8.json' ) ;&
-    ( "${json_d}"'/n_array_a_invalid_utf8.json' ) ;&
-    ( "${json_d}"'/i_string_invalid_utf-8.json' ) ;&
-    ( "${json_d}"'/i_string_iso_latin_1.json' ) ;&
-    ( "${json_d}"'/i_string_lone_utf8_continuation_byte.json' ) ;&
-    ( "${json_d}"'/i_string_overlong_sequence_2_bytes.json' ) ;&
-    ( "${json_d}"'/i_string_overlong_sequence_6_bytes.json' ) ;&
-    ( "${json_d}"'/i_string_overlong_sequence_6_bytes_null.json' ) ;&
-    ( "${json_d}"'/i_string_truncated-utf-8.json' ) ;&
-    ( "${json_d}"'/i_string_UTF-16LE_with_BOM.json' ) ;&
-    ( "${json_d}"'/i_string_UTF-8_invalid_sequence.json' )
-      printf '[\033[38;5;6mSKIPPED\033[m] %s > %s\n          \033[38;5;5m=> SED does not handle characters in this file\033[m\n' "${script}" "${basename}"
       continue ;;
     ( * ) sed='sed --null-data' ;;
     esac

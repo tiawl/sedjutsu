@@ -27,6 +27,11 @@
 #   If you do not want to see the trailing new line, use the `-n`/`--quiet`   #
 #   option.                                                                   #
 #                                                                             #
+#   For UTF-8 support, you need to set (and export) the LC_CTYPE, LANG or     #
+#   LC_ALL variables into your environment. Depending of your system you      #
+#   need to change the value of one of these with "C", "C.UTF-8" or           #
+#   "<lang_COUNTRY>.UTF-8" (for example: "en_US.UTF-8").                      #
+#                                                                             #
 ### KNOWN LIMITATIONS #########################################################
 #                                                                             #
 #   1) If your input contains NUL characters AND new line characters,         #
@@ -35,9 +40,6 @@
 #   2) If your input file is empty, this script will parse it successfully    #
 #      because `sed` does not operate on empty files. An empty file should    #
 #      result in a parsing error.                                             #
-#                                                                             #
-#   3) If your input contains bytes `sed` does not handle properly, this      #
-#      script will fail (for example: `\xe9`)                                 #
 #                                                                             #
 ###############################################################################
 
