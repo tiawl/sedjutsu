@@ -1,25 +1,27 @@
 ### README ####################################################################
 #                                                                             #
-#   This script can be used to emulate some `jq`, `json_pp` or `json_xs`      #
+#     This script can be used to emulate some `jq`, `json_pp` or `json_xs`    #
 #   features.                                                                 #
 #                                                                             #
-#   Because it is particulary hard to deal with the `n` and `N` GNU `sed`     #
+#     Because it is particulary hard to deal with the `n` and `N` GNU `sed`   #
 #   commands (If there is no more input, these commands make `sed` exits      #
 #   and `sed` has no way to know internally if there is more input), this     #
 #   script expects a oneliner input.                                          #
 #                                                                             #
-#   If your input contains new line characters without NUL characters, you    #
-#   definitly want to use the `-z`/`--null-data` GNU `sed` option.            #
+#     If your input contains new line characters without NUL characters,      #
+#   you definitly want to use the `-z`/`--null-data` GNU `sed` option.        #
 #                                                                             #
-#   However, if your input contains NUL characters without new line           #
+#     However, if your input contains NUL characters without new line         #
 #   characters, avoid this option.                                            #
 #                                                                             #
-#   If you do not want to see the trailing new line, use the `-n`/`--quiet`   #
-#   option.                                                                   #
+#     If you do not want to see the trailing new line, use the                #
+#   `-n`/`--quiet`option.                                                     #
 #                                                                             #
-#   For UTF-8 support, you need to set (and export) the LC_CTYPE, LANG or     #
-#   LC_ALL variables into your environment. Depending of your system you      #
-#   need to change the value of one of these with "C", "C.UTF-8" or           #
+#     For UTF-8 support, you need to set and export the LC_CTYPE, LANG or     #
+#   LC_ALL variables into your environment. You can also set it with the      #
+#   `env` utility if exporting one of these variable is not possible          #
+#   outside the running environment. Depending of your system you need to     #
+#   change the value of one of these with "C", "C.UTF-8" or                   #
 #   "<lang_COUNTRY>.UTF-8" (for example: "en_US.UTF-8").                      #
 #                                                                             #
 ### KNOWN LIMITATIONS #########################################################
@@ -30,6 +32,25 @@
 #   2) If your input file is empty, this script will parse it successfully    #
 #      because `sed` does not operate on empty files. An empty file should    #
 #      result in a parsing error.                                             #
+#                                                                             #
+#   3) The RFC 8259 specifies that an unescaped character could be any        #
+#      character between \x20 and 10FFFF except double-quotes `"` and         #
+#      backslash `\` characters. However with `sed` there is no way to        #
+#      match unicode characters with code point greater than 255.             #
+#      Because of this restriction, `sed` can not make distinction between    #
+#      matching a string of 4 UTF-8 characters, a string of 2 UTF-16          #
+#      characters or 1 UTF-32 character. To override this difficulty          #
+#      without betraying more conventions in the JSON specification, the      #
+#      script handles characters as UTF-8 characters whatever their           #
+#      encoding. The cost of this decision is a more restrictive validator.   #
+#      The script will fail to parse JSON strings with UTF-16 or UTF-32       #
+#      characters which contain \x00 to \x1f or \x22 (hexadecimal             #
+#      representation of the double-quotes character) or \x5c (hexadecimal    #
+#      representation of the backslash character) in their code points. So    #
+#      for example these unicodes are accepted by the RFC 8259 but are not    #
+#      by this script:                                                        #
+#      - \Uec1e (contains the forbidden \x1e character)                       #
+#      - \U0001ffff (contains \x00 and \x01 forbidden characters)             #
 #                                                                             #
 ###############################################################################
 
@@ -47,6 +68,10 @@
   x
   s/.*\(.\)$/\11\11\1/
   x
+  /^$/ {
+    s/^/empty input/
+    b json_validator___FAILURE
+  }
   b json_validator___json
 
 #
