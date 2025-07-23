@@ -66,7 +66,7 @@
   h
   s/.$//
   x
-  s/.*\(.\)$/\11\11\1/
+  s/.*\(.\)$/\1a\1a\1/
   x
   /^$/ {
     s/^/empty input/
@@ -116,15 +116,24 @@
   }
   /^true/ {
     s/....//
-    b incr4_col
+    x
+    s/[\n\x00]$/aaaa\0/
+    x
+    b json_validator___RETURN
   }
   /^false/ {
     s/.....//
-    b incr5_col
+    x
+    s/[\n\x00]$/aaaaa\0/
+    x
+    b json_validator___RETURN
   }
   /^null/ {
     s/....//
-    b incr4_col
+    x
+    s/[\n\x00]$/aaaa\0/
+    x
+    b json_validator___RETURN
   }
   z
   s/^/malformed JSON string, neither array, object, number, string or atom/
@@ -137,15 +146,17 @@
   /^{[\x20\x0a\x0d\x09]*}/ {
     s/.//
     x
-    s/^/o1o2/
+    s/^/o1/
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
+    b json_validator___ws
     : json_validator___object_1
-      b json_validator___ws
-    : json_validator___object_2
       /^}/ {
         s/.//
-        b incr_col
+        x
+        s/[\n\x00]$/a\0/
+        x
+        b json_validator___RETURN
       }
       z
       s/^/`,` or `}` expected while parsing JSON object/
@@ -154,21 +165,23 @@
   /^{/ {
     s/.//
     x
-    s/^/o3o4/
+    s/^/o2/
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
-    : json_validator___object_3
-      b json_validator___members
-    : json_validator___object_4
+    b json_validator___members
+    : json_validator___object_2
       /^}/ {
         s/.//
-        b incr_col
+        x
+        s/[\n\x00]$/a\0/
+        x
+        b json_validator___RETURN
       }
       z
       s/^/`,` or `}` expected while parsing JSON object/
       b json_validator___FAILURE
   }
-  b json_validator___RETURN
+  b json_validator___FAILURE
 
 ### members
 ###     member
@@ -182,19 +195,17 @@
     /^,/ {
       s/.//
       x
-      s/^/M2/
+      s/[\n\x00]$/a\0/
       x
-      b incr_col
+      b json_validator___members
     }
     b json_validator___RETURN
-  : json_validator___members_2
-    b json_validator___members
 
 ### member
 ###     ws string ws ':' element
 : json_validator___member
   x
-  s/^/m1m2m3m4/
+  s/^/m1m2m3/
   x
   b json_validator___ws
   : json_validator___member_1
@@ -204,13 +215,14 @@
   : json_validator___member_3
     /^:/ {
       s/.//
-      b incr_col
+      x
+      s/[\n\x00]$/a\0/
+      x
+      b json_validator___element
     }
     z
     s/^/`:` expected/
     b json_validator___FAILURE
-  : json_validator___member_4
-    b json_validator___element
 
 ### array
 ###     '[' ws ']'
@@ -219,15 +231,17 @@
   /^\[[\x20\x0a\x0d\x09]*]/ {
     s/.//
     x
-    s/^/a1a2/
+    s/^/a1/
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
+    b json_validator___ws
     : json_validator___array_1
-      b json_validator___ws
-    : json_validator___array_2
       /^]/ {
         s/.//
-        b incr_col
+        x
+        s/[\n\x00]$/a\0/
+        x
+        b json_validator___RETURN
       }
       z
       s/^/`,` or `]` expected while parsing JSON array/
@@ -236,21 +250,23 @@
   /^\[/ {
     s/.//
     x
-    s/^/a3a4/
+    s/^/a2/
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
-    : json_validator___array_3
-      b json_validator___elements
-    : json_validator___array_4
+    b json_validator___elements
+    : json_validator___array_2
       /^]/ {
         s/.//
-        b incr_col
+        x
+        s/[\n\x00]$/a\0/
+        x
+        b json_validator___RETURN
       }
       z
       s/^/`,` or `]` expected while parsing JSON array/
       b json_validator___FAILURE
   }
-  b json_validator___RETURN
+  b json_validator___FAILURE
 
 ### elements
 ###     element
@@ -264,13 +280,11 @@
     /^,/ {
       s/.//
       x
-      s/^/E2/
+      s/[\n\x00]$/a\0/
       x
-      b incr_col
+      b json_validator___elements
     }
     b json_validator___RETURN
-  : json_validator___elements_2
-    b json_validator___elements
 
 ### element
 ###     ws value ws
@@ -288,21 +302,25 @@
 ### '"' characters '"'
 : json_validator___string
   x
-  s/^/s1s2/
+  s/^/s1/
   x
   /^"/ {
     s/.//
-    b incr_col
+    x
+    s/[\n\x00]$/a\0/
+    x
+    b json_validator___characters
   }
   z
   s/^/`"` expected while parsing JSON string/
   b json_validator___FAILURE
   : json_validator___string_1
-    b json_validator___characters
-  : json_validator___string_2
     /^"/ {
       s/.//
-      b incr_col
+      x
+      s/[\n\x00]$/a\0/
+      x
+      b json_validator___RETURN
     }
     z
     s/^/Unexpected end of string while parsing JSON string/
@@ -329,11 +347,9 @@
   /^\\/ {
     s/.//
     x
-    s/^/c1/
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
-    : json_validator___character_1
-      b json_validator___escape
+    b json_validator___escape
   }
   /^[\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"]/ {
     z
@@ -341,7 +357,10 @@
     b json_validator___FAILURE
   }
   s/.//
-  b incr_col
+  x
+  s/[\n\x00]$/a\0/
+  x
+  b json_validator___RETURN
 
 ### escape
 ###     '"'
@@ -357,21 +376,23 @@
   /^u/ {
     s/.//
     x
-    s/^/\\1\\2\\3\\4/
+    s/^/\\1\\2\\3/
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
+    b json_validator___hex
     : json_validator___escape_1
       b json_validator___hex
     : json_validator___escape_2
       b json_validator___hex
     : json_validator___escape_3
       b json_validator___hex
-    : json_validator___escape_4
-      b json_validator___hex
   }
   /^["\\/bfnrt]/ {
     s/.//
-    b incr_col
+    x
+    s/[\n\x00]$/a\0/
+    x
+    b json_validator___RETURN
   }
   z
   s/^/Invalid escaped character encountered/
@@ -384,7 +405,10 @@
 : json_validator___hex
   /^[A-Fa-f]/ {
     s/.//
-    b incr_col
+    x
+    s/[\n\x00]$/a\0/
+    x
+    b json_validator___RETURN
   }
   /^[0-9]/ {
     b json_validator___digit
@@ -414,17 +438,15 @@
   /^-/ {
     s/.//
     x
-    s/^/i1/
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
   }
-  : json_validator___integer_1
   /^[1-9][0-9]/ {
     x
-    s/^/i2/
+    s/^/i1/
     x
     b json_validator___onenine
-    : json_validator___integer_2
+    : json_validator___integer_1
       b json_validator___digits
   }
   /^[0-9]/ {
@@ -453,7 +475,10 @@
 : json_validator___digit
   /^0/ {
     s/.//
-    b incr_col
+    x
+    s/[\n\x00]$/a\0/
+    x
+    b json_validator___RETURN
   }
   /^[1-9]/ {
     b json_validator___onenine
@@ -467,7 +492,10 @@
 : json_validator___onenine
   /^[1-9]/ {
     s/.//
-    b incr_col
+    x
+    s/[\n\x00]$/a\0/
+    x
+    b json_validator___RETURN
   }
   z
   s/^/Invalid onenine encountered/
@@ -480,11 +508,9 @@
   /^\./ {
     s/.//
     x
-    s/^/f1/
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
-    : json_validator___fraction_1
-      b json_validator___digits
+    b json_validator___digits
   }
   b json_validator___RETURN
 
@@ -496,12 +522,11 @@
   /^[eE]/ {
     s/.//
     x
-    s/^/x1x2/
+    s/^/x1/
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
+    b json_validator___sign
     : json_validator___exponent_1
-      b json_validator___sign
-    : json_validator___exponent_2
       b json_validator___digits
   }
   b json_validator___RETURN
@@ -513,7 +538,9 @@
 : json_validator___sign
   /^[-+]/ {
     s/.//
-    b incr_col
+    x
+    s/[\n\x00]$/a\0/
+    x
   }
   b json_validator___RETURN
 
@@ -527,164 +554,17 @@
   /^\x0a/ {
     s/.//
     x
-    s/^/w1/
+    s/[\n\x00]a\+[\n\x00]$/a\0/
     x
-    b incr_row
-    : json_validator___ws_1
-      b json_validator___ws
+    b json_validator___ws
   }
   /^[\x20\x0d\x09]/ {
     s/.//
     x
-    s/^/w2/
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
-    : json_validator___ws_2
-      b json_validator___ws
+    b json_validator___ws
   }
-  b json_validator___RETURN
-
-: incr_col
-  x
-  : incr_col_nines2underscores
-    s/9\(_*[\n\x00]\)$/_\1/
-    t incr_col_nines2underscores
-  : incr_col_lastdigit
-    s/\([\n\x00]\)\(_*[\n\x00]\)$/\11\2/
-    t incr_col_underscores2zeroes
-    s/8\(_*[\n\x00]\)$/9\1/
-    t incr_col_underscores2zeroes
-    s/7\(_*[\n\x00]\)$/8\1/
-    t incr_col_underscores2zeroes
-    s/6\(_*[\n\x00]\)$/7\1/
-    t incr_col_underscores2zeroes
-    s/5\(_*[\n\x00]\)$/6\1/
-    t incr_col_underscores2zeroes
-    s/4\(_*[\n\x00]\)$/5\1/
-    t incr_col_underscores2zeroes
-    s/3\(_*[\n\x00]\)$/4\1/
-    t incr_col_underscores2zeroes
-    s/2\(_*[\n\x00]\)$/3\1/
-    t incr_col_underscores2zeroes
-    s/1\(_*[\n\x00]\)$/2\1/
-    t incr_col_underscores2zeroes
-    s/0\(_*[\n\x00]\)$/1\1/
-  : incr_col_underscores2zeroes
-    s/_\(_*[\n\x00]\)$/0\1/
-    t incr_col_underscores2zeroes
-  x
-  b json_validator___RETURN
-
-: incr_row
-  x
-  s/[0-9]\+[\n\x00]$//
-  s/^/ir/
-  x
-  b incr_col
-  : incr_row_1
-    x
-    s/[\n\x00]$/\01\0/
-    x
-  b json_validator___RETURN
-
-: incr4_col
-  x
-  s/9\([\n\x00]\)$/D\1/
-  s/8\([\n\x00]\)$/C\1/
-  s/7\([\n\x00]\)$/B\1/
-  s/6\([\n\x00]\)$/A\1/
-  : incr4_col_nines2As
-    s/9\(A*[ABCD][\n\x00]\)$/A\1/
-    t incr4_col_nines2As
-  : incr4_col_ge10
-    s/\([\n\x00]\)\(A*[ABCD][\n\x00]\)$/\11\2/
-    t incr4_col_lastdigit
-    s/8\(A*[ABCD][\n\x00]\)$/9\1/
-    t incr4_col_lastdigit
-    s/7\(A*[ABCD][\n\x00]\)$/8\1/
-    t incr4_col_lastdigit
-    s/6\(A*[ABCD][\n\x00]\)$/7\1/
-    t incr4_col_lastdigit
-    s/5\(A*[ABCD][\n\x00]\)$/6\1/
-    t incr4_col_lastdigit
-    s/4\(A*[ABCD][\n\x00]\)$/5\1/
-    t incr4_col_lastdigit
-    s/3\(A*[ABCD][\n\x00]\)$/4\1/
-    t incr4_col_lastdigit
-    s/2\(A*[ABCD][\n\x00]\)$/3\1/
-    t incr4_col_lastdigit
-    s/1\(A*[ABCD][\n\x00]\)$/2\1/
-    t incr4_col_lastdigit
-    s/0\(A*[ABCD][\n\x00]\)$/1\1/
-  : incr4_col_lastdigit
-    s/5\([\n\x00]\)$/9\1/
-    t incr4_col_letters2numbers
-    s/4\([\n\x00]\)$/8\1/
-    t incr4_col_letters2numbers
-    s/3\([\n\x00]\)$/7\1/
-    t incr4_col_letters2numbers
-    s/2\([\n\x00]\)$/6\1/
-    t incr4_col_letters2numbers
-    s/1\([\n\x00]\)$/5\1/
-    t incr4_col_letters2numbers
-    s/0\([\n\x00]\)$/4\1/
-  : incr4_col_letters2numbers
-    s/A\(A*[BCD]\?[\n\x00]\)$/0\1/
-    t incr4_col_letters2numbers
-    s/B\([\n\x00]\)$/1\1/
-    s/C\([\n\x00]\)$/2\1/
-    s/D\([\n\x00]\)$/3\1/
-  x
-  b json_validator___RETURN
-
-: incr5_col
-  x
-  s/9\([\n\x00]\)$/E\1/
-  s/8\([\n\x00]\)$/D\1/
-  s/7\([\n\x00]\)$/C\1/
-  s/6\([\n\x00]\)$/B\1/
-  s/5\([\n\x00]\)$/A\1/
-  : incr5_col_nines2As
-    s/9\(A*[ABCDE][\n\x00]\)$/A\1/
-    t incr5_col_nines2As
-  : incr5_col_ge10
-    s/\([\n\x00]\)\(A*[ABCDE][\n\x00]\)$/\11\2/
-    t incr5_col_lastdigit
-    s/8\(A*[ABCDE][\n\x00]\)$/9\1/
-    t incr5_col_lastdigit
-    s/7\(A*[ABCDE][\n\x00]\)$/8\1/
-    t incr5_col_lastdigit
-    s/6\(A*[ABCDE][\n\x00]\)$/7\1/
-    t incr5_col_lastdigit
-    s/5\(A*[ABCDE][\n\x00]\)$/6\1/
-    t incr5_col_lastdigit
-    s/4\(A*[ABCDE][\n\x00]\)$/5\1/
-    t incr5_col_lastdigit
-    s/3\(A*[ABCDE][\n\x00]\)$/4\1/
-    t incr5_col_lastdigit
-    s/2\(A*[ABCDE][\n\x00]\)$/3\1/
-    t incr5_col_lastdigit
-    s/1\(A*[ABCDE][\n\x00]\)$/2\1/
-    t incr5_col_lastdigit
-    s/0\(A*[ABCDE][\n\x00]\)$/1\1/
-  : incr5_col_lastdigit
-    s/4\([\n\x00]\)$/9\1/
-    t incr5_col_letters2numbers
-    s/3\([\n\x00]\)$/8\1/
-    t incr5_col_letters2numbers
-    s/2\([\n\x00]\)$/7\1/
-    t incr5_col_letters2numbers
-    s/1\([\n\x00]\)$/6\1/
-    t incr5_col_letters2numbers
-    s/0\([\n\x00]\)$/5\1/
-  : incr5_col_letters2numbers
-    s/A\(A*[BCDE]\?[\n\x00]\)$/0\1/
-    t incr5_col_letters2numbers
-    s/B\([\n\x00]\)$/1\1/
-    s/C\([\n\x00]\)$/2\1/
-    s/D\([\n\x00]\)$/3\1/
-    s/E\([\n\x00]\)$/4\1/
-  x
   b json_validator___RETURN
 
 # Redirect the workflow depending of the first element in the workflow stack
@@ -700,25 +580,10 @@
     x
     b json_validator___array_2
   }
-  /^a3/ {
-    s/..//
-    x
-    b json_validator___array_3
-  }
-  /^a4/ {
-    s/..//
-    x
-    b json_validator___array_4
-  }
   /^C1/ {
     s/..//
     x
     b json_validator___characters_1
-  }
-  /^c1/ {
-    s/..//
-    x
-    b json_validator___character_1
   }
   /^D1/ {
     s/..//
@@ -730,11 +595,6 @@
     x
     b json_validator___elements_1
   }
-  /^E2/ {
-    s/..//
-    x
-    b json_validator___elements_2
-  }
   /^e1/ {
     s/..//
     x
@@ -745,25 +605,10 @@
     x
     b json_validator___element_2
   }
-  /^f1/ {
-    s/..//
-    x
-    b json_validator___fraction_1
-  }
   /^i1/ {
     s/..//
     x
     b json_validator___integer_1
-  }
-  /^i2/ {
-    s/..//
-    x
-    b json_validator___integer_2
-  }
-  /^ir/ {
-    s/..//
-    x
-    b incr_row_1
   }
   /^j1/ {
     s/..//
@@ -774,11 +619,6 @@
     s/..//
     x
     b json_validator___members_1
-  }
-  /^M2/ {
-    s/..//
-    x
-    b json_validator___members_2
   }
   /^m1/ {
     s/..//
@@ -794,11 +634,6 @@
     s/..//
     x
     b json_validator___member_3
-  }
-  /^m4/ {
-    s/..//
-    x
-    b json_validator___member_4
   }
   /^n1/ {
     s/..//
@@ -820,45 +655,15 @@
     x
     b json_validator___object_2
   }
-  /^o3/ {
-    s/..//
-    x
-    b json_validator___object_3
-  }
-  /^o4/ {
-    s/..//
-    x
-    b json_validator___object_4
-  }
   /^s1/ {
     s/..//
     x
     b json_validator___string_1
   }
-  /^s2/ {
-    s/..//
-    x
-    b json_validator___string_2
-  }
-  /^w1/ {
-    s/..//
-    x
-    b json_validator___ws_1
-  }
-  /^w2/ {
-    s/..//
-    x
-    b json_validator___ws_2
-  }
   /^x1/ {
     s/..//
     x
     b json_validator___exponent_1
-  }
-  /^x2/ {
-    s/..//
-    x
-    b json_validator___exponent_2
   }
   /^\\1/ {
     s/..//
@@ -875,14 +680,67 @@
     x
     b json_validator___escape_3
   }
-  /^\\4/ {
-    s/..//
-    x
-    b json_validator___escape_4
-  }
   z
   s/^/"Unknown return code"/
   b json_validator___UNREACHABLE
+
+: json_validator___ROW_COL
+  t json_validator___ROW_COL_a_to_b
+  : json_validator___ROW_COL_a_to_b
+    s/aaaaaaaaaa/b/g
+    t json_validator___ROW_COL_b_to_c
+    b json_validator___ROW_COL_letters_to_digits
+  : json_validator___ROW_COL_b_to_c
+    s/bbbbbbbbbb/c/g
+    t json_validator___ROW_COL_c_to_d
+    b json_validator___ROW_COL_letters_to_digits
+  : json_validator___ROW_COL_c_to_d
+    s/cccccccccc/d/g
+    t json_validator___ROW_COL_d_to_e
+    b json_validator___ROW_COL_letters_to_digits
+  : json_validator___ROW_COL_d_to_e
+    s/dddddddddd/e/g
+    t json_validator___ROW_COL_e_to_f
+    b json_validator___ROW_COL_letters_to_digits
+  : json_validator___ROW_COL_e_to_f
+    s/eeeeeeeeee/f/g
+    t json_validator___ROW_COL_f_to_g
+    b json_validator___ROW_COL_letters_to_digits
+  : json_validator___ROW_COL_f_to_g
+    s/ffffffffff/g/g
+    t json_validator___ROW_COL_g_to_h
+    b json_validator___ROW_COL_letters_to_digits
+  : json_validator___ROW_COL_g_to_h
+    s/gggggggggg/h/g
+    t json_validator___ROW_COL_h
+    b json_validator___ROW_COL_letters_to_digits
+  : json_validator___ROW_COL_h
+    s/hhhhhhhhhh//g
+    # Here we can continue to add more letters for bigger numbers
+  : json_validator___ROW_COL_letters_to_digits
+    /^[b-zA-Z]\+[^a-zA-Z0-9]/ {
+      s/[^a-zA-Z0-9]/0\0/
+    }
+    /[^a-zA-Z0-9][b-zA-Z]\+$/ {
+      s/$/0/
+    }
+    s/aaaaaaaaa/9/g
+    s/aaaaaaaa/8/g
+    s/aaaaaaa/7/g
+    s/aaaaaa/6/g
+    s/aaaaa/5/g
+    s/aaaa/4/g
+    s/aaa/3/g
+    s/aa/2/g
+    s/a/1/g
+    y/bcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY/
+    /^[0-9]\+[^a-zA-Z0-9][0-9]\+$/ ! {
+      b json_validator___ROW_COL_letters_to_digits
+    }
+    /\x00/ {
+      b json_validator___FAILURE_NUL
+    }
+    b json_validator___FAILURE_NEWLINE
 
 : json_validator___UNREACHABLE
   x
@@ -911,25 +769,29 @@
     b json_validator___UNREACHABLE
   }
   /\x00$/ {
-    s/.$//
-    x
-    H
-    x
-    s/^[^\x00]*\x00\([0-9]\+\)\x00\([0-9]\+\)\x00\(.*\)/JSON parsing error at ROW \1, COL \2: \3\n/
-    # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
-    w /dev/stderr
-    z
+    s/.*\x00\(a\+\x00a\+\)\x00$/\1/
+    b json_validator___ROW_COL
+    : json_validator___FAILURE_NUL
+      x
+      H
+      x
+      s/^\([0-9]\+\)\x00\([0-9]\+\)\x00\(.*\)/JSON parsing error at ROW \1, COL \2: \3\n/
+      # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
+      w /dev/stderr
+      z
   }
   /\n$/ {
-    s/.$//
-    x
-    H
-    x
-    s/^[^\n]*\n\([0-9]\+\)\n\([0-9]\+\)\n/JSON parsing error at ROW \1, COL \2: /
-    # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
-    w /dev/stderr
-    # If outside the scope it triggers the next conditional statement
-    z
+    s/.*\n\(a\+\na\+\)\n$/\1/
+    b json_validator___ROW_COL
+    : json_validator___FAILURE_NEWLINE
+      x
+      H
+      x
+      s/^\([0-9]\+\)\n\([0-9]\+\)\n/JSON parsing error at ROW \1, COL \2: /
+      # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
+      w /dev/stderr
+      # If outside the scope it triggers the next conditional statement
+      z
   }
   Q 6
 
