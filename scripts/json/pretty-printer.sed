@@ -54,15 +54,13 @@
 #      The script will fail to parse JSON strings with UTF-16 or UTF-32       #
 #      characters which contain \x00 to \x1f or \x22 (hexadecimal             #
 #      representation of the double-quotes character) or \x5c (hexadecimal    #
-#      representation of the backslash character) in their code points. So    #
-#      for example these unicodes are accepted by the RFC 8259 but are not    #
-#      by this script:                                                        #
-#      - \Uec1e (contains the forbidden \x1e character)                       #
-#      - \U0001ffff (contains \x00 and \x01 forbidden characters)             #
+#      representation of the backslash character) in their code points.       #
 #                                                                             #
 ###############################################################################
 
-# TODO: Error for JSON objects with duplicated keys
+# TODO:
+# - Improve int incrementation for col and row
+# - Error for JSON objects with duplicated keys
 
 # Init the holdspace with these variables:
 # - an empty workflow stack
