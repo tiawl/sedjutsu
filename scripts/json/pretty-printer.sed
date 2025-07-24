@@ -3,27 +3,16 @@
 #     This script can be used to emulate some `jq`, `json_pp` or `json_xs`    #
 #   features.                                                                 #
 #                                                                             #
-#     Because it is particulary hard to deal with the `n` and `N` GNU `sed`   #
-#   commands (If there is no more input, these commands make `sed` exits      #
-#   and `sed` has no way to know internally if there is more input), this     #
-#   script expects a oneliner input.                                          #
-#                                                                             #
-#     If your input contains new line characters without NUL characters,      #
-#   you definitly want to use the `-z`/`--null-data` GNU `sed` option.        #
-#                                                                             #
-#     However, if your input contains NUL characters without new line         #
-#   characters, avoid this option.                                            #
-#                                                                             #
 #     If you do not want to see the trailing new line, use the                #
-#   `-n`/`--quiet`option.                                                     #
+#   `-n`/`--quiet` option.                                                    #
 #                                                                             #
 #     For UTF-8 support, you need to set (and export) the LC_CTYPE, LANG or   #
 #   LC_ALL variables into your environment. Depending of your system you      #
 #   need to change the value of one of these with "C", "C.UTF-8" or           #
 #   "<lang_COUNTRY>.UTF-8" (for example: "en_US.UTF-8").                      #
 #                                                                             #
-#     You can configure this script behavior with these environment           #
-#   variables:                                                                #
+#     You can configure this script behavior by providing these               #
+#   environment variables:                                                    #
 #   - SEDJUTSU_INDENT: use the given number of spaces (between 1 and 8)       #
 #     for indentation (default: 4)                                            #
 #   - SEDJUTSU_MONOCHROME: disable color whatever its value                   #
@@ -34,14 +23,11 @@
 #                                                                             #
 ### KNOWN LIMITATIONS #########################################################
 #                                                                             #
-#   1) If your input contains NUL characters AND new line characters,         #
-#      `sed`can not deal with it.                                             #
-#                                                                             #
-#   2) If your input file is empty, this script will parse it successfully    #
+#   1) If your input file is empty, this script will parse it successfully    #
 #      because `sed` does not operate on empty files. An empty file should    #
 #      result in a parsing error.                                             #
 #                                                                             #
-#   3) The RFC 8259 specifies that an unescaped character could be any        #
+#   2) The RFC 8259 specifies that an unescaped character could be any        #
 #      character between \x20 and 10FFFF except double-quotes `"` and         #
 #      backslash `\` characters. However with `sed` there is no way to        #
 #      match unicode characters with code point greater than 255.             #
@@ -68,6 +54,10 @@
 # - row
 # - col
 : init_holdspace
+  $! {
+    N
+    b init_holdspace
+  }
   # Depending of the `-z`/`--null-data` option usage, the `D`, `G`, `H`, `N` and `P` sed commands work with new line or NUL characters. This script must know which one of these characters these commands are using
   G
   h
