@@ -58,9 +58,7 @@
 #                                                                             #
 ###############################################################################
 
-# TODO:
-# - Improve int incrementation for col and row
-# - Error for JSON objects with duplicated keys
+# TODO: Error for JSON objects with duplicated keys
 
 # Init the holdspace with these variables:
 # - an empty workflow stack
@@ -120,7 +118,7 @@
     t init_holdspace_end
     s/^8:/        :/
     : init_holdspace_end
-      s/\(.*\)\([\n\x00]\)$/\2\1\2\2\1\21\21\2/
+      s/\(.*\)\([\n\x00]\)$/\2\1\2\2\1\2a\2a\2/
       x
       /^$/ {
         s/^/empty input/
@@ -174,10 +172,10 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{3\}\(\x00[0-9]\+\)\{2\}\x00$/\x1b[\1m\0/
+      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{3\}\(\x00a\+\)\{2\}\x00$/\x1b[\1m\0/
     }
     /\n$/ {
-      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{3\}\(\n[0-9]\+\)\{2\}\n$/\x1b[\1m\0/
+      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{3\}\(\na\+\)\{2\}\n$/\x1b[\1m\0/
     }
     x
     b json_pp___string
@@ -190,10 +188,10 @@
         b json_pp___UNREACHABLE
       }
       /\x00$/ {
-        s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/\x1b[0m\0/
+        s/\x00[^\x00]*\(\x00a\+\)\{2\}\x00$/\x1b[0m\0/
       }
       /\n$/ {
-        s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/\x1b[0m\0/
+        s/\n[^\n]*\(\na\+\)\{2\}\n$/\x1b[0m\0/
       }
       x
       b json_pp___RETURN
@@ -211,13 +209,14 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{5\}\(\x00[0-9]\+\)\{2\}\x00$/\x1b[\1mtrue\x1b[0m\0/
+      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{5\}\(\x00a\+\)\{2\}\x00$/\x1b[\1mtrue\x1b[0m\0/
     }
     /\n$/ {
-      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{5\}\(\n[0-9]\+\)\{2\}\n$/\x1b[\1mtrue\x1b[0m\0/
+      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{5\}\(\na\+\)\{2\}\n$/\x1b[\1mtrue\x1b[0m\0/
     }
+    s/[\n\x00]$/aaaa\0/
     x
-    b incr4_col
+    b json_pp___RETURN
   }
   /^false/ {
     s/.....//
@@ -229,13 +228,14 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{6\}\(\x00[0-9]\+\)\{2\}\x00$/\x1b[\1mfalse\x1b[0m\0/
+      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{6\}\(\x00a\+\)\{2\}\x00$/\x1b[\1mfalse\x1b[0m\0/
     }
     /\n$/ {
-      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{6\}\(\n[0-9]\+\)\{2\}\n$/\x1b[\1mfalse\x1b[0m\0/
+      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{6\}\(\na\+\)\{2\}\n$/\x1b[\1mfalse\x1b[0m\0/
     }
+    s/[\n\x00]$/aaaaa\0/
     x
-    b incr5_col
+    b json_pp___RETURN
   }
   /^null/ {
     s/....//
@@ -247,13 +247,14 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{7\}\(\x00[0-9]\+\)\{2\}\x00$/\x1b[\1mnull\x1b[0m\0/
+      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{7\}\(\x00a\+\)\{2\}\x00$/\x1b[\1mnull\x1b[0m\0/
     }
     /\n$/ {
-      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{7\}\(\n[0-9]\+\)\{2\}\n$/\x1b[\1mnull\x1b[0m\0/
+      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{7\}\(\na\+\)\{2\}\n$/\x1b[\1mnull\x1b[0m\0/
     }
+    s/[\n\x00]$/aaaa\0/
     x
-    b incr4_col
+    b json_pp___RETURN
   }
   z
   s/^/malformed JSON string, neither array, object, number, string or atom/
@@ -266,7 +267,7 @@
   /^{[ \n\r\t]*}/ {
     s/.//
     x
-    s/^/o1o2/
+    s/^/o1/
     # Format the output for the next line to print
     /[^\n\x00]$/ {
       z
@@ -274,19 +275,21 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00[0-9]\+\)\{2\}\x00$/\x1b[\1m{}\x1b[0m\0/
+      s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00a\+\)\{2\}\x00$/\x1b[\1m{}\x1b[0m\0/
     }
     /\n$/ {
-      s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\n[0-9]\+\)\{2\}\n$/\x1b[\1m{}\x1b[0m\0/
+      s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\na\+\)\{2\}\n$/\x1b[\1m{}\x1b[0m\0/
     }
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
+    b json_pp___ws
     : json_pp___object_1
-      b json_pp___ws
-    : json_pp___object_2
       /^}/ {
         s/.//
-        b incr_col
+        x
+        s/[\n\x00]$/a\0/
+        x
+        b json_pp___RETURN
       }
       z
       s/^/`,` or `}` expected while parsing JSON object/
@@ -295,7 +298,7 @@
   /^{/ {
     s/.//
     x
-    s/^/o3o4o5o6/
+    s/^/o2o3o4/
     # Format the output for the next line to print
     /[^\n\x00]$/ {
       z
@@ -303,14 +306,14 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00[0-9]\+\)\{2\}\x00$/\x1b[\1m{\x1b[0m\0/
+      s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00a\+\)\{2\}\x00$/\x1b[\1m{\x1b[0m\0/
     }
     /\n$/ {
-      s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\n[0-9]\+\)\{2\}\n$/\x1b[\1m{\x1b[0m\0/
+      s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\na\+\)\{2\}\n$/\x1b[\1m{\x1b[0m\0/
     }
     x
     b json_pp___PRINT
-    : json_pp___object_3
+    : json_pp___object_2
       x
       # Increment the indent level
       /[^\n\x00]$/ {
@@ -324,15 +327,14 @@
       /\n$/ {
         s/^[^\n]*\n\( \+\):[^\n]*\n/\0\1/
       }
+      s/[\n\x00]$/a\0/
       x
-      b incr_col
-    : json_pp___object_4
       b json_pp___members
-    : json_pp___object_5
+    : json_pp___object_3
       /^}/ {
         s/.//
         b json_pp___PRINT
-        : json_pp___object_6
+        : json_pp___object_4
           x
           /[^\n\x00]$/ {
             z
@@ -343,22 +345,25 @@
             # Decrement the indent level
             s/^\([^\x00]*\x00\)\( \+\)\(:[^\x00]*\x00\)\2/\1\2\3/
             # Format the output for the next line to print
-            s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00[0-9]\+\)\{2\}\x00$/\x1b[\1m}\x1b[0m\0/
+            s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00a\+\)\{2\}\x00$/\x1b[\1m}\x1b[0m\0/
           }
           /\n$/ {
             # Decrement the indent level
             s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
             # Format the output for the next line to print
-            s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\n[0-9]\+\)\{2\}\n$/\x1b[\1m}\x1b[0m\0/
+            s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\na\+\)\{2\}\n$/\x1b[\1m}\x1b[0m\0/
           }
+          s/[\n\x00]$/a\0/
           x
-          b incr_col
+          b json_pp___RETURN
       }
       z
       s/^/`,` or `}` expected while parsing JSON object/
       b json_pp___PARSING_FAILURE
   }
-  b json_pp___RETURN
+  z
+  s/^/`{` expected while parsing JSON object/
+  b json_pp___PARSING_FAILURE
 
 ### members
 ###     member
@@ -372,7 +377,7 @@
     /^,/ {
       s/.//
       x
-      s/^/M2M3/
+      s/^/M2/
       # Format the output for the next line to print
       /[^\n\x00]$/ {
         z
@@ -380,25 +385,24 @@
         b json_pp___UNREACHABLE
       }
       /\x00$/ {
-        s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00[0-9]\+\)\{2\}\x00$/\x1b[\1m,\x1b[0m\0/
+        s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00a\+\)\{2\}\x00$/\x1b[\1m,\x1b[0m\0/
       }
       /\n$/ {
-        s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\n[0-9]\+\)\{2\}\n$/\x1b[\1m,\x1b[0m\0/
+        s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\na\+\)\{2\}\n$/\x1b[\1m,\x1b[0m\0/
       }
+      s/[\n\x00]$/a\0/
       x
       b json_pp___PRINT
       : json_pp___members_2
-        b incr_col
+        b json_pp___members
     }
     b json_pp___RETURN
-  : json_pp___members_3
-    b json_pp___members
 
 ### member
 ###     ws string ws ':' element
 : json_pp___member
   x
-  s/^/m1m2m3m4/
+  s/^/m1m2m3/
   x
   b json_pp___ws
   : json_pp___member_1
@@ -410,10 +414,10 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]\+:\([^:]\+\)\(\x00[0-9]\+\)\{2\}\x00$/\x1b[\1m\0/
+      s/\x00[^\x00]\+:\([^:]\+\)\(\x00a\+\)\{2\}\x00$/\x1b[\1m\0/
     }
     /\n$/ {
-      s/\n[^\n]\+:\([^:]\+\)\(\n[0-9]\+\)\{2\}\n$/\x1b[\1m\0/
+      s/\n[^\n]\+:\([^:]\+\)\(\na\+\)\{2\}\n$/\x1b[\1m\0/
     }
     x
     b json_pp___string
@@ -426,10 +430,10 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/\x1b[0m\0/
+      s/\x00[^\x00]*\(\x00a\+\)\{2\}\x00$/\x1b[0m\0/
     }
     /\n$/ {
-      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/\x1b[0m\0/
+      s/\n[^\n]*\(\na\+\)\{2\}\n$/\x1b[0m\0/
     }
     x
     b json_pp___ws
@@ -444,19 +448,18 @@
         b json_pp___UNREACHABLE
       }
       /\x00$/ {
-        s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00[0-9]\+\)\{2\}\x00$/\x1b[\1m: \x1b[0m\0/
+        s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00a\+\)\{2\}\x00$/\x1b[\1m: \x1b[0m\0/
       }
       /\n$/ {
-        s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\n[0-9]\+\)\{2\}\n$/\x1b[\1m: \x1b[0m\0/
+        s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\na\+\)\{2\}\n$/\x1b[\1m: \x1b[0m\0/
       }
+      s/[\n\x00]$/a\0/
       x
-      b incr_col
+      b json_pp___element
     }
     z
     s/^/`:` expected/
     b json_pp___PARSING_FAILURE
-  : json_pp___member_4
-    b json_pp___element
 
 ### array
 ###     '[' ws ']'
@@ -465,7 +468,7 @@
   /^\[[ \n\r\t]*]/ {
     s/.//
     x
-    s/^/a1a2/
+    s/^/a1/
     # Format the output for the next line to print
     /[^\n\x00]$/ {
       z
@@ -473,19 +476,21 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00[0-9]\+\)\{2\}\x00$/\x1b[\1m[]\x1b[0m\0/
+      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00a\+\)\{2\}\x00$/\x1b[\1m[]\x1b[0m\0/
     }
     /\n$/ {
-      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\n$/\x1b[\1m[]\x1b[0m\0/
+      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\na\+\)\{2\}\n$/\x1b[\1m[]\x1b[0m\0/
     }
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
+    b json_pp___ws
     : json_pp___array_1
-      b json_pp___ws
-    : json_pp___array_2
       /^]/ {
         s/.//
-        b incr_col
+        x
+        s/[\n\x00]$/a\0/
+        x
+        b json_pp___RETURN
       }
       z
       s/^/`,` or `]` expected while parsing JSON array/
@@ -494,7 +499,7 @@
   /^\[/ {
     s/.//
     x
-    s/^/a3a4a5a6/
+    s/^/a2a3a4/
     # Format the output for the next line to print
     /[^\n\x00]$/ {
       z
@@ -502,14 +507,14 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00[0-9]\+\)\{2\}\x00$/\x1b[\1m[\x1b[0m\0/
+      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00a\+\)\{2\}\x00$/\x1b[\1m[\x1b[0m\0/
     }
     /\n$/ {
-      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\n$/\x1b[\1m[\x1b[0m\0/
+      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\na\+\)\{2\}\n$/\x1b[\1m[\x1b[0m\0/
     }
     x
     b json_pp___PRINT
-    : json_pp___array_3
+    : json_pp___array_2
       x
       # Increment the indent level
       /[^\n\x00]$/ {
@@ -523,15 +528,14 @@
       /\n$/ {
         s/^[^\n]*\n\( \+\):[^\n]*\n/\0\1/
       }
+      s/[\n\x00]$/a\0/
       x
-      b incr_col
-    : json_pp___array_4
       b json_pp___elements
-    : json_pp___array_5
+    : json_pp___array_3
       /^]/ {
         s/.//
         b json_pp___PRINT
-        : json_pp___array_6
+        : json_pp___array_4
           x
           /[^\n\x00]$/ {
             z
@@ -542,22 +546,25 @@
             # Decrement the indent level
             s/^\([^\x00]*\x00\)\( \+\)\(:[^\x00]*\x00\)\2/\1\2\3/
             # Format the output for the next line to print
-            s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00[0-9]\+\)\{2\}\x00$/\x1b[\1m]\x1b[0m\0/
+            s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00a\+\)\{2\}\x00$/\x1b[\1m]\x1b[0m\0/
           }
           /\n$/ {
             # Decrement the indent level
             s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
             # Format the output for the next line to print
-            s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\n$/\x1b[\1m]\x1b[0m\0/
+            s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\na\+\)\{2\}\n$/\x1b[\1m]\x1b[0m\0/
           }
+          s/[\n\x00]$/a\0/
           x
-          b incr_col
+          b json_pp___RETURN
       }
       z
       s/^/`,` or `]` expected while parsing JSON array/
       b json_pp___PARSING_FAILURE
   }
-  b json_pp___RETURN
+  z
+  s/^/`[` expected while parsing JSON array/
+  b json_pp___PARSING_FAILURE
 
 ### elements
 ###     element
@@ -571,7 +578,7 @@
     /^,/ {
       s/.//
       x
-      s/^/E2E3/
+      s/^/E2/
       # Format the output for the next line to print
       /[^\n\x00]$/ {
         z
@@ -579,19 +586,18 @@
         b json_pp___UNREACHABLE
       }
       /\x00$/ {
-        s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00[0-9]\+\)\{2\}\x00$/\x1b[\1m,\x1b[0m\0/
+        s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00a\+\)\{2\}\x00$/\x1b[\1m,\x1b[0m\0/
       }
       /\n$/ {
-        s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\n[0-9]\+\)\{2\}\n$/\x1b[\1m,\x1b[0m\0/
+        s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\na\+\)\{2\}\n$/\x1b[\1m,\x1b[0m\0/
       }
+      s/[\n\x00]$/a\0/
       x
       b json_pp___PRINT
       : json_pp___elements_2
-        b incr_col
+        b json_pp___elements
     }
     b json_pp___RETURN
-  : json_pp___elements_3
-    b json_pp___elements
 
 ### element
 ###     ws value ws
@@ -609,7 +615,7 @@
 ### '"' characters '"'
 : json_pp___string
   x
-  s/^/s1s2/
+  s/^/s1/
   x
   /^"/ {
     s/.//
@@ -621,20 +627,19 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/"\0/
+      s/\x00[^\x00]*\(\x00a\+\)\{2\}\x00$/"\0/
     }
     /\n$/ {
-      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/"\0/
+      s/\n[^\n]*\(\na\+\)\{2\}\n$/"\0/
     }
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
+    b json_pp___characters
   }
   z
   s/^/`"` expected while parsing JSON string/
   b json_pp___PARSING_FAILURE
   : json_pp___string_1
-    b json_pp___characters
-  : json_pp___string_2
     /^"/ {
       s/.//
       x
@@ -645,13 +650,14 @@
         b json_pp___UNREACHABLE
       }
       /\x00$/ {
-        s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/"\0/
+        s/\x00[^\x00]*\(\x00a\+\)\{2\}\x00$/"\0/
       }
       /\n$/ {
-        s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/"\0/
+        s/\n[^\n]*\(\na\+\)\{2\}\n$/"\0/
       }
+      s/[\n\x00]$/a\0/
       x
-      b incr_col
+      b json_pp___RETURN
     }
     z
     s/^/Unexpected end of string while parsing JSON string/
@@ -678,18 +684,16 @@
   /^\\/ {
     s/.//
     x
-    s/^/c1/
     # Format the output for the next line to print
     /\x00$/ {
-      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/\\\0/
+      s/\x00[^\x00]*\(\x00a\+\)\{2\}\x00$/\\\0/
     }
     /\n$/ {
-      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/\\\0/
+      s/\n[^\n]*\(\na\+\)\{2\}\n$/\\\0/
     }
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
-    : json_pp___character_1
-      b json_pp___escape
+    b json_pp___escape
   }
   /^[\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"]/ {
     z
@@ -709,7 +713,7 @@
     s/.//
     x
     # Format the output for the next line to print
-    s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+    s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00a\+\)\{2\}\x00\)\(.\).*/\1\5\3/
   }
   /\n$/ {
     s/.$//
@@ -718,10 +722,11 @@
     s/.//
     x
     # Format the output for the next line to print
-    s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+    s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\na\+\)\{2\}\n\)\(.\).*/\1\5\3/
   }
+  s/[\n\x00]$/a\0/
   x
-  b incr_col
+  b json_pp___RETURN
 
 ### escape
 ###     '"'
@@ -737,7 +742,7 @@
   /^u/ {
     s/.//
     x
-    s/^/\\1\\2\\3\\4/
+    s/^/\\1\\2\\3/
     # Format the output for the next line to print
     /[^\n\x00]$/ {
       z
@@ -745,20 +750,19 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/u\0/
+      s/\x00[^\x00]*\(\x00a\+\)\{2\}\x00$/u\0/
     }
     /\n$/ {
-      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/u\0/
+      s/\n[^\n]*\(\na\+\)\{2\}\n$/u\0/
     }
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
+    b json_pp___hex
     : json_pp___escape_1
       b json_pp___hex
     : json_pp___escape_2
       b json_pp___hex
     : json_pp___escape_3
-      b json_pp___hex
-    : json_pp___escape_4
       b json_pp___hex
   }
   /^["\\/bfnrt]/ {
@@ -775,7 +779,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00a\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
     /\n$/ {
       s/.$//
@@ -784,10 +788,11 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\na\+\)\{2\}\n\)\(.\).*/\1\5\3/
     }
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
+    b json_pp___RETURN
   }
   z
   s/^/Invalid escaped character encountered/
@@ -812,7 +817,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00a\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
     /\n$/ {
       s/.$//
@@ -821,10 +826,11 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\na\+\)\{2\}\n\)\(.\).*/\1\5\3/
     }
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
+    b json_pp___RETURN
   }
   /^[0-9]/ {
     b json_pp___digit
@@ -845,10 +851,10 @@
     b json_pp___UNREACHABLE
   }
   /\x00$/ {
-    s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{4\}\(\x00[0-9]\+\)\{2\}\x00$/\x1b[\1m\0/
+    s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{4\}\(\x00a\+\)\{2\}\x00$/\x1b[\1m\0/
   }
   /\n$/ {
-    s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{4\}\(\n[0-9]\+\)\{2\}\n$/\x1b[\1m\0/
+    s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{4\}\(\na\+\)\{2\}\n$/\x1b[\1m\0/
   }
   x
   b json_pp___integer
@@ -865,10 +871,10 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/\x1b[0m\0/
+      s/\x00[^\x00]*\(\x00a\+\)\{2\}\x00$/\x1b[0m\0/
     }
     /\n$/ {
-      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/\x1b[0m\0/
+      s/\n[^\n]*\(\na\+\)\{2\}\n$/\x1b[0m\0/
     }
     x
     b json_pp___RETURN
@@ -882,7 +888,6 @@
   /^-/ {
     s/.//
     x
-    s/^/i1/
     # Format the output for the next line to print
     /[^\n\x00]$/ {
       z
@@ -890,21 +895,20 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/-\0/
+      s/\x00[^\x00]*\(\x00a\+\)\{2\}\x00$/-\0/
     }
     /\n$/ {
-      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/-\0/
+      s/\n[^\n]*\(\na\+\)\{2\}\n$/-\0/
     }
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
   }
-  : json_pp___integer_1
   /^[1-9][0-9]/ {
     x
-    s/^/i2/
+    s/^/i1/
     x
     b json_pp___onenine
-    : json_pp___integer_2
+    : json_pp___integer_1
       b json_pp___digits
   }
   /^[0-9]/ {
@@ -941,13 +945,14 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/0\0/
+      s/\x00[^\x00]*\(\x00a\+\)\{2\}\x00$/0\0/
     }
     /\n$/ {
-      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/0\0/
+      s/\n[^\n]*\(\na\+\)\{2\}\n$/0\0/
     }
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
+    b json_pp___RETURN
   }
   /^[1-9]/ {
     b json_pp___onenine
@@ -973,7 +978,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00a\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
     /\n$/ {
       s/.$//
@@ -982,10 +987,11 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\na\+\)\{2\}\n\)\(.\).*/\1\5\3/
     }
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
+    b json_pp___RETURN
   }
   z
   s/^/Invalid onenine encountered/
@@ -998,7 +1004,6 @@
   /^\./ {
     s/.//
     x
-    s/^/f1/
     # Format the output for the next line to print
     /[^\n\x00]$/ {
       z
@@ -1006,15 +1011,14 @@
       b json_pp___UNREACHABLE
     }
     /\x00$/ {
-      s/\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00$/.\0/
+      s/\x00[^\x00]*\(\x00a\+\)\{2\}\x00$/.\0/
     }
     /\n$/ {
-      s/\n[^\n]*\(\n[0-9]\+\)\{2\}\n$/.\0/
+      s/\n[^\n]*\(\na\+\)\{2\}\n$/.\0/
     }
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
-    : json_pp___fraction_1
-      b json_pp___digits
+    b json_pp___digits
   }
   b json_pp___RETURN
 
@@ -1025,7 +1029,7 @@
 : json_pp___exponent
   /^[eE]/ {
     x
-    s/^/x1x2/
+    s/^/x1/
     /[^\n\x00]$/ {
       z
       s/^/"Hold space must end with a new line or NUL character"/
@@ -1038,7 +1042,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00a\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
     /\n$/ {
       s/.$//
@@ -1047,13 +1051,12 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\na\+\)\{2\}\n\)\(.\).*/\1\5\3/
     }
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
+    b json_pp___sign
     : json_pp___exponent_1
-      b json_pp___sign
-    : json_pp___exponent_2
       b json_pp___digits
   }
   b json_pp___RETURN
@@ -1077,7 +1080,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00a\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
     /\n$/ {
       s/.$//
@@ -1086,10 +1089,10 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\n[0-9]\+\)\{2\}\n\)\(.\).*/\1\5\3/
+      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\na\+\)\{2\}\n\)\(.\).*/\1\5\3/
     }
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
   }
   b json_pp___RETURN
 
@@ -1103,164 +1106,17 @@
   /^\n/ {
     s/.//
     x
-    s/^/w1/
+    s/[\n\x00]a\+\([\n\x00]\)$/a\1a\1/
     x
-    b incr_row
-    : json_pp___ws_1
-      b json_pp___ws
+    b json_pp___ws
   }
   /^[ \r\t]/ {
     s/.//
     x
-    s/^/w2/
+    s/[\n\x00]$/a\0/
     x
-    b incr_col
-    : json_pp___ws_2
-      b json_pp___ws
+    b json_pp___ws
   }
-  b json_pp___RETURN
-
-: incr_col
-  x
-  : incr_col_nines2underscores
-    s/9\(_*[\n\x00]\)$/_\1/
-    t incr_col_nines2underscores
-  : incr_col_lastdigit
-    s/\([\n\x00]\)\(_*[\n\x00]\)$/\11\2/
-    t incr_col_underscores2zeroes
-    s/8\(_*[\n\x00]\)$/9\1/
-    t incr_col_underscores2zeroes
-    s/7\(_*[\n\x00]\)$/8\1/
-    t incr_col_underscores2zeroes
-    s/6\(_*[\n\x00]\)$/7\1/
-    t incr_col_underscores2zeroes
-    s/5\(_*[\n\x00]\)$/6\1/
-    t incr_col_underscores2zeroes
-    s/4\(_*[\n\x00]\)$/5\1/
-    t incr_col_underscores2zeroes
-    s/3\(_*[\n\x00]\)$/4\1/
-    t incr_col_underscores2zeroes
-    s/2\(_*[\n\x00]\)$/3\1/
-    t incr_col_underscores2zeroes
-    s/1\(_*[\n\x00]\)$/2\1/
-    t incr_col_underscores2zeroes
-    s/0\(_*[\n\x00]\)$/1\1/
-  : incr_col_underscores2zeroes
-    s/_\(_*[\n\x00]\)$/0\1/
-    t incr_col_underscores2zeroes
-  x
-  b json_pp___RETURN
-
-: incr_row
-  x
-  s/[0-9]\+[\n\x00]$//
-  s/^/ir/
-  x
-  b incr_col
-  : incr_row_1
-    x
-    s/[\n\x00]$/\01\0/
-    x
-  b json_pp___RETURN
-
-: incr4_col
-  x
-  s/9\([\n\x00]\)$/D\1/
-  s/8\([\n\x00]\)$/C\1/
-  s/7\([\n\x00]\)$/B\1/
-  s/6\([\n\x00]\)$/A\1/
-  : incr4_col_nines2As
-    s/9\(A*[ABCD][\n\x00]\)$/A\1/
-    t incr4_col_nines2As
-  : incr4_col_ge10
-    s/\([\n\x00]\)\(A*[ABCD][\n\x00]\)$/\11\2/
-    t incr4_col_lastdigit
-    s/8\(A*[ABCD][\n\x00]\)$/9\1/
-    t incr4_col_lastdigit
-    s/7\(A*[ABCD][\n\x00]\)$/8\1/
-    t incr4_col_lastdigit
-    s/6\(A*[ABCD][\n\x00]\)$/7\1/
-    t incr4_col_lastdigit
-    s/5\(A*[ABCD][\n\x00]\)$/6\1/
-    t incr4_col_lastdigit
-    s/4\(A*[ABCD][\n\x00]\)$/5\1/
-    t incr4_col_lastdigit
-    s/3\(A*[ABCD][\n\x00]\)$/4\1/
-    t incr4_col_lastdigit
-    s/2\(A*[ABCD][\n\x00]\)$/3\1/
-    t incr4_col_lastdigit
-    s/1\(A*[ABCD][\n\x00]\)$/2\1/
-    t incr4_col_lastdigit
-    s/0\(A*[ABCD][\n\x00]\)$/1\1/
-  : incr4_col_lastdigit
-    s/5\([\n\x00]\)$/9\1/
-    t incr4_col_letters2numbers
-    s/4\([\n\x00]\)$/8\1/
-    t incr4_col_letters2numbers
-    s/3\([\n\x00]\)$/7\1/
-    t incr4_col_letters2numbers
-    s/2\([\n\x00]\)$/6\1/
-    t incr4_col_letters2numbers
-    s/1\([\n\x00]\)$/5\1/
-    t incr4_col_letters2numbers
-    s/0\([\n\x00]\)$/4\1/
-  : incr4_col_letters2numbers
-    s/A\(A*[BCD]\?[\n\x00]\)$/0\1/
-    t incr4_col_letters2numbers
-    s/B\([\n\x00]\)$/1\1/
-    s/C\([\n\x00]\)$/2\1/
-    s/D\([\n\x00]\)$/3\1/
-  x
-  b json_pp___RETURN
-
-: incr5_col
-  x
-  s/9\([\n\x00]\)$/E\1/
-  s/8\([\n\x00]\)$/D\1/
-  s/7\([\n\x00]\)$/C\1/
-  s/6\([\n\x00]\)$/B\1/
-  s/5\([\n\x00]\)$/A\1/
-  : incr5_col_nines2As
-    s/9\(A*[ABCDE][\n\x00]\)$/A\1/
-    t incr5_col_nines2As
-  : incr5_col_ge10
-    s/\([\n\x00]\)\(A*[ABCDE][\n\x00]\)$/\11\2/
-    t incr5_col_lastdigit
-    s/8\(A*[ABCDE][\n\x00]\)$/9\1/
-    t incr5_col_lastdigit
-    s/7\(A*[ABCDE][\n\x00]\)$/8\1/
-    t incr5_col_lastdigit
-    s/6\(A*[ABCDE][\n\x00]\)$/7\1/
-    t incr5_col_lastdigit
-    s/5\(A*[ABCDE][\n\x00]\)$/6\1/
-    t incr5_col_lastdigit
-    s/4\(A*[ABCDE][\n\x00]\)$/5\1/
-    t incr5_col_lastdigit
-    s/3\(A*[ABCDE][\n\x00]\)$/4\1/
-    t incr5_col_lastdigit
-    s/2\(A*[ABCDE][\n\x00]\)$/3\1/
-    t incr5_col_lastdigit
-    s/1\(A*[ABCDE][\n\x00]\)$/2\1/
-    t incr5_col_lastdigit
-    s/0\(A*[ABCDE][\n\x00]\)$/1\1/
-  : incr5_col_lastdigit
-    s/4\([\n\x00]\)$/9\1/
-    t incr5_col_letters2numbers
-    s/3\([\n\x00]\)$/8\1/
-    t incr5_col_letters2numbers
-    s/2\([\n\x00]\)$/7\1/
-    t incr5_col_letters2numbers
-    s/1\([\n\x00]\)$/6\1/
-    t incr5_col_letters2numbers
-    s/0\([\n\x00]\)$/5\1/
-  : incr5_col_letters2numbers
-    s/A\(A*[BCDE]\?[\n\x00]\)$/0\1/
-    t incr5_col_letters2numbers
-    s/B\([\n\x00]\)$/1\1/
-    s/C\([\n\x00]\)$/2\1/
-    s/D\([\n\x00]\)$/3\1/
-    s/E\([\n\x00]\)$/4\1/
-  x
   b json_pp___RETURN
 
 : json_pp___PRINT
@@ -1284,7 +1140,7 @@
     s/^\([^\x00]*\x00\)\{6\}//
     # Restore the hold space to its state before the print and reset the line to format
     x
-    s/^\(\([^\x00]*\x00\)\{2\} *\)[^\x00]*\(\x00[^\x00]*\(\x00[0-9]\+\)\{2\}\x00\).*/\1\3/
+    s/^\(\([^\x00]*\x00\)\{2\} *\)[^\x00]*\(\x00[^\x00]*\(\x00a\+\)\{2\}\x00\).*/\1\3/
   }
   /\n$/ {
     s/.$//
@@ -1300,7 +1156,7 @@
     s/^\([^\n]*\n\)\{6\}//
     # Restore the hold space to its state before the print and reset the line to format
     x
-    s/^\(\([^\n]*\n\)\{2\} *\)[^\n]*\(\n[^\n]*\(\n[0-9]\+\)\{2\}\n\).*/\1\3/
+    s/^\(\([^\n]*\n\)\{2\} *\)[^\n]*\(\n[^\n]*\(\na\+\)\{2\}\n\).*/\1\3/
   }
   x
   b json_pp___RETURN
@@ -1328,25 +1184,10 @@
     x
     b json_pp___array_4
   }
-  /^a5/ {
-    s/..//
-    x
-    b json_pp___array_5
-  }
-  /^a6/ {
-    s/..//
-    x
-    b json_pp___array_6
-  }
   /^C1/ {
     s/..//
     x
     b json_pp___characters_1
-  }
-  /^c1/ {
-    s/..//
-    x
-    b json_pp___character_1
   }
   /^D1/ {
     s/..//
@@ -1363,11 +1204,6 @@
     x
     b json_pp___elements_2
   }
-  /^E3/ {
-    s/..//
-    x
-    b json_pp___elements_3
-  }
   /^e1/ {
     s/..//
     x
@@ -1378,25 +1214,10 @@
     x
     b json_pp___element_2
   }
-  /^f1/ {
-    s/..//
-    x
-    b json_pp___fraction_1
-  }
   /^i1/ {
     s/..//
     x
     b json_pp___integer_1
-  }
-  /^i2/ {
-    s/..//
-    x
-    b json_pp___integer_2
-  }
-  /^ir/ {
-    s/..//
-    x
-    b incr_row_1
   }
   /^j1/ {
     s/..//
@@ -1418,11 +1239,6 @@
     x
     b json_pp___members_2
   }
-  /^M3/ {
-    s/..//
-    x
-    b json_pp___members_3
-  }
   /^m1/ {
     s/..//
     x
@@ -1437,11 +1253,6 @@
     s/..//
     x
     b json_pp___member_3
-  }
-  /^m4/ {
-    s/..//
-    x
-    b json_pp___member_4
   }
   /^n1/ {
     s/..//
@@ -1478,50 +1289,20 @@
     x
     b json_pp___object_4
   }
-  /^o5/ {
-    s/..//
-    x
-    b json_pp___object_5
-  }
-  /^o6/ {
-    s/..//
-    x
-    b json_pp___object_6
-  }
   /^s1/ {
     s/..//
     x
     b json_pp___string_1
-  }
-  /^s2/ {
-    s/..//
-    x
-    b json_pp___string_2
   }
   /^v1/ {
     s/..//
     x
     b json_pp___value_1
   }
-  /^w1/ {
-    s/..//
-    x
-    b json_pp___ws_1
-  }
-  /^w2/ {
-    s/..//
-    x
-    b json_pp___ws_2
-  }
   /^x1/ {
     s/..//
     x
     b json_pp___exponent_1
-  }
-  /^x2/ {
-    s/..//
-    x
-    b json_pp___exponent_2
   }
   /^\\1/ {
     s/..//
@@ -1537,11 +1318,6 @@
     s/..//
     x
     b json_pp___escape_3
-  }
-  /^\\4/ {
-    s/..//
-    x
-    b json_pp___escape_4
   }
   z
   s/^/"Unknown return code"/
@@ -1566,6 +1342,64 @@
   }
   Q 5
 
+: json_pp___COMPUTE_FAILURE_LOCATION
+  t json_pp___COMPUTE_FAILURE_LOCATION_a_to_b
+  : json_pp___COMPUTE_FAILURE_LOCATION_a_to_b
+    s/aaaaaaaaaa/b/g
+    t json_pp___COMPUTE_FAILURE_LOCATION_b_to_c
+    b json_pp___COMPUTE_FAILURE_LOCATION_letters_to_digits
+  : json_pp___COMPUTE_FAILURE_LOCATION_b_to_c
+    s/bbbbbbbbbb/c/g
+    t json_pp___COMPUTE_FAILURE_LOCATION_c_to_d
+    b json_pp___COMPUTE_FAILURE_LOCATION_letters_to_digits
+  : json_pp___COMPUTE_FAILURE_LOCATION_c_to_d
+    s/cccccccccc/d/g
+    t json_pp___COMPUTE_FAILURE_LOCATION_d_to_e
+    b json_pp___COMPUTE_FAILURE_LOCATION_letters_to_digits
+  : json_pp___COMPUTE_FAILURE_LOCATION_d_to_e
+    s/dddddddddd/e/g
+    t json_pp___COMPUTE_FAILURE_LOCATION_e_to_f
+    b json_pp___COMPUTE_FAILURE_LOCATION_letters_to_digits
+  : json_pp___COMPUTE_FAILURE_LOCATION_e_to_f
+    s/eeeeeeeeee/f/g
+    t json_pp___COMPUTE_FAILURE_LOCATION_f_to_g
+    b json_pp___COMPUTE_FAILURE_LOCATION_letters_to_digits
+  : json_pp___COMPUTE_FAILURE_LOCATION_f_to_g
+    s/ffffffffff/g/g
+    t json_pp___COMPUTE_FAILURE_LOCATION_g_to_h
+    b json_pp___COMPUTE_FAILURE_LOCATION_letters_to_digits
+  : json_pp___COMPUTE_FAILURE_LOCATION_g_to_h
+    s/gggggggggg/h/g
+    t json_pp___COMPUTE_FAILURE_LOCATION_h
+    b json_pp___COMPUTE_FAILURE_LOCATION_letters_to_digits
+  : json_pp___COMPUTE_FAILURE_LOCATION_h
+    s/hhhhhhhhhh//g
+    # Here we can continue to add more letters for bigger numbers
+  : json_pp___COMPUTE_FAILURE_LOCATION_letters_to_digits
+    /^[b-zA-Z]\+[^a-zA-Z0-9]/ {
+      s/[^a-zA-Z0-9]/0\0/
+    }
+    /[^a-zA-Z0-9][b-zA-Z]\+$/ {
+      s/$/0/
+    }
+    s/aaaaaaaaa/9/g
+    s/aaaaaaaa/8/g
+    s/aaaaaaa/7/g
+    s/aaaaaa/6/g
+    s/aaaaa/5/g
+    s/aaaa/4/g
+    s/aaa/3/g
+    s/aa/2/g
+    s/a/1/g
+    y/bcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY/
+    /^[0-9]\+[^a-zA-Z0-9][0-9]\+$/ ! {
+      b json_pp___COMPUTE_FAILURE_LOCATION_letters_to_digits
+    }
+    /\x00/ {
+      b json_pp___PARSING_FAILURE_NUL
+    }
+    b json_pp___PARSING_FAILURE_NEWLINE
+
 : json_pp___PARSING_FAILURE
   x
   /[^\n\x00]$/ {
@@ -1574,25 +1408,29 @@
     b json_pp___UNREACHABLE
   }
   /\x00$/ {
-    s/.$//
-    x
-    H
-    x
-    s/^\([^\x00]*\x00\)\{4\}\([0-9]\+\)\x00\([0-9]\+\)\x00\(.*\)/\x1b[0mJSON parsing error at ROW \2, COL \3: \4\n/
-    # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
-    w /dev/stderr
-    # If outside the scope it triggers the next conditional statement
-    z
+    s/.*\x00\(a\+\x00a\+\)\x00$/\1/
+    b json_pp___COMPUTE_FAILURE_LOCATION
+    : json_pp___PARSING_FAILURE_NUL
+      x
+      H
+      x
+      s/^\([0-9]\+\)\x00\([0-9]\+\)\x00\(.*\)/\x1b[0mJSON parsing error at ROW \1, COL \2: \3\n/
+      # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
+      w /dev/stderr
+      # If outside the scope it triggers the next conditional statement
+      z
   }
   /\n$/ {
-    s/.$//
-    x
-    H
-    x
-    s/^\([^\n]*\n\)\{4\}\([0-9]\+\)\n\([0-9]\+\)\n/\x1b[0mJSON parsing error at ROW \2, COL \3: /
-    # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
-    w /dev/stderr
-    z
+    s/.*\n\(a\+\na\+\)\n$/\1/
+    b json_pp___COMPUTE_FAILURE_LOCATION
+    : json_pp___PARSING_FAILURE_NEWLINE
+      x
+      H
+      x
+      s/^\([0-9]\+\)\n\([0-9]\+\)\n/\x1b[0mJSON parsing error at ROW \1, COL \2: /
+      # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
+      w /dev/stderr
+      z
   }
   Q 6
 

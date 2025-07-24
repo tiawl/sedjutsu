@@ -177,6 +177,8 @@
       s/^/`,` or `}` expected while parsing JSON object/
       b json_validator___FAILURE
   }
+  z
+  s/^/`{` expected while parsing JSON object/
   b json_validator___FAILURE
 
 ### members
@@ -262,6 +264,8 @@
       s/^/`,` or `]` expected while parsing JSON array/
       b json_validator___FAILURE
   }
+  z
+  s/^/`[` expected while parsing JSON array/
   b json_validator___FAILURE
 
 ### elements
@@ -680,40 +684,40 @@
   s/^/"Unknown return code"/
   b json_validator___UNREACHABLE
 
-: json_validator___ROW_COL
-  t json_validator___ROW_COL_a_to_b
-  : json_validator___ROW_COL_a_to_b
+: json_validator___COMPUTE_FAILURE_LOCATION
+  t json_validator___COMPUTE_FAILURE_LOCATION_a_to_b
+  : json_validator___COMPUTE_FAILURE_LOCATION_a_to_b
     s/aaaaaaaaaa/b/g
-    t json_validator___ROW_COL_b_to_c
-    b json_validator___ROW_COL_letters_to_digits
-  : json_validator___ROW_COL_b_to_c
+    t json_validator___COMPUTE_FAILURE_LOCATION_b_to_c
+    b json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
+  : json_validator___COMPUTE_FAILURE_LOCATION_b_to_c
     s/bbbbbbbbbb/c/g
-    t json_validator___ROW_COL_c_to_d
-    b json_validator___ROW_COL_letters_to_digits
-  : json_validator___ROW_COL_c_to_d
+    t json_validator___COMPUTE_FAILURE_LOCATION_c_to_d
+    b json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
+  : json_validator___COMPUTE_FAILURE_LOCATION_c_to_d
     s/cccccccccc/d/g
-    t json_validator___ROW_COL_d_to_e
-    b json_validator___ROW_COL_letters_to_digits
-  : json_validator___ROW_COL_d_to_e
+    t json_validator___COMPUTE_FAILURE_LOCATION_d_to_e
+    b json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
+  : json_validator___COMPUTE_FAILURE_LOCATION_d_to_e
     s/dddddddddd/e/g
-    t json_validator___ROW_COL_e_to_f
-    b json_validator___ROW_COL_letters_to_digits
-  : json_validator___ROW_COL_e_to_f
+    t json_validator___COMPUTE_FAILURE_LOCATION_e_to_f
+    b json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
+  : json_validator___COMPUTE_FAILURE_LOCATION_e_to_f
     s/eeeeeeeeee/f/g
-    t json_validator___ROW_COL_f_to_g
-    b json_validator___ROW_COL_letters_to_digits
-  : json_validator___ROW_COL_f_to_g
+    t json_validator___COMPUTE_FAILURE_LOCATION_f_to_g
+    b json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
+  : json_validator___COMPUTE_FAILURE_LOCATION_f_to_g
     s/ffffffffff/g/g
-    t json_validator___ROW_COL_g_to_h
-    b json_validator___ROW_COL_letters_to_digits
-  : json_validator___ROW_COL_g_to_h
+    t json_validator___COMPUTE_FAILURE_LOCATION_g_to_h
+    b json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
+  : json_validator___COMPUTE_FAILURE_LOCATION_g_to_h
     s/gggggggggg/h/g
-    t json_validator___ROW_COL_h
-    b json_validator___ROW_COL_letters_to_digits
-  : json_validator___ROW_COL_h
+    t json_validator___COMPUTE_FAILURE_LOCATION_h
+    b json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
+  : json_validator___COMPUTE_FAILURE_LOCATION_h
     s/hhhhhhhhhh//g
     # Here we can continue to add more letters for bigger numbers
-  : json_validator___ROW_COL_letters_to_digits
+  : json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
     /^[b-zA-Z]\+[^a-zA-Z0-9]/ {
       s/[^a-zA-Z0-9]/0\0/
     }
@@ -731,7 +735,7 @@
     s/a/1/g
     y/bcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY/
     /^[0-9]\+[^a-zA-Z0-9][0-9]\+$/ ! {
-      b json_validator___ROW_COL_letters_to_digits
+      b json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
     }
     /\x00/ {
       b json_validator___FAILURE_NUL
@@ -766,7 +770,7 @@
   }
   /\x00$/ {
     s/.*\x00\(a\+\x00a\+\)\x00$/\1/
-    b json_validator___ROW_COL
+    b json_validator___COMPUTE_FAILURE_LOCATION
     : json_validator___FAILURE_NUL
       x
       H
@@ -778,7 +782,7 @@
   }
   /\n$/ {
     s/.*\n\(a\+\na\+\)\n$/\1/
-    b json_validator___ROW_COL
+    b json_validator___COMPUTE_FAILURE_LOCATION
     : json_validator___FAILURE_NEWLINE
       x
       H
