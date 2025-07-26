@@ -109,6 +109,11 @@
     s/^8:/        :/
     : init_holdspace_end
       s/\(.*\)\([\n\x00]\)$/\2\1\2\2\1\2a\2a\2/
+      /\x00$/ {
+        x
+        s/\x00/\n/g
+        x
+      }
       x
       /^$/ {
         s/^/empty input/
