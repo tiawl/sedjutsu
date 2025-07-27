@@ -19,9 +19,12 @@
 #     as %{variable_name}. You can output a normal % by using %{percent}      #
 #     and a newline by using %{new_line}. The variables available are:        #
 #     * code_ascii: ASCII value from the keyboard event according to the US   #
-#                   keyboard layout                                           #
+#                   keyboard layout. It uses hat notation for control         #
+#                   characters                                                #
 #     * code_key: key code from the keyboard event                            #
 #     * code_scan: scan code from the keyboard event                          #
+#     * code_hex: hexadecimal value from the keyboard event according to      #
+#                 the US keyboard layout                                      #
 #     * value_low: `release`, `press` or `repeat`                             #
 #     * value_up: `RELEASE`, `PRESS` or `REPEAT`                              #
 #     * value_verb: `released`, `pressed` or `repeated`                       #
@@ -117,9 +120,7 @@
         x
         s/./1/
       }
-      x
-      s/....//
-      b kblogger_us_loop
+      b kblogger_us_modifiers_end
     }
     # R_ALT
     /^\x64/ {
@@ -132,9 +133,7 @@
         x
         s/^\(.\)./\11/
       }
-      x
-      s/....//
-      b kblogger_us_loop
+      b kblogger_us_modifiers_end
     }
     # L_CTRL
     /^\x1d/ {
@@ -147,9 +146,7 @@
         x
         s/^\(..\)./\11/
       }
-      x
-      s/....//
-      b kblogger_us_loop
+      b kblogger_us_modifiers_end
     }
     # R_CTRL
     /^\x61/ {
@@ -162,9 +159,7 @@
         x
         s/^\(...\)./\11/
       }
-      x
-      s/....//
-      b kblogger_us_loop
+      b kblogger_us_modifiers_end
     }
     # L_SHIFT
     /^\x2a/ {
@@ -177,9 +172,7 @@
         x
         s/^\(....\)./\11/
       }
-      x
-      s/....//
-      b kblogger_us_loop
+      b kblogger_us_modifiers_end
     }
     # R_SHIFT
     /^\x36/ {
@@ -192,9 +185,7 @@
         x
         s/^\(.....\)./\11/
       }
-      x
-      s/....//
-      b kblogger_us_loop
+      b kblogger_us_modifiers_end
     }
     # CAPS_LOCK
     /^\x3a/ {
@@ -210,94 +201,195 @@
       b kblogger_us_loop
     }
     b kblogger_us_mapping
+    : kblogger_us_modifiers_end
+      x
+      s/....//
+      b kblogger_us_loop
 
-  # List of covered keys. If not covered this symbol ✖░ is used. For each not bold-font square:
+  # List of covered keys:
+  # - if a key mapping is not covered this symbol ✘░ is used,
+  # - if a key mapping is covered but not easy to represent in this drawing the symbol ✔ is used
+  # - a fully covered key mapping contains its own symbol for US keyboard layout
+  # For each not bold-font square:
   # - the bottom-left side is the ascii representation of the key without modifier
   # - the top-left side is the ascii representation of the key with SHIFT modifier
+  # - the bottom-middle side is the ascii representation of the key CTRL modifier
+  # - the top-middle side is the ascii representation of the key with ALT modifier
   # - the top-right side is the ascii representation of the key with ALT and SHIFT modifiers
-  # - the bottom-right side is the ascii representation of the key with ALT modifier
+  # - the bottom-right side is the ascii representation of the key with ALT and CTRL modifiers
   # ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┲━━━━━━━━━┓
-  # │ ✖ ✖ │ ✖ ̨✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ ┃Backspace┃
-  # │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ ┃  ✖  ⌫   ┃
+  # │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ ┃Backspace┃
+  # │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ ┃   ⌫     ┃
   # ┢━━━━━┷━┱───┴─┬───┴─┬───┴─┬───┴─┬───┴─┬───┴─┬───┴─┬───┴─┬───┴─┬───┴─┬───┴─┬───┺━┳━━━━━━━┫
-  # ┃  ✖ ⇥  ┃ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ ┃ Enter ┃
-  # ┃  ✖ ⇤  ┃ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ ┃   ✖   ┃
+  # ┃       ┃ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ ┃ Enter ┃
+  # ┃Tab ↹  ┃ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ ┃       ┃
   # ┣━━━━━━━┻┱────┴┬────┴┬────┴┬────┴┬────┴┬────┴┬────┴┬────┴┬────┴┬────┴┬────┴┬────┺┓  ⏎   ┃
-  # ┃Caps    ┃ A ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ ┃      ┃
-  # ┃Lock ⇬  ┃ a ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ ┃      ┃
+  # ┃Caps    ┃  A  │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ ┃      ┃
+  # ┃Lock ⇬  ┃  a  │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ ┃      ┃
   # ┣━━━━━━━┳┹────┬┴────┬┴────┬┴────┬┴────┬┴────┬┴────┬┴────┬┴────┬┴────┬┴────┲┷━━━━━┻━━━━━━┫
-  # ┃Shift  ┃ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ ┃    Shift    ┃
-  # ┃     ⇧ ┃ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ │ ✖ ✖ ┃      ⇧      ┃
+  # ┃Shift  ┃ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ ┃    Shift    ┃
+  # ┃     ⇧ ┃ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ ┃      ⇧      ┃
   # ┣━━━━━━━╋━━━━━┷━┳━━━┷━━━┳━┷━━━━━┷━━━━━┷━━━━━┷━━━━━┷━━━━━┷━━━┳━┷━━━━━╈━━━━━┻━┳━━━┳━━━┳━━━┫
-  # ┃Ctrl   ┃Meta ✖ ┃Alt    ┃ ␣ ✖ Space       ✖ Escaped space ⍽ ┃ AltGr ┃Ctrl   ┃ ⇞ ┃ ↑ ┃ ⇟ ┃
-  # ┃       ┃       ┃       ┃ ␣                               ⍽ ┃   ⇮   ┃       ┣━━━╋━━━╋━━━┫
+  # ┃Ctrl   ┃Meta ✘ ┃Alt    ┃              Space                ┃ AltGr ┃Ctrl   ┃ ⇞ ┃ ↑ ┃ ⇟ ┃
+  # ┃       ┃       ┃       ┃                                   ┃   ⇮   ┃       ┣━━━╋━━━╋━━━┫
   # ┗━━━━━━━┻━━━━━━━┻━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━┻━━━━━━━┫ ← ┃ ↓ ┃→  ┃
   #                                                                             ┗━━━┻━━━┻━━━┛
   : kblogger_us_mapping
-    # Key: a A
+    # Key: Backspace
+    /^\x0e/ {
+      # CTRL modifier
+      # ALT modifier
+      # ALT + CTRL modifiers
+      x
+      s/^[01]\+\n\([^\n]*\n\)/14\n0x0e\n^?\n0x7f\n\1\0/
+      b kblogger_us_mapping_end
+    }
+    # Key: Tab
+    /^\x0f/ {
+      x
+      # SHIFT modifier
+      /^[01]\{4\}000\n/ ! {
+        s/^[01]\+\n\([^\n]*\n\)/15\n0x0f\n^[[Z\n0x1b 0x5b 0x5a\n\1\0/
+        b kblogger_us_mapping_end
+      }
+      s/^[01]\+\n\([^\n]*\n\)/15\n0x0f\n\t\n0x09\n\1\0/
+      b kblogger_us_mapping_end
+    }
+    # Key: Enter
+    /^\x1c/ {
+      # ALT modifier
+      x
+      s/^[01]\+\n\([^\n]*\n\)/28\n0x1c\n^M\n0x13\n\1\0/
+      b kblogger_us_mapping_end
+    }
+    # Key: a A ^A ^[a ^[A ^[^A
     /^\x1e/ {
       x
-      # check SHIFT modifiers
-      /^....000\n/ ! {
-        s/^[01]\+\n\([^\n]*\n\)/30\n0x1e\nA\n\1\0/
+      # ALT modifier
+      /^00[01]\{5\}\n/ ! {
+        # ALT + CTRL modifiers: CTRL prevails on SHIFT
+        /^[01]\{2\}00[01]\{3\}\n/ ! {
+          s/^[01]\+\n\([^\n]*\n\)/30\n0x1e\n^[^A\n0x1b 0x01\n\1\0/
+          b kblogger_us_mapping_end
+        }
+        # ALT + SHIFT modifiers
+        /^[01]\{4\}000\n/ ! {
+          s/^[01]\+\n\([^\n]*\n\)/30\n0x1e\n^[A\n0x1b 0x41\n\1\0/
+          b kblogger_us_mapping_end
+        }
+        s/^[01]\+\n\([^\n]*\n\)/30\n0x1e\n^[a\n0x1b 0x61\n\1\0/
+        b kblogger_us_mapping_end
       }
-      /^....000\n/ {
-        s/^[01]\+\n\([^\n]*\n\)/30\n0x1e\na\n\1\0/
+      # SHIFT modifier
+      /^[01]\{4\}000\n/ ! {
+        s/^[01]\+\n\([^\n]*\n\)/30\n0x1e\nA\n0x41\n\1\0/
+        b kblogger_us_mapping_end
       }
-      x
-      s/..//
-      b kblogger_us___PRINT
+      # CTRL modifier
+      /^[01]\{2\}00[01]\{3\}\n/ ! {
+        s/^[01]\+\n\([^\n]*\n\)/30\n0x1e\n^A\n0x01\n\1\0/
+        b kblogger_us_mapping_end
+      }
+      s/^[01]\+\n\([^\n]*\n\)/30\n0x1e\na\n0x61\n\1\0/
+      b kblogger_us_mapping_end
     }
-    # Key: →
-    /^\x6a/ {
+    # Key: Space
+    /^\x39/ {
       x
-      s/^[01]\+\n\([^\n]*\n\)/106\n0x6a\n\x1b\x5b\x43\n\1\0/
-      x
-      s/..//
-      b kblogger_us___PRINT
-    }
-    # Key: ←
-    /^\x69/ {
-      x
-      s/^[01]\+\n\([^\n]*\n\)/105\n0x69\n\x1b\x5b\x44\n\1\0/
-      x
-      s/..//
-      b kblogger_us___PRINT
+      # ALT modifier
+      /^00[01]\{5\}\n/ ! {
+        # ALT + CTRL modifiers
+        /^[01]\{2\}00[01]\{3\}\n/ ! {
+          s/^[01]\+\n\([^\n]*\n\)/57\n0x39\n^[^@\n0x1b 0x0 \n\1\0/
+          b kblogger_us_mapping_end
+        }
+        s/^[01]\+\n\([^\n]*\n\)/57\n0x39\n^[ \n0x1b 0x20\n\1\0/
+        b kblogger_us_mapping_end
+      }
+      # CTRL modifier
+      /^[01]\{2\}00[01]\{3\}\n/ ! {
+        s/^[01]\+\n\([^\n]*\n\)/57\n0x32\n^@\n0x00\n\1\0/
+        b kblogger_us_mapping_end
+      }
+      s/^[01]\+\n\([^\n]*\n\)/50\n0x32\n \n0x20\n\1\0/
+      b kblogger_us_mapping_end
     }
     # Key: ↑
     /^\x67/ {
       x
-      s/^[01]\+\n\([^\n]*\n\)/103\n0x67\n\x1b\x5b\x41\n\1\0/
-      x
-      s/..//
-      b kblogger_us___PRINT
-    }
-    # Key: ↓
-    /^\x6c/ {
-      x
-      s/^[01]\+\n\([^\n]*\n\)/108\n0x6c\n\x1b\x5b\x42\n\1\0/
-      x
-      s/..//
-      b kblogger_us___PRINT
+      # ALT modifier
+      # ALT + CTRL modifiers
+      # ALT + SHIFT modifiers
+      # ALT + SHIFT + CTRL modifiers
+      # CTRL modifier
+      # SHIFT + CTRL modifiers
+      # SHIFT modifier
+      s/^[01]\+\n\([^\n]*\n\)/103\n0x67\n^[[A\n0x1b 0x5b 0x41\n\1\0/
+      b kblogger_us_mapping_end
     }
     # Key: ⇞
     /^\x68/ {
+      # CTRL modifier
+      # ALT modifier
+      # ALT + CTRL modifiers
       x
-      s/^[01]\+\n\([^\n]*\n\)/104\n0x68\n\x1b\x5b\x35\x7e\n\1\0/
+      s/^[01]\+\n\([^\n]*\n\)/104\n0x68\n^[[5~\n0x1b 0x5b 0x35 0x7e\n\1\0/
+      b kblogger_us_mapping_end
+    }
+    # Key: ←
+    /^\x69/ {
+      # ALT modifier
+      # ALT + CTRL modifiers
+      # ALT + SHIFT modifiers
+      # ALT + SHIFT + CTRL modifiers
+      # CTRL modifier
+      # SHIFT + CTRL modifiers
+      # SHIFT modifier
       x
-      s/..//
-      b kblogger_us___PRINT
+      s/^[01]\+\n\([^\n]*\n\)/105\n0x69\n^[[D\n0x1b 0x5b 0x44\n\1\0/
+      b kblogger_us_mapping_end
+    }
+    # Key: →
+    /^\x6a/ {
+      # ALT modifier
+      # ALT + CTRL modifiers
+      # ALT + SHIFT modifiers
+      # ALT + SHIFT + CTRL modifiers
+      # CTRL modifier
+      # SHIFT + CTRL modifiers
+      # SHIFT modifier
+      x
+      s/^[01]\+\n\([^\n]*\n\)/106\n0x6a\n^[[C\n0x1b 0x5b 0x43\n\1\0/
+      b kblogger_us_mapping_end
+    }
+    # Key: ↓
+    /^\x6c/ {
+      # ALT modifier
+      # ALT + CTRL modifiers
+      # ALT + SHIFT modifiers
+      # ALT + SHIFT + CTRL modifiers
+      # CTRL modifier
+      # SHIFT + CTRL modifiers
+      # SHIFT modifier
+      x
+      s/^[01]\+\n\([^\n]*\n\)/108\n0x6c\n^[[B\n0x1b 0x5b 0x42\n\1\0/
+      b kblogger_us_mapping_end
     }
     # Key: ⇟
     /^\x6d/ {
+      # CTRL modifier
+      # ALT modifier
+      # ALT + CTRL modifiers
       x
-      s/^[01]\+\n\([^\n]*\n\)/109\n0x6d\n\x1b\x5b\x35\x7e\n\1\0/
-      x
-      s/..//
-      b kblogger_us___PRINT
+      s/^[01]\+\n\([^\n]*\n\)/109\n0x6d\n^[[6~\n0x1b 0x5b 0x36 0x7e\n\1\0/
+      b kblogger_us_mapping_end
     }
     # TODO: complete the mapping
     b kblogger_us___UNKNOWN_MAPPING
+    : kblogger_us_mapping_end
+      x
+      s/..//
+      b kblogger_us___PRINT
 
   : kblogger_us___PRINT
     # Remove value field from the input_event struct
@@ -315,28 +407,31 @@
     }
     # TODO: timestamp ??
     : kblogger_us___PRINT_format_value_low
-      s/^\(\([^\n]*\)\n\([^\n]*\n\)\{6\}[^\n]*\)%{value_low}/\1\2/
+      s/^\(\([^\n]*\)\n\([^\n]*\n\)\{7\}[^\n]*\)%{value_low}/\1\2/
       t kblogger_us___PRINT_format_value_low
     : kblogger_us___PRINT_format_value_up
-      s/^\([^\n]*\n\([^\n]*\)\n\([^\n]*\n\)\{5\}[^\n]*\)%{value_up}/\1\2/
+      s/^\([^\n]*\n\([^\n]*\)\n\([^\n]*\n\)\{6\}[^\n]*\)%{value_up}/\1\2/
       t kblogger_us___PRINT_format_value_up
     : kblogger_us___PRINT_format_value_verb
-      s/^\(\([^\n]*\n\)\{2\}\([^\n]*\)\n\([^\n]*\n\)\{4\}[^\n]*\)%{value_verb}/\1\3/
+      s/^\(\([^\n]*\n\)\{2\}\([^\n]*\)\n\([^\n]*\n\)\{5\}[^\n]*\)%{value_verb}/\1\3/
       t kblogger_us___PRINT_format_value_verb
     : kblogger_us___PRINT_format_value_id
-      s/^\(\([^\n]*\n\)\{3\}\([^\n]*\)\n\([^\n]*\n\)\{3\}[^\n]*\)%{value_id}/\1\3/
+      s/^\(\([^\n]*\n\)\{3\}\([^\n]*\)\n\([^\n]*\n\)\{4\}[^\n]*\)%{value_id}/\1\3/
       t kblogger_us___PRINT_format_value_id
     : kblogger_us___PRINT_format_code_key
-      s/^\(\([^\n]*\n\)\{4\}\([^\n]*\)\n\([^\n]*\n\)\{2\}[^\n]*\)%{code_key}/\1\3/
+      s/^\(\([^\n]*\n\)\{4\}\([^\n]*\)\n\([^\n]*\n\)\{3\}[^\n]*\)%{code_key}/\1\3/
       t kblogger_us___PRINT_format_code_key
     : kblogger_us___PRINT_format_code_scan
-      s/^\(\([^\n]*\n\)\{5\}\([^\n]*\)\n[^\n]*\n[^\n]*\)%{code_scan}/\1\3/
+      s/^\(\([^\n]*\n\)\{5\}\([^\n]*\)\n\([^\n]*\n\)\{2\}[^\n]*\)%{code_scan}/\1\3/
       t kblogger_us___PRINT_format_code_scan
     : kblogger_us___PRINT_format_code_ascii
-      s/^\(\([^\n]*\n\)\{6\}\([^\n]*\)\n[^\n]*\)%{code_ascii}/\1\3/
+      s/^\(\([^\n]*\n\)\{6\}\([^\n]*\)\n[^\n]*\n[^\n]*\)%{code_ascii}/\1\3/
       t kblogger_us___PRINT_format_code_ascii
+    : kblogger_us___PRINT_format_code_hex
+      s/^\(\([^\n]*\n\)\{7\}\([^\n]*\)\n[^\n]*\)%{code_hex}/\1\3/
+      t kblogger_us___PRINT_format_code_hex
     : kblogger_us___PRINT_format_special_chars
-      s/^\([^\n]*\n\)\{7\}//
+      s/^\([^\n]*\n\)\{8\}//
     : kblogger_us___PRINT_remove_inserted_new_line
       s/\([^\n]*\)\n\([^\n]*\n[01]\+\n[^\n]*\n[^\n]*\)$/\1\2/
       t kblogger_us___PRINT_remove_inserted_new_line
