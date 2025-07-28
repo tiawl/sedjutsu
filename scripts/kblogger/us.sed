@@ -25,6 +25,7 @@
 #     * code_scan: scan code from the keyboard event                          #
 #     * code_hex: hexadecimal value from the keyboard event according to      #
 #                 the US keyboard layout                                      #
+#     * modifiers_scan: scan codes of active modifiers                        #
 #     * value_low: `release`, `press` or `repeat`                             #
 #     * value_up: `RELEASE`, `PRESS` or `REPEAT`                              #
 #     * value_verb: `released`, `pressed` or `repeated`                       #
@@ -217,7 +218,10 @@
   # - the top-middle side is the ascii representation of the key with ALT modifier
   # - the top-right side is the ascii representation of the key with ALT and SHIFT modifiers
   # - the bottom-right side is the ascii representation of the key with ALT and CTRL modifiers
-  # ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┲━━━━━━━━━┓
+  #   ✘    ✘    ✘    ✘    ✘    ✘    ✘    ✘    ✘    ✘     ✘     ✘     ✘    ✘    ✘    ✘    ✘
+  # ┏━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━━┳━━━━━┳━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┓
+  # ┃Esc ┃ F1 ┃ F2 ┃ F3 ┃ F4 ┃ F5 ┃ F6 ┃ F7 ┃ F8 ┃ F9 ┃ F10 ┃ F11 ┃ F12 ┃ ↖  ┃ ↘  ┃ ⎀  ┃Del ┃
+  # ┡━━━━┻┯━━━┻━┯━━┻━━┯━┻━━━┯┻━━━━╇━━━━┻┯━━━┻━┯━━┻━━┯━┻━━━┯━┻━━━┯━┻━━━┯━┻━━━┯┻━━━━╋━━━━┻━━━━┫
   # │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ ┃Backspace┃
   # │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ │ ✘✘✘ ┃   ⌫     ┃
   # ┢━━━━━┷━┱───┴─┬───┴─┬───┴─┬───┴─┬───┴─┬───┴─┬───┴─┬───┴─┬───┴─┬───┴─┬───┴─┬───┺━┳━━━━━━━┫
@@ -241,56 +245,58 @@
       # ALT modifier
       # ALT + CTRL modifiers
       x
-      s/^[01]\+\n\([^\n]*\n\)/14\n0x0e\n^?\n0x7f\n\1\0/
+      s/^[01]\+\n\([^\n]*\n\)/\n14\n0x0e\n^?\n0x7f\n\1\0/
       b kblogger_us_mapping_end
     }
     # Key: Tab
     /^\x0f/ {
       x
+      # ALT modifier
       # SHIFT modifier
       /^[01]\{4\}000\n/ ! {
-        s/^[01]\+\n\([^\n]*\n\)/15\n0x0f\n^[[Z\n0x1b 0x5b 0x5a\n\1\0/
+        s/^[01]\+\n\([^\n]*\n\)/\n15\n0x0f\n^[[Z\n0x1b 0x5b 0x5a\n\1\0/
         b kblogger_us_mapping_end
       }
-      s/^[01]\+\n\([^\n]*\n\)/15\n0x0f\n\t\n0x09\n\1\0/
+      s/^[01]\+\n\([^\n]*\n\)/\n15\n0x0f\n\t\n0x09\n\1\0/
       b kblogger_us_mapping_end
     }
     # Key: Enter
     /^\x1c/ {
       # ALT modifier
       x
-      s/^[01]\+\n\([^\n]*\n\)/28\n0x1c\n^M\n0x13\n\1\0/
+      s/^[01]\+\n\([^\n]*\n\)/\n28\n0x1c\n^M\n0x13\n\1\0/
       b kblogger_us_mapping_end
     }
     # Key: a A ^A ^[a ^[A ^[^A
     /^\x1e/ {
+      # TODO: CAPS_LOCK + SHIFT = no modifiers
       x
       # ALT modifier
       /^00[01]\{5\}\n/ ! {
         # ALT + CTRL modifiers: CTRL prevails on SHIFT
         /^[01]\{2\}00[01]\{3\}\n/ ! {
-          s/^[01]\+\n\([^\n]*\n\)/30\n0x1e\n^[^A\n0x1b 0x01\n\1\0/
+          s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\n^[^A\n0x1b 0x01\n\1\0/
           b kblogger_us_mapping_end
         }
         # ALT + SHIFT modifiers
         /^[01]\{4\}000\n/ ! {
-          s/^[01]\+\n\([^\n]*\n\)/30\n0x1e\n^[A\n0x1b 0x41\n\1\0/
+          s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\n^[A\n0x1b 0x41\n\1\0/
           b kblogger_us_mapping_end
         }
-        s/^[01]\+\n\([^\n]*\n\)/30\n0x1e\n^[a\n0x1b 0x61\n\1\0/
+        s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\n^[a\n0x1b 0x61\n\1\0/
         b kblogger_us_mapping_end
       }
       # SHIFT modifier
       /^[01]\{4\}000\n/ ! {
-        s/^[01]\+\n\([^\n]*\n\)/30\n0x1e\nA\n0x41\n\1\0/
+        s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\nA\n0x41\n\1\0/
         b kblogger_us_mapping_end
       }
       # CTRL modifier
       /^[01]\{2\}00[01]\{3\}\n/ ! {
-        s/^[01]\+\n\([^\n]*\n\)/30\n0x1e\n^A\n0x01\n\1\0/
+        s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\n^A\n0x01\n\1\0/
         b kblogger_us_mapping_end
       }
-      s/^[01]\+\n\([^\n]*\n\)/30\n0x1e\na\n0x61\n\1\0/
+      s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\na\n0x61\n\1\0/
       b kblogger_us_mapping_end
     }
     # Key: Space
@@ -300,18 +306,18 @@
       /^00[01]\{5\}\n/ ! {
         # ALT + CTRL modifiers
         /^[01]\{2\}00[01]\{3\}\n/ ! {
-          s/^[01]\+\n\([^\n]*\n\)/57\n0x39\n^[^@\n0x1b 0x0 \n\1\0/
+          s/^[01]\+\n\([^\n]*\n\)/\n57\n0x39\n^[^@\n0x1b 0x0 \n\1\0/
           b kblogger_us_mapping_end
         }
-        s/^[01]\+\n\([^\n]*\n\)/57\n0x39\n^[ \n0x1b 0x20\n\1\0/
+        s/^[01]\+\n\([^\n]*\n\)/\n57\n0x39\n^[ \n0x1b 0x20\n\1\0/
         b kblogger_us_mapping_end
       }
       # CTRL modifier
       /^[01]\{2\}00[01]\{3\}\n/ ! {
-        s/^[01]\+\n\([^\n]*\n\)/57\n0x32\n^@\n0x00\n\1\0/
+        s/^[01]\+\n\([^\n]*\n\)/\n57\n0x39\n^@\n0x00\n\1\0/
         b kblogger_us_mapping_end
       }
-      s/^[01]\+\n\([^\n]*\n\)/50\n0x32\n \n0x20\n\1\0/
+      s/^[01]\+\n\([^\n]*\n\)/\n57\n0x39\n \n0x20\n\1\0/
       b kblogger_us_mapping_end
     }
     # Key: ↑
@@ -324,7 +330,7 @@
       # CTRL modifier
       # SHIFT + CTRL modifiers
       # SHIFT modifier
-      s/^[01]\+\n\([^\n]*\n\)/103\n0x67\n^[[A\n0x1b 0x5b 0x41\n\1\0/
+      s/^[01]\+\n\([^\n]*\n\)/\n103\n0x67\n^[[A\n0x1b 0x5b 0x41\n\1\0/
       b kblogger_us_mapping_end
     }
     # Key: ⇞
@@ -333,7 +339,7 @@
       # ALT modifier
       # ALT + CTRL modifiers
       x
-      s/^[01]\+\n\([^\n]*\n\)/104\n0x68\n^[[5~\n0x1b 0x5b 0x35 0x7e\n\1\0/
+      s/^[01]\+\n\([^\n]*\n\)/\n104\n0x68\n^[[5~\n0x1b 0x5b 0x35 0x7e\n\1\0/
       b kblogger_us_mapping_end
     }
     # Key: ←
@@ -346,7 +352,7 @@
       # SHIFT + CTRL modifiers
       # SHIFT modifier
       x
-      s/^[01]\+\n\([^\n]*\n\)/105\n0x69\n^[[D\n0x1b 0x5b 0x44\n\1\0/
+      s/^[01]\+\n\([^\n]*\n\)/\n105\n0x69\n^[[D\n0x1b 0x5b 0x44\n\1\0/
       b kblogger_us_mapping_end
     }
     # Key: →
@@ -359,7 +365,7 @@
       # SHIFT + CTRL modifiers
       # SHIFT modifier
       x
-      s/^[01]\+\n\([^\n]*\n\)/106\n0x6a\n^[[C\n0x1b 0x5b 0x43\n\1\0/
+      s/^[01]\+\n\([^\n]*\n\)/\n106\n0x6a\n^[[C\n0x1b 0x5b 0x43\n\1\0/
       b kblogger_us_mapping_end
     }
     # Key: ↓
@@ -372,7 +378,7 @@
       # SHIFT + CTRL modifiers
       # SHIFT modifier
       x
-      s/^[01]\+\n\([^\n]*\n\)/108\n0x6c\n^[[B\n0x1b 0x5b 0x42\n\1\0/
+      s/^[01]\+\n\([^\n]*\n\)/\n108\n0x6c\n^[[B\n0x1b 0x5b 0x42\n\1\0/
       b kblogger_us_mapping_end
     }
     # Key: ⇟
@@ -381,7 +387,7 @@
       # ALT modifier
       # ALT + CTRL modifiers
       x
-      s/^[01]\+\n\([^\n]*\n\)/109\n0x6d\n^[[6~\n0x1b 0x5b 0x36 0x7e\n\1\0/
+      s/^[01]\+\n\([^\n]*\n\)/\n109\n0x6d\n^[[6~\n0x1b 0x5b 0x36 0x7e\n\1\0/
       b kblogger_us_mapping_end
     }
     # TODO: complete the mapping
@@ -392,46 +398,73 @@
       b kblogger_us___PRINT
 
   : kblogger_us___PRINT
+    x
+    # add active modifiers
+    /1\(\n[^\n]*\)\{2\}$/ {
+      s/^/ 0x3a/
+    }
+    /1[01]\(\n[^\n]*\)\{2\}$/ {
+      s/^/ 0x36/
+    }
+    /1[01]\{2\}\(\n[^\n]*\)\{2\}$/ {
+      s/^/ 0x24/
+    }
+    /1[01]\{3\}\(\n[^\n]*\)\{2\}$/ {
+      s/^/ 0x61/
+    }
+    /1[01]\{4\}\(\n[^\n]*\)\{2\}$/ {
+      s/^/ 0x1d/
+    }
+    /1[01]\{5\}\(\n[^\n]*\)\{2\}$/ {
+      s/^/ 0x64/
+    }
+    /1[01]\{6\}\(\n[^\n]*\)\{2\}$/ {
+      s/^/ 0x38/
+    }
+    x
     # Remove value field from the input_event struct
     /^\x00\x00\x00\x00/ {
       x
-      s/^/release\nRELEASE\nreleased\n0\n/
+      s/^ \?/release\nRELEASE\nreleased\n0\n/
     }
     /^\x01\x00\x00\x00/ {
       x
-      s/^/press\nPRESS\npressed\n1\n/
+      s/^ \?/press\nPRESS\npressed\n1\n/
     }
     /^\x02\x00\x00\x00/ {
       x
-      s/^/repeat\nREPEAT\nrepeated\n2\n/
+      s/^ \?/repeat\nREPEAT\nrepeated\n2\n/
     }
     # TODO: timestamp ??
     : kblogger_us___PRINT_format_value_low
-      s/^\(\([^\n]*\)\n\([^\n]*\n\)\{7\}[^\n]*\)%{value_low}/\1\2/
+      s/^\(\([^\n]*\)\n\([^\n]*\n\)\{8\}[^\n]*\)%{value_low}/\1\2/
       t kblogger_us___PRINT_format_value_low
     : kblogger_us___PRINT_format_value_up
-      s/^\([^\n]*\n\([^\n]*\)\n\([^\n]*\n\)\{6\}[^\n]*\)%{value_up}/\1\2/
+      s/^\([^\n]*\n\([^\n]*\)\n\([^\n]*\n\)\{7\}[^\n]*\)%{value_up}/\1\2/
       t kblogger_us___PRINT_format_value_up
     : kblogger_us___PRINT_format_value_verb
-      s/^\(\([^\n]*\n\)\{2\}\([^\n]*\)\n\([^\n]*\n\)\{5\}[^\n]*\)%{value_verb}/\1\3/
+      s/^\(\([^\n]*\n\)\{2\}\([^\n]*\)\n\([^\n]*\n\)\{6\}[^\n]*\)%{value_verb}/\1\3/
       t kblogger_us___PRINT_format_value_verb
     : kblogger_us___PRINT_format_value_id
-      s/^\(\([^\n]*\n\)\{3\}\([^\n]*\)\n\([^\n]*\n\)\{4\}[^\n]*\)%{value_id}/\1\3/
+      s/^\(\([^\n]*\n\)\{3\}\([^\n]*\)\n\([^\n]*\n\)\{5\}[^\n]*\)%{value_id}/\1\3/
       t kblogger_us___PRINT_format_value_id
+    : kblogger_us___PRINT_format_modifiers_scan
+      s/^\(\([^\n]*\n\)\{4\}\([^\n]*\)\n\([^\n]*\n\)\{4\}[^\n]*\)%{modifiers_scan}/\1\3/
+      t kblogger_us___PRINT_format_modifiers_scan
     : kblogger_us___PRINT_format_code_key
-      s/^\(\([^\n]*\n\)\{4\}\([^\n]*\)\n\([^\n]*\n\)\{3\}[^\n]*\)%{code_key}/\1\3/
+      s/^\(\([^\n]*\n\)\{5\}\([^\n]*\)\n\([^\n]*\n\)\{3\}[^\n]*\)%{code_key}/\1\3/
       t kblogger_us___PRINT_format_code_key
     : kblogger_us___PRINT_format_code_scan
-      s/^\(\([^\n]*\n\)\{5\}\([^\n]*\)\n\([^\n]*\n\)\{2\}[^\n]*\)%{code_scan}/\1\3/
+      s/^\(\([^\n]*\n\)\{6\}\([^\n]*\)\n\([^\n]*\n\)\{2\}[^\n]*\)%{code_scan}/\1\3/
       t kblogger_us___PRINT_format_code_scan
     : kblogger_us___PRINT_format_code_ascii
-      s/^\(\([^\n]*\n\)\{6\}\([^\n]*\)\n[^\n]*\n[^\n]*\)%{code_ascii}/\1\3/
+      s/^\(\([^\n]*\n\)\{7\}\([^\n]*\)\n[^\n]*\n[^\n]*\)%{code_ascii}/\1\3/
       t kblogger_us___PRINT_format_code_ascii
     : kblogger_us___PRINT_format_code_hex
-      s/^\(\([^\n]*\n\)\{7\}\([^\n]*\)\n[^\n]*\)%{code_hex}/\1\3/
+      s/^\(\([^\n]*\n\)\{8\}\([^\n]*\)\n[^\n]*\)%{code_hex}/\1\3/
       t kblogger_us___PRINT_format_code_hex
     : kblogger_us___PRINT_format_special_chars
-      s/^\([^\n]*\n\)\{8\}//
+      s/^\([^\n]*\n\)\{9\}//
     : kblogger_us___PRINT_remove_inserted_new_line
       s/\([^\n]*\)\n\([^\n]*\n[01]\+\n[^\n]*\n[^\n]*\)$/\1\2/
       t kblogger_us___PRINT_remove_inserted_new_line
