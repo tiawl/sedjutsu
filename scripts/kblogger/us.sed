@@ -20,19 +20,19 @@
 #     and a newline by using %{new_line}. The variables available are:        #
 #     * code_ascii: ASCII value from the keyboard event according to the US   #
 #                   keyboard layout. It uses hat notation for control         #
-#                   characters                                                #
+#                   characters.                                               #
 #     * code_key: key code from the keyboard event                            #
-#     * code_scan: scan code from the keyboard event                          #
+#     * code_hexkey: hexadecimal key code from the keyboard event             #
 #     * code_hex: hexadecimal value from the keyboard event according to      #
 #                 the US keyboard layout                                      #
-#     * modifiers_scan: scan codes of active modifiers                        #
+#     * modifiers_hex: hexadecimal key code of active modifiers               #
 #     * value_low: `release`, `press` or `repeat`                             #
 #     * value_up: `RELEASE`, `PRESS` or `REPEAT`                              #
 #     * value_verb: `released`, `pressed` or `repeated`                       #
 #     * value_id: 0 for release, 1 for press, and 2 for repeat                #
 #     Its default value is `%{code_ascii} %{value_verb}`                      #
 #                                                                             #
-### PREREQUESITES #############################################################
+### PREREQUISITES #############################################################
 #                                                                             #
 #   1) UTF-8 support is needed here to process binary output from             #
 #      /dev/input/eventX files. Use LC_CTYPE, LANG or LC_ALL variables        #
@@ -47,17 +47,19 @@
 #                                                                             #
 ### HOW TO RUN IT #############################################################
 #                                                                             #
-#   echo | LC_CTYPE=C sudo -E sed -n -f /path/to/scripts/kblogger/us.sed    #
+#   echo | LC_CTYPE=C sudo -E sed -n -f /path/to/scripts/kblogger/us.sed      #
 #                                                                             #
 ### KNOWN LIMITATIONS #########################################################
 #                                                                             #
 #   1) Over simplified keyboard: not every keys, modifiers and keys combos    #
-#      are processed. See comment section into the kblogger_us_mapping       #
+#      are processed. See comment section into the kblogger_us_mapping        #
 #      branch for more details.                                               #
 #   2) Sometimes KEY RELEASED events are skipped just after KEY REPEATED      #
 #      events. Probably because sed becomes too slow when processing          #
-#      multiple events in a row and the KEY RELEASED event is caught by an    #
-#      other process.                                                         #
+#      multiple events in a row and the KEY RELEASED event is emitted         #
+#      before sed read it.                                                    #
+#   3) If CAPSLOCK was activated before running, this script can not know     #
+#      it.                                                                    #
 #                                                                             #
 ###############################################################################
 
@@ -89,7 +91,7 @@
   x
   # Skip 1 block before and 1 block after the block to catch
   s/ count=1 \([^\n]*\)$/ skip=1 count=1 skip=1 \1/
-  # keyboard modifiers state: L_ALT R_ALT L_CTRL R_CTRL L_SHIFT R_SHIFT CAPS_LOCK
+  # keyboard modifiers state: L_ALT R_ALT L_CTRL R_CTRL L_SHIFT R_SHIFT CAPSLOCK
   s/^/0000000\n/
   x
   b kblogger_us_loop
@@ -188,7 +190,7 @@
       }
       b kblogger_us_modifiers_end
     }
-    # CAPS_LOCK
+    # CAPSLOCK
     /^\x3a/ {
       s/..//
       /^\x01/ {
@@ -240,19 +242,32 @@
   #                                                                             ┗━━━┻━━━┻━━━┛
   : kblogger_us_mapping
     # Key: Backspace
-    /^\x0e/ {
-      # CTRL modifier
-      # ALT modifier
-      # ALT + CTRL modifiers
-      x
-      s/^[01]\+\n\([^\n]*\n\)/\n14\n0x0e\n^?\n0x7f\n\1\0/
-      b kblogger_us_mapping_end
-    }
+    : kblogger_us_mapping_0x0e
+      /^\x0e/ {
+        x
+        : kblogger_us_mapping_0x0e_ALT
+          /^00[01]\{5\}\n/ ! {
+            : kblogger_us_mapping_0x0e_ALT_CTRL
+              /^[01]\{2\}00[01]\{3\}\n/ ! {
+                s/^[01]\+\n\([^\n]*\n\)/\n14\n0x0e\n^[^H\n0x1b 0x08\n\1\0/
+                b kblogger_us_mapping_end
+              }
+            s/^[01]\+\n\([^\n]*\n\)/\n14\n0x0e\n^[^?\n0x1b 0x7f\n\1\0/
+            b kblogger_us_mapping_end
+          }
+        : kblogger_us_mapping_0x0e_CTRL
+          /^[01]\{2\}00[01]\{3\}\n/ ! {
+            s/^[01]\+\n\([^\n]*\n\)/\n14\n0x0e\n^H\n0x08\n\1\0/
+            b kblogger_us_mapping_end
+          }
+        s/^[01]\+\n\([^\n]*\n\)/\n14\n0x0e\n^?\n0x7f\n\1\0/
+        b kblogger_us_mapping_end
+      }
     # Key: Tab
     /^\x0f/ {
       x
-      # ALT modifier
-      # SHIFT modifier
+      # TODO: ALT modifier
+      # TODO: SHIFT modifier
       /^[01]\{4\}000\n/ ! {
         s/^[01]\+\n\([^\n]*\n\)/\n15\n0x0f\n^[[Z\n0x1b 0x5b 0x5a\n\1\0/
         b kblogger_us_mapping_end
@@ -262,130 +277,147 @@
     }
     # Key: Enter
     /^\x1c/ {
-      # ALT modifier
+      # TODO: ALT modifier
       x
       s/^[01]\+\n\([^\n]*\n\)/\n28\n0x1c\n^M\n0x13\n\1\0/
       b kblogger_us_mapping_end
     }
     # Key: a A ^A ^[a ^[A ^[^A
-    /^\x1e/ {
-      # TODO: CAPS_LOCK + SHIFT = no modifiers
-      x
-      # ALT modifier
-      /^00[01]\{5\}\n/ ! {
-        # ALT + CTRL modifiers: CTRL prevails on SHIFT
-        /^[01]\{2\}00[01]\{3\}\n/ ! {
-          s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\n^[^A\n0x1b 0x01\n\1\0/
+    : kblogger_us_mapping_0x1e
+      /^\x1e/ {
+        x
+        : kblogger_us_mapping_0x1e_ALT
+          /^00[01]\{5\}\n/ ! {
+            # CTRL prevails on SHIFT
+            : kblogger_us_mapping_0x1e_ALT_CTRL
+              /^[01]\{2\}00[01]\{3\}\n/ ! {
+                s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\n^[^A\n0x1b 0x01\n\1\0/
+                b kblogger_us_mapping_end
+              }
+            : kblogger_us_mapping_0x1e_ALT_SHIFT
+              /^[01]\{4\}00[01]\n/ ! {
+                /^[01]\{6\}0\n/ {
+                  s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\n^[A\n0x1b 0x41\n\1\0/
+                  b kblogger_us_mapping_end
+                }
+                : kblogger_us_mapping_0x1e_ALT_SHIFT_CAPSLOCK
+                  b kblogger_us_mapping_0x1e_ALT_end
+              }
+            : kblogger_us_mapping_0x1e_ALT_end
+              s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\n^[a\n0x1b 0x61\n\1\0/
+              b kblogger_us_mapping_end
+          }
+        : kblogger_us_mapping_0x1e_SHIFT
+          /^[01]\{4\}00[01]\n/ ! {
+            /^[01]\{6\}0\n/ {
+              s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\nA\n0x41\n\1\0/
+              b kblogger_us_mapping_end
+            }
+            : kblogger_us_mapping_0x1e_SHIFT_CAPSLOCK
+              b kblogger_us_mapping_0x1e_end
+          }
+        : kblogger_us_mapping_0x1e_CAPSLOCK
+          /^[01]\{6\}1\n/ {
+            s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\nA\n0x41\n\1\0/
+            b kblogger_us_mapping_end
+          }
+        : kblogger_us_mapping_0x1e_CTRL
+          /^[01]\{2\}00[01]\{3\}\n/ ! {
+            s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\n^A\n0x01\n\1\0/
+            b kblogger_us_mapping_end
+          }
+        : kblogger_us_mapping_0x1e_end
+          s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\na\n0x61\n\1\0/
           b kblogger_us_mapping_end
-        }
-        # ALT + SHIFT modifiers
-        /^[01]\{4\}000\n/ ! {
-          s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\n^[A\n0x1b 0x41\n\1\0/
-          b kblogger_us_mapping_end
-        }
-        s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\n^[a\n0x1b 0x61\n\1\0/
-        b kblogger_us_mapping_end
       }
-      # SHIFT modifier
-      /^[01]\{4\}000\n/ ! {
-        s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\nA\n0x41\n\1\0/
-        b kblogger_us_mapping_end
-      }
-      # CTRL modifier
-      /^[01]\{2\}00[01]\{3\}\n/ ! {
-        s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\n^A\n0x01\n\1\0/
-        b kblogger_us_mapping_end
-      }
-      s/^[01]\+\n\([^\n]*\n\)/\n30\n0x1e\na\n0x61\n\1\0/
-      b kblogger_us_mapping_end
-    }
     # Key: Space
-    /^\x39/ {
-      x
-      # ALT modifier
-      /^00[01]\{5\}\n/ ! {
-        # ALT + CTRL modifiers
-        /^[01]\{2\}00[01]\{3\}\n/ ! {
-          s/^[01]\+\n\([^\n]*\n\)/\n57\n0x39\n^[^@\n0x1b 0x0 \n\1\0/
-          b kblogger_us_mapping_end
-        }
-        s/^[01]\+\n\([^\n]*\n\)/\n57\n0x39\n^[ \n0x1b 0x20\n\1\0/
+    : kblogger_us_mapping_0x39
+      /^\x39/ {
+        x
+        : kblogger_us_mapping_0x39_ALT
+          /^00[01]\{5\}\n/ ! {
+            : kblogger_us_mapping_0x39_ALT_CTRL
+              /^[01]\{2\}00[01]\{3\}\n/ ! {
+                s/^[01]\+\n\([^\n]*\n\)/\n57\n0x39\n^[^@\n0x1b 0x00\n\1\0/
+                b kblogger_us_mapping_end
+              }
+            s/^[01]\+\n\([^\n]*\n\)/\n57\n0x39\n^[ \n0x1b 0x20\n\1\0/
+            b kblogger_us_mapping_end
+          }
+        : kblogger_us_mapping_0x39_CTRL
+          /^[01]\{2\}00[01]\{3\}\n/ ! {
+            s/^[01]\+\n\([^\n]*\n\)/\n57\n0x39\n^@\n0x00\n\1\0/
+            b kblogger_us_mapping_end
+          }
+        s/^[01]\+\n\([^\n]*\n\)/\n57\n0x39\n \n0x20\n\1\0/
         b kblogger_us_mapping_end
       }
-      # CTRL modifier
-      /^[01]\{2\}00[01]\{3\}\n/ ! {
-        s/^[01]\+\n\([^\n]*\n\)/\n57\n0x39\n^@\n0x00\n\1\0/
-        b kblogger_us_mapping_end
-      }
-      s/^[01]\+\n\([^\n]*\n\)/\n57\n0x39\n \n0x20\n\1\0/
-      b kblogger_us_mapping_end
-    }
     # Key: ↑
     /^\x67/ {
       x
-      # ALT modifier
-      # ALT + CTRL modifiers
-      # ALT + SHIFT modifiers
-      # ALT + SHIFT + CTRL modifiers
-      # CTRL modifier
-      # SHIFT + CTRL modifiers
-      # SHIFT modifier
+      # TODO: ALT modifier
+      # TODO: ALT + CTRL modifiers
+      # TODO: ALT + SHIFT modifiers
+      # TODO: ALT + SHIFT + CTRL modifiers
+      # TODO: CTRL modifier
+      # TODO: SHIFT + CTRL modifiers
+      # TODO: SHIFT modifier
       s/^[01]\+\n\([^\n]*\n\)/\n103\n0x67\n^[[A\n0x1b 0x5b 0x41\n\1\0/
       b kblogger_us_mapping_end
     }
     # Key: ⇞
     /^\x68/ {
-      # CTRL modifier
-      # ALT modifier
-      # ALT + CTRL modifiers
+      # TODO: CTRL modifier
+      # TODO: ALT modifier
+      # TODO: ALT + CTRL modifiers
       x
       s/^[01]\+\n\([^\n]*\n\)/\n104\n0x68\n^[[5~\n0x1b 0x5b 0x35 0x7e\n\1\0/
       b kblogger_us_mapping_end
     }
     # Key: ←
     /^\x69/ {
-      # ALT modifier
-      # ALT + CTRL modifiers
-      # ALT + SHIFT modifiers
-      # ALT + SHIFT + CTRL modifiers
-      # CTRL modifier
-      # SHIFT + CTRL modifiers
-      # SHIFT modifier
+      # TODO: ALT modifier
+      # TODO: ALT + CTRL modifiers
+      # TODO: ALT + SHIFT modifiers
+      # TODO: ALT + SHIFT + CTRL modifiers
+      # TODO: CTRL modifier
+      # TODO: SHIFT + CTRL modifiers
+      # TODO: SHIFT modifier
       x
       s/^[01]\+\n\([^\n]*\n\)/\n105\n0x69\n^[[D\n0x1b 0x5b 0x44\n\1\0/
       b kblogger_us_mapping_end
     }
     # Key: →
     /^\x6a/ {
-      # ALT modifier
-      # ALT + CTRL modifiers
-      # ALT + SHIFT modifiers
-      # ALT + SHIFT + CTRL modifiers
-      # CTRL modifier
-      # SHIFT + CTRL modifiers
-      # SHIFT modifier
+      # TODO: ALT modifier
+      # TODO: ALT + CTRL modifiers
+      # TODO: ALT + SHIFT modifiers
+      # TODO: ALT + SHIFT + CTRL modifiers
+      # TODO: CTRL modifier
+      # TODO: SHIFT + CTRL modifiers
+      # TODO: SHIFT modifier
       x
       s/^[01]\+\n\([^\n]*\n\)/\n106\n0x6a\n^[[C\n0x1b 0x5b 0x43\n\1\0/
       b kblogger_us_mapping_end
     }
     # Key: ↓
     /^\x6c/ {
-      # ALT modifier
-      # ALT + CTRL modifiers
-      # ALT + SHIFT modifiers
-      # ALT + SHIFT + CTRL modifiers
-      # CTRL modifier
-      # SHIFT + CTRL modifiers
-      # SHIFT modifier
+      # TODO: ALT modifier
+      # TODO: ALT + CTRL modifiers
+      # TODO: ALT + SHIFT modifiers
+      # TODO: ALT + SHIFT + CTRL modifiers
+      # TODO: CTRL modifier
+      # TODO: SHIFT + CTRL modifiers
+      # TODO: SHIFT modifier
       x
       s/^[01]\+\n\([^\n]*\n\)/\n108\n0x6c\n^[[B\n0x1b 0x5b 0x42\n\1\0/
       b kblogger_us_mapping_end
     }
     # Key: ⇟
     /^\x6d/ {
-      # CTRL modifier
-      # ALT modifier
-      # ALT + CTRL modifiers
+      # TODO: CTRL modifier
+      # TODO: ALT modifier
+      # TODO: ALT + CTRL modifiers
       x
       s/^[01]\+\n\([^\n]*\n\)/\n109\n0x6d\n^[[6~\n0x1b 0x5b 0x36 0x7e\n\1\0/
       b kblogger_us_mapping_end
@@ -448,15 +480,15 @@
     : kblogger_us___PRINT_format_value_id
       s/^\(\([^\n]*\n\)\{3\}\([^\n]*\)\n\([^\n]*\n\)\{5\}[^\n]*\)%{value_id}/\1\3/
       t kblogger_us___PRINT_format_value_id
-    : kblogger_us___PRINT_format_modifiers_scan
-      s/^\(\([^\n]*\n\)\{4\}\([^\n]*\)\n\([^\n]*\n\)\{4\}[^\n]*\)%{modifiers_scan}/\1\3/
-      t kblogger_us___PRINT_format_modifiers_scan
+    : kblogger_us___PRINT_format_modifiers_hex
+      s/^\(\([^\n]*\n\)\{4\}\([^\n]*\)\n\([^\n]*\n\)\{4\}[^\n]*\)%{modifiers_hex}/\1\3/
+      t kblogger_us___PRINT_format_modifiers_hex
     : kblogger_us___PRINT_format_code_key
       s/^\(\([^\n]*\n\)\{5\}\([^\n]*\)\n\([^\n]*\n\)\{3\}[^\n]*\)%{code_key}/\1\3/
       t kblogger_us___PRINT_format_code_key
-    : kblogger_us___PRINT_format_code_scan
-      s/^\(\([^\n]*\n\)\{6\}\([^\n]*\)\n\([^\n]*\n\)\{2\}[^\n]*\)%{code_scan}/\1\3/
-      t kblogger_us___PRINT_format_code_scan
+    : kblogger_us___PRINT_format_code_hexkey
+      s/^\(\([^\n]*\n\)\{6\}\([^\n]*\)\n\([^\n]*\n\)\{2\}[^\n]*\)%{code_hexkey}/\1\3/
+      t kblogger_us___PRINT_format_code_hexkey
     : kblogger_us___PRINT_format_code_ascii
       s/^\(\([^\n]*\n\)\{7\}\([^\n]*\)\n[^\n]*\n[^\n]*\)%{code_ascii}/\1\3/
       t kblogger_us___PRINT_format_code_ascii
