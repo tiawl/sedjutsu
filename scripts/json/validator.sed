@@ -52,7 +52,7 @@
   h
   s/.$//
   x
-  s/.*\(.\)$/\1a\1a\1/
+  s/.*\(.\)$/\1x\1x\1/
   /\x00$/ {
     x
     s/\x00/\n/g
@@ -108,21 +108,21 @@
   /^true/ {
     s/....//
     x
-    s/[\n\x00]$/aaaa\0/
+    s/[\n\x00]$/xxxx\0/
     x
     b json_validator___RETURN
   }
   /^false/ {
     s/.....//
     x
-    s/[\n\x00]$/aaaaa\0/
+    s/[\n\x00]$/xxxxx\0/
     x
     b json_validator___RETURN
   }
   /^null/ {
     s/....//
     x
-    s/[\n\x00]$/aaaa\0/
+    s/[\n\x00]$/xxxx\0/
     x
     b json_validator___RETURN
   }
@@ -138,14 +138,14 @@
     s/.//
     x
     s/^/o1/
-    s/[\n\x00]$/a\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___ws
     : json_validator___object_1
       /^}/ {
         s/.//
         x
-        s/[\n\x00]$/a\0/
+        s/[\n\x00]$/x\0/
         x
         b json_validator___RETURN
       }
@@ -157,14 +157,14 @@
     s/.//
     x
     s/^/o2/
-    s/[\n\x00]$/a\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___members
     : json_validator___object_2
       /^}/ {
         s/.//
         x
-        s/[\n\x00]$/a\0/
+        s/[\n\x00]$/x\0/
         x
         b json_validator___RETURN
       }
@@ -188,7 +188,7 @@
     /^,/ {
       s/.//
       x
-      s/[\n\x00]$/a\0/
+      s/[\n\x00]$/x\0/
       x
       b json_validator___members
     }
@@ -209,7 +209,7 @@
     /^:/ {
       s/.//
       x
-      s/[\n\x00]$/a\0/
+      s/[\n\x00]$/x\0/
       x
       b json_validator___element
     }
@@ -225,14 +225,14 @@
     s/.//
     x
     s/^/a1/
-    s/[\n\x00]$/a\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___ws
     : json_validator___array_1
       /^]/ {
         s/.//
         x
-        s/[\n\x00]$/a\0/
+        s/[\n\x00]$/x\0/
         x
         b json_validator___RETURN
       }
@@ -244,14 +244,14 @@
     s/.//
     x
     s/^/a2/
-    s/[\n\x00]$/a\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___elements
     : json_validator___array_2
       /^]/ {
         s/.//
         x
-        s/[\n\x00]$/a\0/
+        s/[\n\x00]$/x\0/
         x
         b json_validator___RETURN
       }
@@ -275,7 +275,7 @@
     /^,/ {
       s/.//
       x
-      s/[\n\x00]$/a\0/
+      s/[\n\x00]$/x\0/
       x
       b json_validator___elements
     }
@@ -302,7 +302,7 @@
   /^"/ {
     s/.//
     x
-    s/[\n\x00]$/a\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___characters
   }
@@ -313,7 +313,7 @@
     /^"/ {
       s/.//
       x
-      s/[\n\x00]$/a\0/
+      s/[\n\x00]$/x\0/
       x
       b json_validator___RETURN
     }
@@ -342,7 +342,7 @@
   /^\\/ {
     s/.//
     x
-    s/[\n\x00]$/a\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___escape
   }
@@ -353,7 +353,7 @@
   }
   s/.//
   x
-  s/[\n\x00]$/a\0/
+  s/[\n\x00]$/x\0/
   x
   b json_validator___RETURN
 
@@ -372,7 +372,7 @@
     s/.//
     x
     s/^/\\1\\2\\3/
-    s/[\n\x00]$/a\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___hex
     : json_validator___escape_1
@@ -385,7 +385,7 @@
   /^["\\/bfnrt]/ {
     s/.//
     x
-    s/[\n\x00]$/a\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___RETURN
   }
@@ -401,7 +401,7 @@
   /^[A-Fa-f]/ {
     s/.//
     x
-    s/[\n\x00]$/a\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___RETURN
   }
@@ -433,7 +433,7 @@
   /^-/ {
     s/.//
     x
-    s/[\n\x00]$/a\0/
+    s/[\n\x00]$/x\0/
     x
   }
   /^[1-9][0-9]/ {
@@ -471,7 +471,7 @@
   /^0/ {
     s/.//
     x
-    s/[\n\x00]$/a\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___RETURN
   }
@@ -488,7 +488,7 @@
   /^[1-9]/ {
     s/.//
     x
-    s/[\n\x00]$/a\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___RETURN
   }
@@ -503,7 +503,7 @@
   /^\./ {
     s/.//
     x
-    s/[\n\x00]$/a\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___digits
   }
@@ -518,7 +518,7 @@
     s/.//
     x
     s/^/x1/
-    s/[\n\x00]$/a\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___sign
     : json_validator___exponent_1
@@ -534,7 +534,7 @@
   /^[-+]/ {
     s/.//
     x
-    s/[\n\x00]$/a\0/
+    s/[\n\x00]$/x\0/
     x
   }
   b json_validator___RETURN
@@ -549,14 +549,14 @@
   /^\x0a/ {
     s/.//
     x
-    s/[\n\x00]a\+\([\n\x00]\)$/a\1a\1/
+    s/[\n\x00]x\+\([\n\x00]\)$/x\1x\1/
     x
     b json_validator___ws
   }
   /^[\x20\x0d\x09]/ {
     s/.//
     x
-    s/[\n\x00]$/a\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___ws
   }
@@ -680,58 +680,93 @@
   b json_validator___UNREACHABLE
 
 : json_validator___COMPUTE_FAILURE_LOCATION
-  t json_validator___COMPUTE_FAILURE_LOCATION_a_to_b
-  : json_validator___COMPUTE_FAILURE_LOCATION_a_to_b
-    s/aaaaaaaaaa/b/g
-    t json_validator___COMPUTE_FAILURE_LOCATION_b_to_c
-    b json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
-  : json_validator___COMPUTE_FAILURE_LOCATION_b_to_c
-    s/bbbbbbbbbb/c/g
-    t json_validator___COMPUTE_FAILURE_LOCATION_c_to_d
-    b json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
-  : json_validator___COMPUTE_FAILURE_LOCATION_c_to_d
-    s/cccccccccc/d/g
-    t json_validator___COMPUTE_FAILURE_LOCATION_d_to_e
-    b json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
-  : json_validator___COMPUTE_FAILURE_LOCATION_d_to_e
-    s/dddddddddd/e/g
-    t json_validator___COMPUTE_FAILURE_LOCATION_e_to_f
-    b json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
-  : json_validator___COMPUTE_FAILURE_LOCATION_e_to_f
-    s/eeeeeeeeee/f/g
-    t json_validator___COMPUTE_FAILURE_LOCATION_f_to_g
-    b json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
-  : json_validator___COMPUTE_FAILURE_LOCATION_f_to_g
-    s/ffffffffff/g/g
-    t json_validator___COMPUTE_FAILURE_LOCATION_g_to_h
-    b json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
-  : json_validator___COMPUTE_FAILURE_LOCATION_g_to_h
-    s/gggggggggg/h/g
-    t json_validator___COMPUTE_FAILURE_LOCATION_h
-    b json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
-  : json_validator___COMPUTE_FAILURE_LOCATION_h
-    s/hhhhhhhhhh//g
-    # Here we can continue to add more letters for bigger numbers
-  : json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
-    /^[b-zA-Z]\+[^a-zA-Z0-9]/ {
-      s/[^a-zA-Z0-9]/0\0/
+  : json_validator___COMPUTE_FAILURE_LOCATION_ROW
+    G
+    h
+    s/^\([xyz]*\)[\x00\n].*/\1/
+    x
+    s/^x*\|^y*//
+    x
+    s/^\(x\+\).*\|^\(y\+\).*/\1\2/
+    /xxxxxxxxxx/ {
+      s/xxxxxxxxxx/y/g
+      # If the pattern space if full of 'y' we add a trailing 'z' to replace it later with a '0'
+      s/^y\+$/\0z/
+      b json_validator___COMPUTE_FAILURE_LOCATION_ROW_next
     }
-    /[^a-zA-Z0-9][b-zA-Z]\+$/ {
-      s/$/0/
+    /yyyyyyyyyy/ {
+      s/yyyyyyyyyy/x/g
+      # If the pattern space if full of 'x' we add a trailing 'z' to replace it later with a '0'
+      s/^x\+$/\0z/
+      b json_validator___COMPUTE_FAILURE_LOCATION_ROW_next
     }
-    s/aaaaaaaaa/9/g
-    s/aaaaaaaa/8/g
-    s/aaaaaaa/7/g
-    s/aaaaaa/6/g
-    s/aaaaa/5/g
-    s/aaaa/4/g
-    s/aaa/3/g
-    s/aa/2/g
-    s/a/1/g
-    y/bcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY/
-    /^[0-9]\+[^a-zA-Z0-9][0-9]\+$/ ! {
-      b json_validator___COMPUTE_FAILURE_LOCATION_letters_to_digits
+    G
+    s/[\x00\n]//
+    s/[\x00\n][^\x00\n]*$//
+    x
+    s/^\([xyz]*[\x00\n]\)\{2\}//
+    x
+    b json_validator___COMPUTE_FAILURE_LOCATION_COL
+    : json_validator___COMPUTE_FAILURE_LOCATION_ROW_next
+      G
+      s/[\x00\n]//
+      s/[\x00\n][^\x00\n]*$//
+      x
+      s/^\([xyz]*[\x00\n]\)\{2\}//
+      x
+      b json_validator___COMPUTE_FAILURE_LOCATION_ROW
+  : json_validator___COMPUTE_FAILURE_LOCATION_COL
+    G
+    h
+    s/^[xyz]*[\x00\n]\([xyz]*\)[\x00\n].*/\1/
+    x
+    s/\([\x00\n]\)x*\|\([\x00\n]\)y*/\1\2/
+    x
+    s/^\(x\+\).*\|^\(y\+\).*/\1\2/
+    /xxxxxxxxxx/ {
+      s/xxxxxxxxxx/y/g
+      # If the pattern space if full of 'y' we add a trailing 'z' to replace it later with a '0'
+      s/^y\+$/\0z/
+      b json_validator___COMPUTE_FAILURE_LOCATION_COL_next
     }
+    /yyyyyyyyyy/ {
+      s/yyyyyyyyyy/x/g
+      # If the pattern space if full of 'x' we add a trailing 'z' to replace it later with a '0'
+      s/^x\+$/\0z/
+      b json_validator___COMPUTE_FAILURE_LOCATION_COL_next
+    }
+    G
+    s/[\x00\n][^\x00\n]*[\x00\n]//
+    x
+    s/[\x00\n].*$//
+    G
+    h
+    s/^[xyz]*[\x00\n][xyz]*//
+    x
+    s/^\([xyz]*[\x00\n][xyz]*\).*/\1/
+    b json_validator___COMPUTE_FAILURE_LOCATION_END
+    : json_validator___COMPUTE_FAILURE_LOCATION_COL_next
+      G
+      s/[\x00\n][^\x00\n]*[\x00\n]//
+      x
+      s/[\x00\n].*$//
+      G
+      h
+      s/^[xyz]*[\x00\n][xyz]*//
+      x
+      s/^\([xyz]*[\x00\n][xyz]*\).*/\1/
+      b json_validator___COMPUTE_FAILURE_LOCATION_COL
+  : json_validator___COMPUTE_FAILURE_LOCATION_END
+    s/xxxxxxxxx\|yyyyyyyyy/9/g
+    s/xxxxxxxx\|yyyyyyyy/8/g
+    s/xxxxxxx\|yyyyyyy/7/g
+    s/xxxxxx\|yyyyyy/6/g
+    s/xxxxx\|yyyyy/5/g
+    s/xxxx\|yyyy/4/g
+    s/xxx\|yyy/3/g
+    s/xx\|yy/2/g
+    s/x\|y/1/g
+    s/z/0/g
     /\x00/ {
       b json_validator___FAILURE_NUL
     }
@@ -764,7 +799,7 @@
     b json_validator___UNREACHABLE
   }
   /\x00$/ {
-    s/.*\x00\(a\+\x00a\+\)\x00$/\1/
+    s/.*\x00\(x\+\x00x\+\)\x00$/\1/
     b json_validator___COMPUTE_FAILURE_LOCATION
     : json_validator___FAILURE_NUL
       x
@@ -776,7 +811,7 @@
       z
   }
   /\n$/ {
-    s/.*\n\(a\+\na\+\)\n$/\1/
+    s/.*\n\(x\+\nx\+\)\n$/\1/
     b json_validator___COMPUTE_FAILURE_LOCATION
     : json_validator___FAILURE_NEWLINE
       x
