@@ -12,20 +12,17 @@ The main purpose of this repository is the challenge. I am having fun writing us
 
 ## What you can find here
 
-- Some standard utilities emutaled with GNU `sed` and not already covered into the [GNU sed documentation][1],
+- Some features coming from standard utilities emutaled with GNU `sed` and not already covered into the [GNU sed documentation][1],
 - Potentially famous and simple games.
 
 ## Important notes
 
 - Each script has its own README written as a header comment. It contains:
-    - A set of external dependencies: for most of the scripts, you only need GNU `sed`. But for others it is not enough. In this case a "PREREQUISITES" section, into the README, indicates what is required to make the script run. I try to keep the set of external dependencies as minimal as possible, with these restrictions in mind:
-        1) Use GNU `sed` scripting when possible,
-        2) If not, use POSIX-compliant shell: (bash, ash, dash, ...) or POSIX-compliant utilities to make it possible,
-        3) If not, use other GNU utilities to make it possible (you already need GNU `sed` to run scripts you can find here, so I assume other GNU utilities are also installed).
-    - A Linux-only banner. If possible I would like to open Linux-only scripts to other POSIX-compliant operating systems.
+    - A description.
     - A command to run the script.
     - A set of usable environment variables to configure the script.
 - You probably already noticed, but the scripts was written and tested with the GNU implementation of `sed`. If you want to make a script work with other `sed` implementations, you will need to rework it. Depending of the script and the `sed` implementation you are using, the amount of work needed can vary a lot. It may range from just some minor replacements to more technical rewriting due to differences between the implementations' feature set.
+- I assume a POSIX-compliant shell (bash, ash, dash, ...) is also installed on your laptop.
 
 ## Contributing
 

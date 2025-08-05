@@ -15,7 +15,8 @@
 #   environment variables:                                                    #
 #   - SEDJUTSU_INDENT: use the given number of spaces (between 1 and 8)       #
 #     for indentation (default: 4)                                            #
-#   - SEDJUTSU_MONOCHROME: disable color whatever its value                   #
+#   - SEDJUTSU_MONOCHROME: disable color. The script will consider this       #
+#     variable whatever its value (even empty).                               #
 #   - SEDJUTSU_COLORS: work like JQ_COLORS does (for more details, see:       #
 #     https://jqlang.org/manual/#colors)                                      #
 #   If SEDJUTSU_MONOCHROME and SEDJUTSU_COLORS are set when the script run,   #

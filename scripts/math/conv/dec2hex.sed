@@ -1,30 +1,60 @@
 ### README ####################################################################
 #                                                                             #
-#     This script can be used to emulate some shell features to convert       #
-#   decimal numbers to hexadecimal                                            #
+#     This script can be used to emulate some `bc` or `dc` features.          #
 #                                                                             #
 #     If you do not want to see the trailing new line, use the                #
 #   `-n`/`--quiet` option.                                                    #
 #                                                                             #
 #     You can configure this script behavior by providing these               #
 #   environment variables:                                                    #
-#   - SEDJUTSU_PREFIX: TODO                                                   #
-#   - SEDJUTSU_UPPERCASE: TODO                                                #
+#   - SEDJUTSU_PREFIX: add a prefix to the final output. If you want to       #
+#     remove the prefix, leave it empty: SEDJUTSU_PREFIX=                     #
+#     (default: `0x`).                                                        #
+#   - SEDJUTSU_UPPERCASE: print A-F instead of a-f hexadecimal digits into    #
+#     the final output. The script will consider this variable whatever its   #
+#     value (even empty).                                                     #
 #                                                                             #
 ###############################################################################
 
-# Directly go to the end if the input is zero
-/^0\+$/ {
-  z
-  s/^/z/
-  b math_conv_dec2hex_xy_to_base16
-}
+: init_holdspace
+  # Remove trailing newline if the `-z`/`--null-data` is used
+  s/\n$//
+  # Depending of the `-z`/`--null-data` option usage, the `D`, `G`, `H`, `N` and `P` sed commands work with new line or NUL characters. This script must know which one of these characters these commands are using
+  G
+  h
+  s/.$//
+  x
+  # Map the NUL characters to `Z` characters because shell does not support it
+  /\x00$/ {
+    z
+    s/^/printf '%sZ%s' "${SEDJUTSU_PREFIX:-0x}" "${SEDJUTSU_UPPERCASE+y}"/
+  }
+  /\n$/ {
+    z
+    s/^/printf '%s\n%s\n' "${SEDJUTSU_PREFIX:-0x}" "${SEDJUTSU_UPPERCASE+y}"/
+  }
+  e
+  s/Z\(y\?\)$/\x00\1/
+  x
+  /[^0-9]/ {
+    z
+    s/^/Input must a positive integer/
+    w /dev/stderr
+    Q 6
+  }
+  # Directly go to the end if the input is zero
+  /^0\+$/ {
+    z
+    H
+    s/^/z/
+    b math_conv_dec2hex_xy_to_base16
+  }
+  # Remove leading zeroes
+  s/^0*//
+  b math_conv_dec2hex_base10_to_x
 
-# Remove leading zeroes
-s/^0*//
-
-# Alternatively replace digits from the decimal representation with 'x' and
-# 'y' characters
+# The 2 next loops are working together. Alternatively they replace digits
+# from the decimal representation with 'x' and 'y' characters
 
 # Replace trailing digit with 'x'
 : math_conv_dec2hex_base10_to_x
@@ -55,7 +85,7 @@ s/^0*//
   t math_conv_dec2hex_base10_to_y
   s/\(.*\)9$/xxxxxxxxxx\1/
   t math_conv_dec2hex_base10_to_y
-  b math_conv_dec2hex___INVALID_INPUT
+  b math_conv_dec2hex___UNREACHABLE
 
 # Replace trailing digit with 'y'
 : math_conv_dec2hex_base10_to_y
@@ -86,7 +116,7 @@ s/^0*//
   t math_conv_dec2hex_base10_to_x
   s/\(.*\)9$/yyyyyyyyyy\1/
   t math_conv_dec2hex_base10_to_x
-  b math_conv_dec2hex___INVALID_INPUT
+  b math_conv_dec2hex___UNREACHABLE
 
 # Alternatively replace leading 'x' character with 10 'y' then leading 'y' with 10 'x'
 : math_conv_dec2hex_xy_to_x
@@ -99,14 +129,17 @@ s/^0*//
   s/^\(x*\)x\|^\(y*\)y/\U\1\1\1\1\1\1\1\1\1\1\2\2\2\2\2\2\2\2\2\2\E/
   y/XY/yx/
   t math_conv_dec2hex_xy_to_x
+  b math_conv_dec2hex___UNREACHABLE
 
 : math_conv_dec2hex_x_to_xy
-  h
-  # Keep trailing 'x' and 'y' characters into the hold space for the next iteration
-  s/^x*\|^y*//
-  x
+  H
   # Keep leading 'x' or 'y' repeated characters into the pattern space
   s/^\(x\+\).*\|^\(y\+\).*/\1\2/
+  x
+  # Keep trailing 'x' and 'y' characters into the hold space for the next iteration
+  s/^\(\([^\x00\n]*[\x00\n]\)\{2\}\)x*\|^\(\([^\x00\n]*[\x00\n]\)\{2\}\)y*/\1\3/
+  #s/[\x00\n]$//
+  x
   # Replace 16 'x' with 'y'
   /xxxxxxxxxxxxxxxx/ {
     s/xxxxxxxxxxxxxxxx/y/g
@@ -124,20 +157,28 @@ s/^0*//
   # If there are no 'x' or 'y' character into the pattern space, go to the final step
   b math_conv_dec2hex_xy_to_base16
   : math_conv_dec2hex_x_to_xy_next
-    G
-    s/\n//
+    H
+    g
+    s/^\([^\x00\n]*[\x00\n]\)\{2\}\([xyz]*\)[\n\x00]\([xyz]*\)/\3\2/
+    x
+    s/[\x00\n][xyz]*[\x00\n][xyz]*$//
+    x
     b math_conv_dec2hex_x_to_xy
 
 # Replace repeated characters with base16 digits
 : math_conv_dec2hex_xy_to_base16
-  G
-  s/\n//
-  s/xxxxxxxxxxxxxxx\|yyyyyyyyyyyyyyy/F/g
-  s/xxxxxxxxxxxxxx\|yyyyyyyyyyyyyy/E/g
-  s/xxxxxxxxxxxxx\|yyyyyyyyyyyyy/D/g
-  s/xxxxxxxxxxxx\|yyyyyyyyyyyy/C/g
-  s/xxxxxxxxxxx\|yyyyyyyyyyy/B/g
-  s/xxxxxxxxxx\|yyyyyyyyyy/A/g
+  H
+  g
+  s/^\([^\x00\n]*[\x00\n]\)\{2\}\([xyz]*\)[\n\x00]\([xyz]*\)/\3\2/
+  x
+  s/[\x00\n][xyz]*[\x00\n][xyz]*$//
+  x
+  s/xxxxxxxxxxxxxxx\|yyyyyyyyyyyyyyy/f/g
+  s/xxxxxxxxxxxxxx\|yyyyyyyyyyyyyy/e/g
+  s/xxxxxxxxxxxxx\|yyyyyyyyyyyyy/d/g
+  s/xxxxxxxxxxxx\|yyyyyyyyyyyy/c/g
+  s/xxxxxxxxxxx\|yyyyyyyyyyy/b/g
+  s/xxxxxxxxxx\|yyyyyyyyyy/a/g
   s/xxxxxxxxx\|yyyyyyyyy/9/g
   s/xxxxxxxx\|yyyyyyyy/8/g
   s/xxxxxxx\|yyyyyyy/7/g
@@ -148,12 +189,19 @@ s/^0*//
   s/xx\|yy/2/g
   s/x\|y/1/g
   s/z/0/g
-  s/^/0x/
+  G
+  # Uppercase output
+  /[\x00\n]y$/ {
+    s/^\([0-9a-f]\+\)[\x00\n]\([^\x00\n]*\)[\x00\n]y/\2\U\1\E/
+    b math_conv_dec2hex___SUCCESS
+  }
+  # Lowercase output
+  s/^\([0-9a-f]\+\)[\x00\n]\([^\x00\n]*\)[\x00\n]/\2\1/
   b math_conv_dec2hex___SUCCESS
 
-: math_conv_dec2hex___INVALID_INPUT
+: math_conv_dec2hex___UNREACHABLE
   z
-  s/^/Input must a positive integer/
+  s/^/Reached unreachable code in scripts\/math\/conv\/dec2hex.sed/
   w /dev/stderr
   Q 5
 
