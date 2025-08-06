@@ -65,11 +65,11 @@
   s/.$//
   x
   # Map the NUL characters to `Z` characters because shell does not support it
-  /\x00$/ {
+  /^[^\x00\n]*\x00/ {
     z
     s/^/printf '%s:%s%sZ' "${SEDJUTSU_INDENT:-4}" "${SEDJUTSU_MONOCHROME+y:}" "${SEDJUTSU_COLORS:-0;90:0;39:0;39:0;39:0;32:1;39:1;39:1;34}"/
   }
-  /\n$/ {
+  /^[^\x00\n]*\n/ {
     z
     s/^/printf '%s:%s%s\n\n' "${SEDJUTSU_INDENT:-4}" "${SEDJUTSU_MONOCHROME+y:}" "${SEDJUTSU_COLORS:-0;90:0;39:0;39:0;39:0;32:1;39:1;39:1;34}"/
   }
@@ -110,7 +110,7 @@
     s/^8:/        :/
     : init_holdspace_end
       s/\(.*\)\([\n\x00]\)$/\2\1\2\2\1\2x\2x\2/
-      /\x00$/ {
+      /^[^\x00\n]*\x00/ {
         x
         s/\x00/\n/g
         x
@@ -162,15 +162,10 @@
     x
     s/^/v1/
     # Format the output for the next line to print
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{3\}\(\x00x\+\)\{2\}\x00$/\x1b[\1m\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{3\}\(\nx\+\)\{2\}\n$/\x1b[\1m\0/
     }
     x
@@ -178,15 +173,10 @@
     : json_pp___value_1
       x
       # Format the output for the next line to print
-      /[^\n\x00]$/ {
-        z
-        s/^/"Hold space must end with a new line or NUL character"/
-        b json_pp___UNREACHABLE
-      }
-      /\x00$/ {
+      /^[^\x00\n]*\x00/ {
         s/\x00[^\x00]*\(\x00x\+\)\{2\}\x00$/\x1b[0m\0/
       }
-      /\n$/ {
+      /^[^\x00\n]*\n/ {
         s/\n[^\n]*\(\nx\+\)\{2\}\n$/\x1b[0m\0/
       }
       x
@@ -199,15 +189,10 @@
     s/....//
     x
     # Format the output for the next line to print
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{5\}\(\x00x\+\)\{2\}\x00$/\x1b[\1mtrue\x1b[0m\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{5\}\(\nx\+\)\{2\}\n$/\x1b[\1mtrue\x1b[0m\0/
     }
     s/[\n\x00]$/xxxx\0/
@@ -218,15 +203,10 @@
     s/.....//
     x
     # Format the output for the next line to print
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{6\}\(\x00x\+\)\{2\}\x00$/\x1b[\1mfalse\x1b[0m\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{6\}\(\nx\+\)\{2\}\n$/\x1b[\1mfalse\x1b[0m\0/
     }
     s/[\n\x00]$/xxxxx\0/
@@ -237,15 +217,10 @@
     s/....//
     x
     # Format the output for the next line to print
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{7\}\(\x00x\+\)\{2\}\x00$/\x1b[\1mnull\x1b[0m\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{7\}\(\nx\+\)\{2\}\n$/\x1b[\1mnull\x1b[0m\0/
     }
     s/[\n\x00]$/xxxx\0/
@@ -265,15 +240,10 @@
     x
     s/^/o1/
     # Format the output for the next line to print
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00x\+\)\{2\}\x00$/\x1b[\1m{}\x1b[0m\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\nx\+\)\{2\}\n$/\x1b[\1m{}\x1b[0m\0/
     }
     s/[\n\x00]$/x\0/
@@ -296,15 +266,10 @@
     x
     s/^/o2o3o4/
     # Format the output for the next line to print
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00x\+\)\{2\}\x00$/\x1b[\1m{\x1b[0m\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\nx\+\)\{2\}\n$/\x1b[\1m{\x1b[0m\0/
     }
     x
@@ -312,15 +277,10 @@
     : json_pp___object_2
       x
       # Increment the indent level
-      /[^\n\x00]$/ {
-        z
-        s/^/"Hold space must end with a new line or NUL character"/
-        b json_pp___UNREACHABLE
-      }
-      /\x00$/ {
+      /^[^\x00\n]*\x00/ {
         s/^[^\x00]*\x00\( \+\):[^\x00]*\x00/\0\1/
       }
-      /\n$/ {
+      /^[^\x00\n]*\n/ {
         s/^[^\n]*\n\( \+\):[^\n]*\n/\0\1/
       }
       s/[\n\x00]$/x\0/
@@ -332,18 +292,13 @@
         b json_pp___PRINT
         : json_pp___object_4
           x
-          /[^\n\x00]$/ {
-            z
-            s/^/"Hold space must end with a new line or NUL character"/
-            b json_pp___UNREACHABLE
-          }
-          /\x00$/ {
+          /^[^\x00\n]*\x00/ {
             # Decrement the indent level
             s/^\([^\x00]*\x00\)\( \+\)\(:[^\x00]*\x00\)\2/\1\2\3/
             # Format the output for the next line to print
             s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00x\+\)\{2\}\x00$/\x1b[\1m}\x1b[0m\0/
           }
-          /\n$/ {
+          /^[^\x00\n]*\n/ {
             # Decrement the indent level
             s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
             # Format the output for the next line to print
@@ -375,15 +330,10 @@
       x
       s/^/M2/
       # Format the output for the next line to print
-      /[^\n\x00]$/ {
-        z
-        s/^/"Hold space must end with a new line or NUL character"/
-        b json_pp___UNREACHABLE
-      }
-      /\x00$/ {
+      /^[^\x00\n]*\x00/ {
         s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00x\+\)\{2\}\x00$/\x1b[\1m,\x1b[0m\0/
       }
-      /\n$/ {
+      /^[^\x00\n]*\n/ {
         s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\nx\+\)\{2\}\n$/\x1b[\1m,\x1b[0m\0/
       }
       s/[\n\x00]$/x\0/
@@ -404,15 +354,10 @@
   : json_pp___member_1
     x
     # Format the output for the next line to print
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]\+:\([^:]\+\)\(\x00x\+\)\{2\}\x00$/\x1b[\1m\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]\+:\([^:]\+\)\(\nx\+\)\{2\}\n$/\x1b[\1m\0/
     }
     x
@@ -420,15 +365,10 @@
   : json_pp___member_2
     x
     # Format the output for the next line to print
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]*\(\x00x\+\)\{2\}\x00$/\x1b[0m\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]*\(\nx\+\)\{2\}\n$/\x1b[0m\0/
     }
     x
@@ -438,15 +378,10 @@
       s/.//
       x
       # Format the output for the next line to print
-      /[^\n\x00]$/ {
-        z
-        s/^/"Hold space must end with a new line or NUL character"/
-        b json_pp___UNREACHABLE
-      }
-      /\x00$/ {
+      /^[^\x00\n]*\x00/ {
         s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00x\+\)\{2\}\x00$/\x1b[\1m: \x1b[0m\0/
       }
-      /\n$/ {
+      /^[^\x00\n]*\n/ {
         s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\nx\+\)\{2\}\n$/\x1b[\1m: \x1b[0m\0/
       }
       s/[\n\x00]$/x\0/
@@ -466,15 +401,10 @@
     x
     s/^/a1/
     # Format the output for the next line to print
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00x\+\)\{2\}\x00$/\x1b[\1m[]\x1b[0m\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\nx\+\)\{2\}\n$/\x1b[\1m[]\x1b[0m\0/
     }
     s/[\n\x00]$/x\0/
@@ -497,15 +427,10 @@
     x
     s/^/a2a3a4/
     # Format the output for the next line to print
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00x\+\)\{2\}\x00$/\x1b[\1m[\x1b[0m\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\nx\+\)\{2\}\n$/\x1b[\1m[\x1b[0m\0/
     }
     x
@@ -513,15 +438,10 @@
     : json_pp___array_2
       x
       # Increment the indent level
-      /[^\n\x00]$/ {
-        z
-        s/^/"Hold space must end with a new line or NUL character"/
-        b json_pp___UNREACHABLE
-      }
-      /\x00$/ {
+      /^[^\x00\n]*\x00/ {
         s/^[^\x00]*\x00\( \+\):[^\x00]*\x00/\0\1/
       }
-      /\n$/ {
+      /^[^\x00\n]*\n/ {
         s/^[^\n]*\n\( \+\):[^\n]*\n/\0\1/
       }
       s/[\n\x00]$/x\0/
@@ -533,18 +453,13 @@
         b json_pp___PRINT
         : json_pp___array_4
           x
-          /[^\n\x00]$/ {
-            z
-            s/^/"Hold space must end with a new line or NUL character"/
-            b json_pp___UNREACHABLE
-          }
-          /\x00$/ {
+          /^[^\x00\n]*\x00/ {
             # Decrement the indent level
             s/^\([^\x00]*\x00\)\( \+\)\(:[^\x00]*\x00\)\2/\1\2\3/
             # Format the output for the next line to print
             s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00x\+\)\{2\}\x00$/\x1b[\1m]\x1b[0m\0/
           }
-          /\n$/ {
+          /^[^\x00\n]*\n/ {
             # Decrement the indent level
             s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
             # Format the output for the next line to print
@@ -576,15 +491,10 @@
       x
       s/^/E2/
       # Format the output for the next line to print
-      /[^\n\x00]$/ {
-        z
-        s/^/"Hold space must end with a new line or NUL character"/
-        b json_pp___UNREACHABLE
-      }
-      /\x00$/ {
+      /^[^\x00\n]*\x00/ {
         s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00x\+\)\{2\}\x00$/\x1b[\1m,\x1b[0m\0/
       }
-      /\n$/ {
+      /^[^\x00\n]*\n/ {
         s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\nx\+\)\{2\}\n$/\x1b[\1m,\x1b[0m\0/
       }
       s/[\n\x00]$/x\0/
@@ -617,15 +527,10 @@
     s/.//
     x
     # Format the output for the next line to print
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]*\(\x00x\+\)\{2\}\x00$/"\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]*\(\nx\+\)\{2\}\n$/"\0/
     }
     s/[\n\x00]$/x\0/
@@ -640,15 +545,10 @@
       s/.//
       x
       # Format the output for the next line to print
-      /[^\n\x00]$/ {
-        z
-        s/^/"Hold space must end with a new line or NUL character"/
-        b json_pp___UNREACHABLE
-      }
-      /\x00$/ {
+      /^[^\x00\n]*\x00/ {
         s/\x00[^\x00]*\(\x00x\+\)\{2\}\x00$/"\0/
       }
-      /\n$/ {
+      /^[^\x00\n]*\n/ {
         s/\n[^\n]*\(\nx\+\)\{2\}\n$/"\0/
       }
       s/[\n\x00]$/x\0/
@@ -681,10 +581,10 @@
     s/.//
     x
     # Format the output for the next line to print
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]*\(\x00x\+\)\{2\}\x00$/\\\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]*\(\nx\+\)\{2\}\n$/\\\0/
     }
     s/[\n\x00]$/x\0/
@@ -697,12 +597,7 @@
     b json_pp___PARSING_FAILURE
   }
   x
-  /[^\n\x00]$/ {
-    z
-    s/^/"Hold space must end with a new line or NUL character"/
-    b json_pp___UNREACHABLE
-  }
-  /\x00$/ {
+  /^[^\x00\n]*\x00/ {
     s/.$//
     x
     H
@@ -711,7 +606,7 @@
     # Format the output for the next line to print
     s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
   }
-  /\n$/ {
+  /^[^\x00\n]*\n/ {
     s/.$//
     x
     H
@@ -740,15 +635,10 @@
     x
     s/^/\\1\\2\\3/
     # Format the output for the next line to print
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]*\(\x00x\+\)\{2\}\x00$/u\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]*\(\nx\+\)\{2\}\n$/u\0/
     }
     s/[\n\x00]$/x\0/
@@ -763,12 +653,7 @@
   }
   /^["\\/bfnrt]/ {
     x
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/.$//
       x
       H
@@ -777,7 +662,7 @@
       # Format the output for the next line to print
       s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/.$//
       x
       H
@@ -801,12 +686,7 @@
 : json_pp___hex
   /^[A-Fa-f]/ {
     x
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/.$//
       x
       H
@@ -815,7 +695,7 @@
       # Format the output for the next line to print
       s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/.$//
       x
       H
@@ -841,15 +721,10 @@
   x
   s/^/n1n2n3/
   # Format the output for the next line to print
-  /[^\n\x00]$/ {
-    z
-    s/^/"Hold space must end with a new line or NUL character"/
-    b json_pp___UNREACHABLE
-  }
-  /\x00$/ {
+  /^[^\x00\n]*\x00/ {
     s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{4\}\(\x00x\+\)\{2\}\x00$/\x1b[\1m\0/
   }
-  /\n$/ {
+  /^[^\x00\n]*\n/ {
     s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{4\}\(\nx\+\)\{2\}\n$/\x1b[\1m\0/
   }
   x
@@ -861,15 +736,10 @@
   : json_pp___number_3
     x
     # Format the output for the next line to print
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]*\(\x00x\+\)\{2\}\x00$/\x1b[0m\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]*\(\nx\+\)\{2\}\n$/\x1b[0m\0/
     }
     x
@@ -885,15 +755,10 @@
     s/.//
     x
     # Format the output for the next line to print
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]*\(\x00x\+\)\{2\}\x00$/-\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]*\(\nx\+\)\{2\}\n$/-\0/
     }
     s/[\n\x00]$/x\0/
@@ -935,15 +800,10 @@
     s/.//
     x
     # Format the output for the next line to print
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]*\(\x00x\+\)\{2\}\x00$/0\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]*\(\nx\+\)\{2\}\n$/0\0/
     }
     s/[\n\x00]$/x\0/
@@ -962,12 +822,7 @@
 : json_pp___onenine
   /^[1-9]/ {
     x
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/.$//
       x
       H
@@ -976,7 +831,7 @@
       # Format the output for the next line to print
       s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/.$//
       x
       H
@@ -1001,15 +856,10 @@
     s/.//
     x
     # Format the output for the next line to print
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/\x00[^\x00]*\(\x00x\+\)\{2\}\x00$/.\0/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/\n[^\n]*\(\nx\+\)\{2\}\n$/.\0/
     }
     s/[\n\x00]$/x\0/
@@ -1026,12 +876,7 @@
   /^[eE]/ {
     x
     s/^/x1/
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/.$//
       x
       H
@@ -1040,7 +885,7 @@
       # Format the output for the next line to print
       s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/.$//
       x
       H
@@ -1064,12 +909,7 @@
 : json_pp___sign
   /^[-+]/ {
     x
-    /[^\n\x00]$/ {
-      z
-      s/^/"Hold space must end with a new line or NUL character"/
-      b json_pp___UNREACHABLE
-    }
-    /\x00$/ {
+    /^[^\x00\n]*\x00/ {
       s/.$//
       x
       H
@@ -1078,7 +918,7 @@
       # Format the output for the next line to print
       s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
-    /\n$/ {
+    /^[^\x00\n]*\n/ {
       s/.$//
       x
       H
@@ -1117,12 +957,7 @@
 
 : json_pp___PRINT
   x
-  /[^\n\x00]$/ {
-    z
-    s/^/"Hold space must end with a new line or NUL character"/
-    b json_pp___UNREACHABLE
-  }
-  /\x00$/ {
+  /^[^\x00\n]*\x00/ {
     s/.$//
     x
     # Save the hold and pattern spaces
@@ -1138,7 +973,7 @@
     x
     s/^\(\([^\x00]*\x00\)\{2\} *\)[^\x00]*\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\).*/\1\3/
   }
-  /\n$/ {
+  /^[^\x00\n]*\n/ {
     s/.$//
     x
     # Save the hold and pattern spaces
@@ -1321,7 +1156,7 @@
 
 : json_pp___UNREACHABLE
   x
-  /\x00$/ {
+  /^[^\x00\n]*\x00/ {
     x
     s/.*/\x1b[0mReached unreachable code in scripts\/json\/pretty-printer.sed: \0\n/
     # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
@@ -1329,7 +1164,7 @@
     # If outside the scope it triggers the next conditional statement
     z
   }
-  /\n$/ {
+  /^[^\x00\n]*\n/ {
     x
     s/^/\x1b[0mReached unreachable code in scripts\/json\/pretty-printer.sed: /
     # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
@@ -1351,13 +1186,13 @@
       s/xxxxxxxxxx/y/g
       # If the pattern space if full of 'y' we add a trailing 'z' to replace it later with a '0'
       s/^y\+$/\0z/
-      b json_pp___COMPUTE_FAILURE_LOCATION_ROW_next
+      b json_pp___COMPUTE_FAILURE_LOCATION_ROW_NEXT
     }
     /yyyyyyyyyy/ {
       s/yyyyyyyyyy/x/g
       # If the pattern space if full of 'x' we add a trailing 'z' to replace it later with a '0'
       s/^x\+$/\0z/
-      b json_pp___COMPUTE_FAILURE_LOCATION_ROW_next
+      b json_pp___COMPUTE_FAILURE_LOCATION_ROW_NEXT
     }
     G
     s/[\x00\n]//
@@ -1366,7 +1201,7 @@
     s/^\([xyz]*[\x00\n]\)\{2\}//
     x
     b json_pp___COMPUTE_FAILURE_LOCATION_COL
-    : json_pp___COMPUTE_FAILURE_LOCATION_ROW_next
+    : json_pp___COMPUTE_FAILURE_LOCATION_ROW_NEXT
       G
       s/[\x00\n]//
       s/[\x00\n][^\x00\n]*$//
@@ -1386,13 +1221,13 @@
       s/xxxxxxxxxx/y/g
       # If the pattern space if full of 'y' we add a trailing 'z' to replace it later with a '0'
       s/^y\+$/\0z/
-      b json_pp___COMPUTE_FAILURE_LOCATION_COL_next
+      b json_pp___COMPUTE_FAILURE_LOCATION_COL_NEXT
     }
     /yyyyyyyyyy/ {
       s/yyyyyyyyyy/x/g
       # If the pattern space if full of 'x' we add a trailing 'z' to replace it later with a '0'
       s/^x\+$/\0z/
-      b json_pp___COMPUTE_FAILURE_LOCATION_COL_next
+      b json_pp___COMPUTE_FAILURE_LOCATION_COL_NEXT
     }
     G
     s/[\x00\n][^\x00\n]*[\x00\n]//
@@ -1404,7 +1239,7 @@
     x
     s/^\([xyz]*[\x00\n][xyz]*\).*/\1/
     b json_pp___COMPUTE_FAILURE_LOCATION_END
-    : json_pp___COMPUTE_FAILURE_LOCATION_COL_next
+    : json_pp___COMPUTE_FAILURE_LOCATION_COL_NEXT
       G
       s/[\x00\n][^\x00\n]*[\x00\n]//
       x
@@ -1433,12 +1268,8 @@
 
 : json_pp___PARSING_FAILURE
   x
-  /[^\n\x00]$/ {
-    z
-    s/^/"Hold space must end with a new line or NUL character"/
-    b json_pp___UNREACHABLE
-  }
-  /\x00$/ {
+  /^[^\x00\n]*\x00/ {
+    # TODO replace with when keys object checking will be ready: s/.*\x00\(x\+\x00x\+\)\x00[^\x00]*$/\1/
     s/.*\x00\(x\+\x00x\+\)\x00$/\1/
     b json_pp___COMPUTE_FAILURE_LOCATION
     : json_pp___PARSING_FAILURE_NUL
@@ -1451,14 +1282,15 @@
       # If outside the scope it triggers the next conditional statement
       z
   }
-  /\n$/ {
+  /^[^\x00\n]*\n/ {
+    # TODO replace with when keys object checking will be ready: s/.*\n\(x\+\nx\+\)\n[^\n]*$/\1/
     s/.*\n\(x\+\nx\+\)\n$/\1/
     b json_pp___COMPUTE_FAILURE_LOCATION
     : json_pp___PARSING_FAILURE_NEWLINE
       x
       H
       x
-      s/^\([0-9]\+\)\n\([0-9]\+\)\n/\x1b[0mJSON parsing error at ROW \1, COL \2: /
+      s/^\([0-9]\+\)\n\([0-9]\+\)\n*/\x1b[0mJSON parsing error at ROW \1, COL \2: /
       # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
       w /dev/stderr
       z
@@ -1467,12 +1299,7 @@
 
 : json_pp___ENV_FAILURE
   x
-  /[^\n\x00]$/ {
-    z
-    s/^/"Hold space must end with a new line or NUL character"/
-    b json_pp___UNREACHABLE
-  }
-  /\x00$/ {
+  /^[^\x00\n]*\x00/ {
     x
     s/.*/\x1b[0mError when parsing environment: \0\n/
     # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
@@ -1480,7 +1307,7 @@
     # If outside the scope it triggers the next conditional statement
     z
   }
-  /\n$/ {
+  /^[^\x00\n]*\n/ {
     x
     s/^/\x1b[0mError when parsing environment: /
     # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope

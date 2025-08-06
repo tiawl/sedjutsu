@@ -30,8 +30,8 @@ tests_json () {
   do
     basename="$(basename "${json}")"
     case "${json}" in
-    ( "${json_d}"'/n_structure_100000_opening_arrays.json' ) ;& # This test spends 21m to complete successfully
-    ( "${json_d}"'/n_structure_open_array_object.json' ) # This test spends 85m to complete successfully
+    ( "${json_d}/n_structure_100000_opening_arrays.json" ) ;& # This test spends 21m to complete successfully
+    ( "${json_d}/n_structure_open_array_object.json" ) # This test spends 85m to complete successfully
       if [[ "${all}" == 'yes' ]]
       then
         null='yes'
@@ -39,7 +39,8 @@ tests_json () {
         printf '[\033[38;5;6mSKIPPED\033[m] %s > %s\n' "${script}" "${basename}"
         continue
       fi ;;
-    ( "${json_d}"'/n_multidigit_number_then_00.json' ) null='' ;;
+    ( "${json_d}/n_structure_null-byte-outside-string.json" ) ;&
+    ( "${json_d}/n_multidigit_number_then_00.json" ) null='' ;;
     ( * ) null='yes' ;;
     esac
 
