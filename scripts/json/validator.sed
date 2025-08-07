@@ -51,8 +51,9 @@
   h
   s/.$//
   x
-  s/.*\(.\)$/\1\1x\1x\1/
-  /^[^\x00\n]*\x00/ {
+  # We store \r into the object keys stack as a stop character
+  s/.*\(.\)$/\1\r\1x\1x\1/
+  /\x00$/ {
     x
     s/\x00/\n/g
     x
@@ -107,21 +108,21 @@
   /^true/ {
     s/....//
     x
-    s/[\n\x00][^\n\x00]*$/xxxx\0/
+    s/[\n\x00]$/xxxx\0/
     x
     b json_validator___RETURN
   }
   /^false/ {
     s/.....//
     x
-    s/[\n\x00][^\n\x00]*$/xxxxx\0/
+    s/[\n\x00]$/xxxxx\0/
     x
     b json_validator___RETURN
   }
   /^null/ {
     s/....//
     x
-    s/[\n\x00][^\n\x00]*$/xxxx\0/
+    s/[\n\x00]$/xxxx\0/
     x
     b json_validator___RETURN
   }
@@ -137,14 +138,14 @@
     s/.//
     x
     s/^/o1/
-    s/[\n\x00][^\n\x00]*$/x\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___ws
     : json_validator___object_1
       /^}/ {
         s/.//
         x
-        s/[\n\x00][^\n\x00]*$/x\0/
+        s/[\n\x00]$/x\0/
         x
         b json_validator___RETURN
       }
@@ -157,17 +158,17 @@
     x
     s/^/o2/
     # \t character to split keys between objects
-    s/^[^\x00\n]*[\x00\n]/\0\t/
-    s/[\n\x00][^\n\x00]*$/x\0/
+    s/^[^\x00\n]*[\x00\n]\r/\0\t/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___members
     : json_validator___object_2
       /^}/ {
         s/.//
         x
-        # remove object keys
-        s/^\([^\x00\n]*[\x00\n]\)[^\t]*\t/\1/
-        s/[\n\x00][^\n\x00]*$/x\0/
+        # Remove object keys
+        s/^\([^\x00\n]*[\x00\n]\)[^\t]*\t/\1\r/
+        s/[\n\x00]$/x\0/
         x
         b json_validator___RETURN
       }
@@ -191,7 +192,7 @@
     /^,/ {
       s/.//
       x
-      s/[\n\x00][^\n\x00]*$/x\0/
+      s/[\n\x00]$/x\0/
       x
       b json_validator___members
     }
@@ -205,16 +206,16 @@
   x
   b json_validator___ws
   : json_validator___member_1
-    # Add a trailing alert character into the hold space to indicate we want to store the string as an object key
+    # Replace the carriage return character with a bell character into the hold space to indicate we want to store the string as an object key
     x
-    s/$/\a/
+    s/^\([^\x00\n]*[\x00\n]\)\r/\1\a/
     x
     b json_validator___string
   : json_validator___member_2
     # Check the stored key
     x
+    s/^[^\x00\n]*[\x00\n]/\0\a/
     /^[^\x00\n]*\x00/ {
-      s/\([^\x00]*\x00x\+\x00x\+\x00\)\([^\x00]*\)$/\2\a\1/
       /^[^\x00]*\x00\(\a[^\a\t]*\a\)\(\a[^\a\t]*\a\)*\1/ {
         x
         g
@@ -223,14 +224,13 @@
         G
         h
         x
-        s/^\(x\+\)\x00\([^\x00]*\x00[^\x00]*\x00x\+\x00\)\1x/\2/
+        s/^\(x\+\)\x00\(\([^\x00]*\x00\)\{2\}x\+\x00\)\1x/\2/
         x
         s/^x\+\x00[^\x00]*\x00\a\([^\a\t]*\).*/JSON object with duplicated key "\1"/
         b json_validator___FAILURE
       }
     }
     /^[^\x00\n]*\n/ {
-      s/\([^\n]*\nx\+\nx\+\n\)\([^\n]*\)$/\2\a\1/
       /^[^\n]*\n\(\a[^\a\t]*\a\)\(\a[^\a\t]*\a\)*\1/ {
         x
         g
@@ -239,19 +239,21 @@
         G
         h
         x
-        s/^\(x\+\)\n\([^\n]*\n[^\n]*\nx\+\n\)\1x/\2/
+        s/^\(x\+\)\n\(\([^\n]*\n\)\{2\}x\+\n\)\1x/\2/
         x
         s/^x\+\n[^\n]*\n\a\([^\a\t]*\).*/JSON object with duplicated key "\1"/
         b json_validator___FAILURE
       }
     }
+    # Add the stop character
+    s/^[^\x00\n]*[\x00\n]/\0\r/
     x
     b json_validator___ws
   : json_validator___member_3
     /^:/ {
       s/.//
       x
-      s/[\n\x00][^\n\x00]*$/x\0/
+      s/[\n\x00]$/x\0/
       x
       b json_validator___element
     }
@@ -267,14 +269,14 @@
     s/.//
     x
     s/^/a1/
-    s/[\n\x00][^\n\x00]*$/x\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___ws
     : json_validator___array_1
       /^]/ {
         s/.//
         x
-        s/[\n\x00][^\n\x00]*$/x\0/
+        s/[\n\x00]$/x\0/
         x
         b json_validator___RETURN
       }
@@ -286,14 +288,14 @@
     s/.//
     x
     s/^/a2/
-    s/[\n\x00][^\n\x00]*$/x\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___elements
     : json_validator___array_2
       /^]/ {
         s/.//
         x
-        s/[\n\x00][^\n\x00]*$/x\0/
+        s/[\n\x00]$/x\0/
         x
         b json_validator___RETURN
       }
@@ -317,7 +319,7 @@
     /^,/ {
       s/.//
       x
-      s/[\n\x00][^\n\x00]*$/x\0/
+      s/[\n\x00]$/x\0/
       x
       b json_validator___elements
     }
@@ -344,7 +346,7 @@
   /^"/ {
     s/.//
     x
-    s/[\n\x00][^\n\x00]*$/x\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___characters
   }
@@ -355,7 +357,7 @@
     /^"/ {
       s/.//
       x
-      s/[\n\x00][^\n\x00]*$/x\0/
+      s/[\n\x00]$/x\0/
       x
       b json_validator___RETURN
     }
@@ -384,7 +386,7 @@
   /^\\/ {
     s/.//
     x
-    s/[\n\x00][^\n\x00]*$/x\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___escape
   }
@@ -393,24 +395,22 @@
     s/^/Invalid character encountered/
     b json_validator___FAILURE
   }
-  # Add the character if it is part of an object key
   x
-  /[^\x00\n]$/ {
+  s/[\n\x00]$/x\0/
+  # Add the character if it is part of an object key
+  /^[^\x00\n]*[\x00\n][^\r]/ {
     x
     H
     x
     /^[^\x00\n]*\x00/ {
-      s/\x00\([^\x00]\)[^\x00]*$/\1/
+      s/^\([^\x00]*\x00\)\(.*\)\x00\([^\x00]\)[^\x00]*$/\1\3\2/
     }
     /^[^\x00\n]*\n/ {
-      s/\n\([^\n]\)[^\n]*$/\1/
+      s/^\([^\n]*\n\)\(.*\)\n\([^\n]\)[^\n]*$/\1\3\2/
     }
   }
   x
   s/.//
-  x
-  s/[\n\x00][^\n\x00]*$/x\0/
-  x
   b json_validator___RETURN
 
 ### escape
@@ -425,24 +425,14 @@
 ###     'u' hex hex hex hex
 : json_validator___escape
   /^u/ {
-    # Add the character if it is part of an object key
-    x
-    /[^\x00\n]$/ {
-      x
-      H
-      x
-      /^[^\x00\n]*\x00/ {
-        s/\x00\([^\x00]\)[^\x00]*$/\1/
-      }
-      /^[^\x00\n]*\n/ {
-        s/\n\([^\n]\)[^\n]*$/\1/
-      }
-    }
-    x
     s/.//
     x
     s/^/\\1\\2\\3/
-    s/[\n\x00][^\n\x00]*$/x\0/
+    s/[\n\x00]$/x\0/
+    # Add the character if it is part of an object key
+    /^[^\x00\n]*[\x00\n][^\r]/ {
+      s/^[^\x00\n]*[\x00\n]/\0u/
+    }
     x
     b json_validator___hex
     : json_validator___escape_1
@@ -453,24 +443,22 @@
       b json_validator___hex
   }
   /^["\\/bfnrt]/ {
-    # Add the character if it is part of an object key
     x
-    /[^\x00\n]$/ {
+    s/[\n\x00]$/x\0/
+    # Add the character if it is part of an object key
+    /^[^\x00\n]*[\x00\n][^\r]/ {
       x
       H
       x
       /^[^\x00\n]*\x00/ {
-        s/\x00\([^\x00]\)[^\x00]*$/\1/
+        s/^\([^\x00]*\x00\)\(.*\)\x00\([^\x00]\)[^\x00]*$/\1\3\2/
       }
       /^[^\x00\n]*\n/ {
-        s/\n\([^\n]\)[^\n]*$/\1/
+        s/^\([^\n]*\n\)\(.*\)\n\([^\n]\)[^\n]*$/\1\3\2/
       }
     }
     x
     s/.//
-    x
-    s/[\n\x00][^\n\x00]*$/x\0/
-    x
     b json_validator___RETURN
   }
   z
@@ -483,24 +471,22 @@
 ###     'a' . 'f'
 : json_validator___hex
   /^[A-Fa-f]/ {
-    # Add the character if it is part of an object key
     x
-    /[^\x00\n]$/ {
+    s/[\n\x00]$/x\0/
+    # Add the character if it is part of an object key
+    /^[^\x00\n]*[\x00\n][^\r]/ {
       x
       H
       x
       /^[^\x00\n]*\x00/ {
-        s/\x00\([^\x00]\)[^\x00]*$/\1/
+        s/^\([^\x00]*\x00\)\(.*\)\x00\([^\x00]\)[^\x00]*$/\1\3\2/
       }
       /^[^\x00\n]*\n/ {
-        s/\n\([^\n]\)[^\n]*$/\1/
+        s/^\([^\n]*\n\)\(.*\)\n\([^\n]\)[^\n]*$/\1\3\2/
       }
     }
     x
     s/.//
-    x
-    s/[\n\x00][^\n\x00]*$/x\0/
-    x
     b json_validator___RETURN
   }
   /^[0-9]/ {
@@ -531,7 +517,7 @@
   /^-/ {
     s/.//
     x
-    s/[\n\x00][^\n\x00]*$/x\0/
+    s/[\n\x00]$/x\0/
     x
   }
   /^[1-9][0-9]/ {
@@ -567,15 +553,13 @@
 ###     onenine
 : json_validator___digit
   /^0/ {
-    # Add the character if it is part of an object key
-    x
-    /[^\x00\n]$/ {
-      s/$/0/
-    }
-    x
     s/.//
     x
-    s/[\n\x00][^\n\x00]*$/x\0/
+    s/[\n\x00]$/x\0/
+    # Add the character if it is part of an object key
+    /^[^\x00\n]*[\x00\n][^\r]/ {
+      s/^[^\x00\n]*[\x00\n]/\00/
+    }
     x
     b json_validator___RETURN
   }
@@ -590,24 +574,22 @@
 ###     '1' . '9'
 : json_validator___onenine
   /^[1-9]/ {
-    # Add the character if it is part of an object key
     x
-    /[^\x00\n]$/ {
+    s/[\n\x00]$/x\0/
+    # Add the character if it is part of an object key
+    /^[^\x00\n]*[\x00\n][^\r]/ {
       x
       H
       x
       /^[^\x00\n]*\x00/ {
-        s/\x00\([^\x00]\)[^\x00]*$/\1/
+        s/^\([^\x00]*\x00\)\(.*\)\x00\([^\x00]\)[^\x00]*$/\1\3\2/
       }
       /^[^\x00\n]*\n/ {
-        s/\n\([^\n]\)[^\n]*$/\1/
+        s/^\([^\n]*\n\)\(.*\)\n\([^\n]\)[^\n]*$/\1\3\2/
       }
     }
     x
     s/.//
-    x
-    s/[\n\x00][^\n\x00]*$/x\0/
-    x
     b json_validator___RETURN
   }
   z
@@ -621,7 +603,7 @@
   /^\./ {
     s/.//
     x
-    s/[\n\x00][^\n\x00]*$/x\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___digits
   }
@@ -636,7 +618,7 @@
     s/.//
     x
     s/^/x1/
-    s/[\n\x00][^\n\x00]*$/x\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___sign
     : json_validator___exponent_1
@@ -652,7 +634,7 @@
   /^[-+]/ {
     s/.//
     x
-    s/[\n\x00][^\n\x00]*$/x\0/
+    s/[\n\x00]$/x\0/
     x
   }
   b json_validator___RETURN
@@ -674,7 +656,7 @@
   /^[\x20\x0d\x09]/ {
     s/.//
     x
-    s/[\n\x00][^\n\x00]*$/x\0/
+    s/[\n\x00]$/x\0/
     x
     b json_validator___ws
   }
@@ -912,7 +894,7 @@
 : json_validator___FAILURE
   x
   /^[^\x00\n]*\x00/ {
-    s/.*\x00\(x\+\x00x\+\)\x00[^\x00]*$/\1/
+    s/.*\x00\(x\+\x00x\+\)\x00$/\1/
     b json_validator___COMPUTE_FAILURE_LOCATION
     : json_validator___FAILURE_NUL
       x
@@ -924,7 +906,7 @@
       z
   }
   /^[^\x00\n]*\n/ {
-    s/.*\n\(x\+\nx\+\)\n[^\n]*$/\1/
+    s/.*\n\(x\+\nx\+\)\n$/\1/
     b json_validator___COMPUTE_FAILURE_LOCATION
     : json_validator___FAILURE_NEWLINE
       x

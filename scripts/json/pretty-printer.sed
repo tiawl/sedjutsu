@@ -45,13 +45,12 @@
 #                                                                             #
 ###############################################################################
 
-# TODO: Error for JSON objects with duplicated keys
-
 # Init the holdspace with these variables:
 # - an empty workflow stack
+# - an empty stack to check object keys
 # - env vars
 # - the next line to print
-# - env vars (yes, again: [1] env vars are readonly, so there is no risk of a potential sync error between the 2 locations in the hold space, [2] having a copy here, allow us to remove part of the complexity from (already too) complex regex patterns later)
+# - env vars (yes, again: [1] env vars are readonly, so there is no risk of a potential sync error between the 2 locations in the hold space, [2] having a copy here, allow us to remove part of the complexity into (already too) complex regex patterns later)
 # - row
 # - col
 : init_holdspace
@@ -65,11 +64,11 @@
   s/.$//
   x
   # Map the NUL characters to `Z` characters because shell does not support it
-  /^[^\x00\n]*\x00/ {
+  /\x00$/ {
     z
     s/^/printf '%s:%s%sZ' "${SEDJUTSU_INDENT:-4}" "${SEDJUTSU_MONOCHROME+y:}" "${SEDJUTSU_COLORS:-0;90:0;39:0;39:0;39:0;32:1;39:1;39:1;34}"/
   }
-  /^[^\x00\n]*\n/ {
+  /\n$/ {
     z
     s/^/printf '%s:%s%s\n\n' "${SEDJUTSU_INDENT:-4}" "${SEDJUTSU_MONOCHROME+y:}" "${SEDJUTSU_COLORS:-0;90:0;39:0;39:0;39:0;32:1;39:1;39:1;34}"/
   }
@@ -109,8 +108,9 @@
     t init_holdspace_end
     s/^8:/        :/
     : init_holdspace_end
-      s/\(.*\)\([\n\x00]\)$/\2\1\2\2\1\2x\2x\2/
-      /^[^\x00\n]*\x00/ {
+      # We store \r into the object keys stack as a stop character
+      s/\(.*\)\([\n\x00]\)$/\2\r\2\1\2\2\1\2x\2x\2/
+      /\x00$/ {
         x
         s/\x00/\n/g
         x
@@ -278,11 +278,13 @@
       x
       # Increment the indent level
       /^[^\x00\n]*\x00/ {
-        s/^[^\x00]*\x00\( \+\):[^\x00]*\x00/\0\1/
+        s/^\([^\x00]*\x00\)\{2\}\( \+\):[^\x00]*\x00/\0\2/
       }
       /^[^\x00\n]*\n/ {
-        s/^[^\n]*\n\( \+\):[^\n]*\n/\0\1/
+        s/^\([^\n]*\n\)\{2\}\( \+\):[^\n]*\n/\0\2/
       }
+      # \t character to split keys between objects
+      s/^[^\x00\n]*[\x00\n]\r/\0\t/
       s/[\n\x00]$/x\0/
       x
       b json_pp___members
@@ -294,16 +296,18 @@
           x
           /^[^\x00\n]*\x00/ {
             # Decrement the indent level
-            s/^\([^\x00]*\x00\)\( \+\)\(:[^\x00]*\x00\)\2/\1\2\3/
+            s/^\([^\x00]*\x00[^\x00]*\x00\)\( \+\)\(:[^\x00]*\x00\)\2/\1\2\3/
             # Format the output for the next line to print
             s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00x\+\)\{2\}\x00$/\x1b[\1m}\x1b[0m\0/
           }
           /^[^\x00\n]*\n/ {
             # Decrement the indent level
-            s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
+            s/^\([^\n]*\n[^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
             # Format the output for the next line to print
             s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\nx\+\)\{2\}\n$/\x1b[\1m}\x1b[0m\0/
           }
+          # Remove object keys
+          s/^\([^\x00\n]*[\x00\n]\)[^\t]*\t/\1\r/
           s/[\n\x00]$/x\0/
           x
           b json_pp___RETURN
@@ -360,17 +364,48 @@
     /^[^\x00\n]*\n/ {
       s/\n[^\n]\+:\([^:]\+\)\(\nx\+\)\{2\}\n$/\x1b[\1m\0/
     }
+    # Replace the carriage return character with a bell character into the hold space to indicate we want to store the string as an object key
+    s/^\([^\x00\n]*[\x00\n]\)\r/\1\a/
     x
     b json_pp___string
   : json_pp___member_2
     x
+    s/^[^\x00\n]*[\x00\n]/\0\a/
     # Format the output for the next line to print
     /^[^\x00\n]*\x00/ {
+      /^[^\x00]*\x00\(\a[^\a\t]*\a\)\(\a[^\a\t]*\a\)*\1/ {
+        x
+        g
+        s/^[^\x00]*\x00\a\([^\a\t]*\).*/\1/
+        s/./x/g
+        G
+        h
+        x
+        s/^\(x\+\)\x00\(\([^\x00]*\x00\)\{5\}x\+\x00\)\1x/\2/
+        x
+        s/^x\+\x00[^\x00]*\x00\a\([^\a\t]*\).*/JSON object with duplicated key "\1"/
+        b json_pp___PARSING_FAILURE
+      }
       s/\x00[^\x00]*\(\x00x\+\)\{2\}\x00$/\x1b[0m\0/
     }
     /^[^\x00\n]*\n/ {
+      /^[^\n]*\n\(\a[^\a\t]*\a\)\(\a[^\a\t]*\a\)*\1/ {
+        x
+        g
+        s/^[^\n]*\n\a\([^\a\t]*\).*/\1/
+        s/./x/g
+        G
+        h
+        x
+        s/^\(x\+\)\n\(\([^\n]*\n\)\{5\}x\+\n\)\1x/\2/
+        x
+        s/^x\+\n[^\n]*\n\a\([^\a\t]*\).*/JSON object with duplicated key "\1"/
+        b json_pp___PARSING_FAILURE
+      }
       s/\n[^\n]*\(\nx\+\)\{2\}\n$/\x1b[0m\0/
     }
+    # Add the stop character
+    s/^[^\x00\n]*[\x00\n]/\0\r/
     x
     b json_pp___ws
   : json_pp___member_3
@@ -439,10 +474,10 @@
       x
       # Increment the indent level
       /^[^\x00\n]*\x00/ {
-        s/^[^\x00]*\x00\( \+\):[^\x00]*\x00/\0\1/
+        s/^\([^\x00]*\x00\)\{2\}\( \+\):[^\x00]*\x00/\0\2/
       }
       /^[^\x00\n]*\n/ {
-        s/^[^\n]*\n\( \+\):[^\n]*\n/\0\1/
+        s/^\([^\n]*\n\)\{2\}\( \+\):[^\n]*\n/\0\2/
       }
       s/[\n\x00]$/x\0/
       x
@@ -455,13 +490,13 @@
           x
           /^[^\x00\n]*\x00/ {
             # Decrement the indent level
-            s/^\([^\x00]*\x00\)\( \+\)\(:[^\x00]*\x00\)\2/\1\2\3/
+            s/^\([^\x00]*\x00[^\x00]*\x00\)\( \+\)\(:[^\x00]*\x00\)\2/\1\2\3/
             # Format the output for the next line to print
             s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00x\+\)\{2\}\x00$/\x1b[\1m]\x1b[0m\0/
           }
           /^[^\x00\n]*\n/ {
             # Decrement the indent level
-            s/^\([^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
+            s/^\([^\n]*\n[^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
             # Format the output for the next line to print
             s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\nx\+\)\{2\}\n$/\x1b[\1m]\x1b[0m\0/
           }
@@ -603,8 +638,12 @@
     H
     s/.//
     x
+    # Add the character if it is part of an object key
+    /^[^\x00]*\x00[^\r]/ {
+      s/^\([^\x00]*\x00\)\(.*\)\x00\([^\x00]\)[^\x00]*$/\1\3\2\x00\3/
+    }
     # Format the output for the next line to print
-    s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+    s/^\(\([^\x00]*\x00\)\{3\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
   }
   /^[^\x00\n]*\n/ {
     s/.$//
@@ -612,8 +651,12 @@
     H
     s/.//
     x
+    # Add the character if it is part of an object key
+    /^[^\n]*\n[^\r]/ {
+      s/^\([^\n]*\n\)\(.*\)\n\([^\n]\)[^\n]*$/\1\3\2\n\3/
+    }
     # Format the output for the next line to print
-    s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\nx\+\)\{2\}\n\)\(.\).*/\1\5\3/
+    s/^\(\([^\n]*\n\)\{3\}[^\n]*\)\(\n[^\n]*\(\nx\+\)\{2\}\n\)\(.\).*/\1\5\3/
   }
   s/[\n\x00]$/x\0/
   x
@@ -642,6 +685,10 @@
       s/\n[^\n]*\(\nx\+\)\{2\}\n$/u\0/
     }
     s/[\n\x00]$/x\0/
+    # Add the character if it is part of an object key
+    /^[^\x00\n]*[\x00\n][^\r]/ {
+      s/^[^\x00\n]*[\x00\n]/\0u/
+    }
     x
     b json_pp___hex
     : json_pp___escape_1
@@ -659,8 +706,12 @@
       H
       s/.//
       x
+      # Add the character if it is part of an object key
+      /^[^\x00]*\x00[^\r]/ {
+        s/^\([^\x00]*\x00\)\(.*\)\x00\([^\x00]\)[^\x00]*$/\1\3\2\x00\3/
+      }
       # Format the output for the next line to print
-      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+      s/^\(\([^\x00]*\x00\)\{3\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
     /^[^\x00\n]*\n/ {
       s/.$//
@@ -668,8 +719,12 @@
       H
       s/.//
       x
+      # Add the character if it is part of an object key
+      /^[^\n]*\n[^\r]/ {
+        s/^\([^\n]*\n\)\(.*\)\n\([^\n]\)[^\n]*$/\1\3\2\n\3/
+      }
       # Format the output for the next line to print
-      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\nx\+\)\{2\}\n\)\(.\).*/\1\5\3/
+      s/^\(\([^\n]*\n\)\{3\}[^\n]*\)\(\n[^\n]*\(\nx\+\)\{2\}\n\)\(.\).*/\1\5\3/
     }
     s/[\n\x00]$/x\0/
     x
@@ -692,8 +747,12 @@
       H
       s/.//
       x
+      # Add the character if it is part of an object key
+      /^[^\x00]*\x00[^\r]/ {
+        s/^\([^\x00]*\x00\)\(.*\)\x00\([^\x00]\)[^\x00]*$/\1\3\2\x00\3/
+      }
       # Format the output for the next line to print
-      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+      s/^\(\([^\x00]*\x00\)\{3\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
     /^[^\x00\n]*\n/ {
       s/.$//
@@ -701,8 +760,12 @@
       H
       s/.//
       x
+      # Add the character if it is part of an object key
+      /^[^\n]*\n[^\r]/ {
+        s/^\([^\n]*\n\)\(.*\)\n\([^\n]\)[^\n]*$/\1\3\2\n\3/
+      }
       # Format the output for the next line to print
-      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\nx\+\)\{2\}\n\)\(.\).*/\1\5\3/
+      s/^\(\([^\n]*\n\)\{3\}[^\n]*\)\(\n[^\n]*\(\nx\+\)\{2\}\n\)\(.\).*/\1\5\3/
     }
     s/[\n\x00]$/x\0/
     x
@@ -807,6 +870,10 @@
       s/\n[^\n]*\(\nx\+\)\{2\}\n$/0\0/
     }
     s/[\n\x00]$/x\0/
+    # Add the character if it is part of an object key
+    /^[^\x00\n]*[\x00\n][^\r]/ {
+      s/^[^\x00\n]*[\x00\n]/\00/
+    }
     x
     b json_pp___RETURN
   }
@@ -828,8 +895,12 @@
       H
       s/.//
       x
+      # Add the character if it is part of an object key
+      /^[^\x00]*\x00[^\r]/ {
+        s/^\([^\x00]*\x00\)\(.*\)\x00\([^\x00]\)[^\x00]*$/\1\3\2\x00\3/
+      }
       # Format the output for the next line to print
-      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+      s/^\(\([^\x00]*\x00\)\{3\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
     /^[^\x00\n]*\n/ {
       s/.$//
@@ -837,8 +908,12 @@
       H
       s/.//
       x
+      # Add the character if it is part of an object key
+      /^[^\n]*\n[^\r]/ {
+        s/^\([^\n]*\n\)\(.*\)\n\([^\n]\)[^\n]*$/\1\3\2\n\3/
+      }
       # Format the output for the next line to print
-      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\nx\+\)\{2\}\n\)\(.\).*/\1\5\3/
+      s/^\(\([^\n]*\n\)\{3\}[^\n]*\)\(\n[^\n]*\(\nx\+\)\{2\}\n\)\(.\).*/\1\5\3/
     }
     s/[\n\x00]$/x\0/
     x
@@ -883,7 +958,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+      s/^\(\([^\x00]*\x00\)\{3\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
     /^[^\x00\n]*\n/ {
       s/.$//
@@ -892,7 +967,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\nx\+\)\{2\}\n\)\(.\).*/\1\5\3/
+      s/^\(\([^\n]*\n\)\{3\}[^\n]*\)\(\n[^\n]*\(\nx\+\)\{2\}\n\)\(.\).*/\1\5\3/
     }
     s/[\n\x00]$/x\0/
     x
@@ -916,7 +991,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\x00]*\x00\)\{2\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
+      s/^\(\([^\x00]*\x00\)\{3\}[^\x00]*\)\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\)\(.\).*/\1\5\3/
     }
     /^[^\x00\n]*\n/ {
       s/.$//
@@ -925,7 +1000,7 @@
       s/.//
       x
       # Format the output for the next line to print
-      s/^\(\([^\n]*\n\)\{2\}[^\n]*\)\(\n[^\n]*\(\nx\+\)\{2\}\n\)\(.\).*/\1\5\3/
+      s/^\(\([^\n]*\n\)\{3\}[^\n]*\)\(\n[^\n]*\(\nx\+\)\{2\}\n\)\(.\).*/\1\5\3/
     }
     s/[\n\x00]$/x\0/
     x
@@ -964,14 +1039,14 @@
     H
     g
     # Select the formatted line and print it
-    s/^\([^\x00]*\x00\)\{2\}\([^\x00]*\)\x00.*/\2\n/
+    s/^\([^\x00]*\x00\)\{3\}\([^\x00]*\)\x00.*/\2\n/
     p
     # Restore the pattern space to its state before the print
     g
-    s/^\([^\x00]*\x00\)\{6\}//
+    s/^\([^\x00]*\x00\)\{7\}//
     # Restore the hold space to its state before the print and reset the line to format
     x
-    s/^\(\([^\x00]*\x00\)\{2\} *\)[^\x00]*\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\).*/\1\3/
+    s/^\(\([^\x00]*\x00\)\{3\} *\)[^\x00]*\(\x00[^\x00]*\(\x00x\+\)\{2\}\x00\).*/\1\3/
   }
   /^[^\x00\n]*\n/ {
     s/.$//
@@ -980,14 +1055,14 @@
     H
     g
     # Select the formatted line and print it
-    s/^\([^\n]*\n\)\{2\}\([^\n]*\)\n.*/\2/
+    s/^\([^\n]*\n\)\{3\}\([^\n]*\)\n.*/\2/
     p
     # Restore the pattern space to its state before the print
     g
-    s/^\([^\n]*\n\)\{6\}//
+    s/^\([^\n]*\n\)\{7\}//
     # Restore the hold space to its state before the print and reset the line to format
     x
-    s/^\(\([^\n]*\n\)\{2\} *\)[^\n]*\(\n[^\n]*\(\nx\+\)\{2\}\n\).*/\1\3/
+    s/^\(\([^\n]*\n\)\{3\} *\)[^\n]*\(\n[^\n]*\(\nx\+\)\{2\}\n\).*/\1\3/
   }
   x
   b json_pp___RETURN
@@ -1269,7 +1344,6 @@
 : json_pp___PARSING_FAILURE
   x
   /^[^\x00\n]*\x00/ {
-    # TODO replace with when keys object checking will be ready: s/.*\x00\(x\+\x00x\+\)\x00[^\x00]*$/\1/
     s/.*\x00\(x\+\x00x\+\)\x00$/\1/
     b json_pp___COMPUTE_FAILURE_LOCATION
     : json_pp___PARSING_FAILURE_NUL
@@ -1283,7 +1357,6 @@
       z
   }
   /^[^\x00\n]*\n/ {
-    # TODO replace with when keys object checking will be ready: s/.*\n\(x\+\nx\+\)\n[^\n]*$/\1/
     s/.*\n\(x\+\nx\+\)\n$/\1/
     b json_pp___COMPUTE_FAILURE_LOCATION
     : json_pp___PARSING_FAILURE_NEWLINE

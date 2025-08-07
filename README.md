@@ -1,26 +1,28 @@
 # sedjutsu
 
-A collection of cursed scripts only usable when you are stucked with GNU `sed`
+A set of cursed spells only usable when you are stucked with GNU `sed`
 
 ## Warning
 
-Do not be fooled by the above seductive sentence. Most of the time, even when working in a very restrictive environment, GNU `sed` is not the only friend you have and is certainly not the best choice for what you are trying to achieve. Among (maybe not so) many other tools already installed on the server you are working on, you can probably find `awk`, `perl`, `python` or a shell. Except for very specific usecases, these are options you should consider before.
+Do not be fooled by the above seductive sentence. Most of the time, even when working in a very restrictive environment, if you can find GNU `sed` on the server you are working on, it is certainly neither the only friend you have nor the best choice for what you are trying to achieve. Among (maybe not so) many other tools already installed on the server you are working on, you can probably find `awk`, `perl`, `python` or a shell. Except for very specific usecases, these are options you should consider before.
 
 ## So why ?
 
-The main purpose of this repository is the challenge. I am having fun writing useless GNU `sed` scripts.
+The main purpose of this repository is the challenge. I am having fun writing useless GNU `sed` scripts without relying on external tools.
 
 ## What you can find here
 
-- Some features coming from standard utilities emutaled with GNU `sed` and not already covered into the [GNU sed documentation][1],
-- Potentially famous and simple games.
+- Some features coming from standard utilities emutaled with GNU `sed` and not already covered into the [GNU sed documentation][1]. Currently among them you can find:
+    - JSON utilities,
+    - maths utilities,
+- Potentially famous and simple games: currently none.
 
 ## Important notes
 
-- Each script has its own README written as a header comment. It contains:
-    - A description.
-    - A command to run the script.
+- Each script has its own README written as a header comment. Except a brief description, it contains useful details to make the script work:
+    - A command example.
     - A set of usable environment variables to configure the script.
+    - Potential known limitations.
 - You probably already noticed, but the scripts was written and tested with the GNU implementation of `sed`. If you want to make a script work with other `sed` implementations, you will need to rework it. Depending of the script and the `sed` implementation you are using, the amount of work needed can vary a lot. It may range from just some minor replacements to more technical rewriting due to differences between the implementations' feature set.
 - I assume a POSIX-compliant shell (bash, ash, dash, ...) is also installed on your laptop.
 

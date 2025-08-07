@@ -79,7 +79,7 @@ tests_json () {
     ( * ) expected='\033[38;5;5mFREE\033[m' ;;
     esac
 
-    printf '  EXPECTED: %b\n  RESULT: %b\n  SCRIPT: %s\n  JSON: %s\n  OUTPUT:\n' "${expected}" "${res}" "${script}" "${basename}"
+    printf '  EXPECTED: %b\n  RESULT: %b [%d]\n  SCRIPT: %s\n  JSON: %s\n  OUTPUT:\n' "${expected}" "${res}" "${code}" "${script}" "${basename}"
 
     exec {CAT[1]}>&-
     sed -z 's/^/    >> /g' <&${CAT[0]}
