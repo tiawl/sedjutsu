@@ -38,7 +38,7 @@
   x
   /[^0-9]/ {
     z
-    s/^/Input must a positive integer/
+    s/^/Input must be a positive integer/
     w /dev/stderr
     Q 6
   }
@@ -53,7 +53,7 @@
   s/^0*//
   b math_conv_dec2hex_base10_to_x
 
-# The 2 next loops are working together. Alternatively they replace digits
+# The 2 next loops are working together. Alternatively these replace digits
 # from the decimal representation with 'x' and 'y' characters
 
 # Replace trailing digit with 'x'

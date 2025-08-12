@@ -1,6 +1,6 @@
 # sedjutsu
 
-A set of cursed spells only usable when you are stucked with GNU `sed`
+A set of cursed scripts emulating standard utilities only usable when you are stucked with GNU `sed`
 
 ## Warning
 
@@ -8,14 +8,15 @@ Do not be fooled by the above seductive sentence. Most of the time, even when wo
 
 ## So why ?
 
-The main purpose of this repository is the challenge. I am having fun writing useless GNU `sed` scripts without relying on external tools.
+The main purpose of this repository is the challenge. Some popular utilities are already covered into the [GNU sed documentation][1] but GNU `sed` can make more and I am having fun writing useless GNU `sed` scripts without relying on external tools.
 
 ## What you can find here
 
-- Some features coming from standard utilities emutaled with GNU `sed` and not already covered into the [GNU sed documentation][1]. Currently among them you can find:
-    - JSON utilities,
-    - maths utilities,
-- Potentially famous and simple games: currently none.
+Some features from these utilities:
+- `jq` / `json_pp` / `json_xs`
+- `base64`
+- `dc` / `bc`
+- `yes`
 
 ## Important notes
 
@@ -28,7 +29,7 @@ The main purpose of this repository is the challenge. I am having fun writing us
 
 ## Contributing
 
-If you have other GNU `sed` idea to emulate standard utilities:
+If you have other GNU `sed` idea to emulate other utilities:
 - you can open a pull request for your script,
 - you can open an issue (if I am interested in and have time for, I will go for it. Otherwise I will let it opened if someone else is interested to implement your idea)
 
