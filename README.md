@@ -15,6 +15,7 @@ The main purpose of this repository is the challenge. Some popular utilities are
 Some features from these utilities:
 - `jq` / `json_pp` / `json_xs`
 - `base64`
+- `hd` / `od` / `xxd`
 - `dc` / `bc`
 - `yes`
 
