@@ -1,6 +1,7 @@
 ### README ####################################################################
 #                                                                             #
-#     This script can be used to emulate some `bc` or `dc` features.          #
+#     This script can be used to emulate some `bc` or `dc` features. It       #
+#   converts a decimal number to its hexadecimal representation.              #
 #                                                                             #
 #     If you do not want to see the trailing new line, use the                #
 #   `-n`/`--quiet` option.                                                    #
@@ -13,6 +14,10 @@
 #   - SEDJUTSU_UPPERCASE: print A-F instead of a-f hexadecimal digits into    #
 #     the final output. The script will consider this variable whatever its   #
 #     value (even empty).                                                     #
+#                                                                             #
+### HOW TO RUN IT #############################################################
+#                                                                             #
+#   printf '10254\n' | sed -n -f scripts/math/conv/dec2hex.sed                #
 #                                                                             #
 ###############################################################################
 

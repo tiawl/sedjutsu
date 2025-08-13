@@ -1,7 +1,9 @@
 ### README ####################################################################
 #                                                                             #
 #     This script can be used to emulate some `jq`, `json_pp` or `json_xs`    #
-#   features.                                                                 #
+#   features. It checks if the input is formatted as a valid JSON and         #
+#   add colors and indentation before printing it. It returns the parsing     #
+#   error location in case of failure.                                        #
 #                                                                             #
 #     If you do not want to see the trailing new line, use the                #
 #   `-n`/`--quiet` option.                                                    #
@@ -42,6 +44,12 @@
 #      characters which contain \x00 to \x1f or \x22 (hexadecimal             #
 #      representation of the double-quotes character) or \x5c (hexadecimal    #
 #      representation of the backslash character) in their code points.       #
+#                                                                             #
+### HOW TO RUN IT #############################################################
+#                                                                             #
+#   LC_CTYPE=C sed -znf scripts/json/pretty-printer.sed /path/to/your/json    #
+#                                                                             #
+#   printf '{"k":0}' | LC_CTYPE=C sed -znf scripts/json/pretty-printer.sed    #
 #                                                                             #
 ###############################################################################
 
