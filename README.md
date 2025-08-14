@@ -8,16 +8,22 @@ Do not be fooled by the above seductive sentence. Most of the time, even when wo
 
 ## So why ?
 
-The main purpose of this repository is the challenge. Some popular utilities are already covered into the [GNU sed documentation][1] but GNU `sed` can make more and I am having fun writing useless GNU `sed` scripts without relying on external tools.
+The main purpose of this repository is the challenge. Some popular utilities are already covered into the [GNU sed documentation][1] but GNU `sed` can do much more and I am having fun writing useless GNU `sed` scripts without relying on external tools.
 
 ## What you can find here
 
-Some features from these utilities:
-- `jq` / `json_pp` / `json_xs`
+Some features implemented with GNU `sed` originated from these utilities:
 - `base64`
-- `hd` / `od` / `xxd`
-- `dc` / `bc`
+- `bc`
+- `dc`
+- `hd`
+- `jq`
+- `json_pp`
+- `json_xs`
+- `od`
+- `xxd`
 - `yes`
+- `yq`
 
 ## Important notes
 

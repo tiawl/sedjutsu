@@ -1,0 +1,70 @@
+[0;39mbasic_types[0m[0;39m:[0m 
+  [0;39mstring[0m[0;39m:[0m [0;39mHello, World![0m
+  [0;39mnumber_integer[0m[0;39m:[0m [0;39m42[0m
+  [0;39mnumber_float[0m[0;39m:[0m [0;39m3.14159[0m
+  [0;39mboolean_true[0m[0;39m:[0m [0;39mtrue[0m
+  [0;39mboolean_false[0m[0;39m:[0m [0;39mfalse[0m
+  [0;39mnull_value[0m[0;39m:[0m [0;39mnull[0m
+[0;39marrays[0m[0;39m:[0m 
+  [0;39msimple_array[0m[0;39m:[0m 
+  [0;39m-[0m [0;39m1[0m
+  [0;39m-[0m [0;39m2[0m
+  [0;39m-[0m [0;39m3[0m
+  [0;39m-[0m [0;39m4[0m
+  [0;39m-[0m [0;39m5[0m
+  [0;39mmixed_array[0m[0;39m:[0m 
+  [0;39m-[0m [0;39mtext[0m
+  [0;39m-[0m [0;39m123[0m
+  [0;39m-[0m [0;39mtrue[0m
+  [0;39m-[0m [0;39mnull[0m
+  [0;39m-[0m [0;39mkey[0m[0;39m:[0m [0;39mvalue[0m
+  [0;39mempty_array[0m[0;39m:[0m [0;39m[][0m
+  [0;39mnested_array[0m[0;39m:[0m 
+  [0;39m-[0m [0;39m-[0m [0;39m1[0m
+    [0;39m-[0m [0;39m2[0m
+  [0;39m-[0m [0;39m-[0m [0;39m3[0m
+    [0;39m-[0m [0;39m4[0m
+  [0;39m-[0m [0;39m-[0m [0;39m5[0m
+    [0;39m-[0m [0;39m-[0m [0;39m6[0m
+      [0;39m-[0m [0;39m7[0m
+[0;39mobjects[0m[0;39m:[0m 
+  [0;39msimple_object[0m[0;39m:[0m 
+    [0;39mname[0m[0;39m:[0m [0;39mJohn[0m
+    [0;39mage[0m[0;39m:[0m [0;39m30[0m
+  [0;39mnested_object[0m[0;39m:[0m 
+    [0;39mperson[0m[0;39m:[0m 
+      [0;39mdetails[0m[0;39m:[0m 
+        [0;39mcity[0m[0;39m:[0m [0;39mNew York[0m
+        [0;39mzip[0m[0;39m:[0m [0;39m10001[0m
+      [0;39mactive[0m[0;39m:[0m [0;39mtrue[0m
+  [0;39mempty_object[0m[0;39m:[0m [0;39m{}[0m
+[0;39medge_cases[0m[0;39m:[0m 
+  [0;39mempty_string[0m[0;39m:[0m [0;39m""[0m
+  [0;39mzero[0m[0;39m:[0m [0;39m0[0m
+  [0;39mnegative_number[0m[0;39m:[0m [0;39m-123.456[0m
+  [0;39mexponential_number[0m[0;39m:[0m [0;39m1.23e-4[0m
+  [0;39mlarge_number[0m[0;39m:[0m [0;39m9007199254740991[0m
+  [0;39mspecial_chars[0m[0;39m:[0m [0;39mLine\nBreak\tTab\Backslash"Quote[0m
+  [0;39municode[0m[0;39m:[0m [0;39mこんにちは \u3042[0m
+  [0;39mこんにちは \u3042[0m[0;39m:[0m [0;39m2[0m
+[0;39mcomplex_structure[0m[0;39m:[0m 
+  [0;39musers[0m[0;39m:[0m 
+  [0;39m-[0m [0;39mid[0m[0;39m:[0m [0;39m1[0m
+    [0;39mname[0m[0;39m:[0m [0;39mAlice[0m
+    [0;39mscores[0m[0;39m:[0m 
+    [0;39m-[0m [0;39m95[0m
+    [0;39m-[0m [0;39m87[0m
+    [0;39m-[0m [0;39m92[0m
+    [0;39mdetails[0m[0;39m:[0m 
+      [0;39memail[0m[0;39m:[0m [0;39malice@example.com[0m
+      [0;39mactive[0m[0;39m:[0m [0;39mtrue[0m
+      [0;39msettings[0m[0;39m:[0m 
+        [0;39mtheme[0m[0;39m:[0m [0;39mdark[0m
+        [0;39mnotifications[0m[0;39m:[0m [0;39mfalse[0m
+  [0;39m-[0m [0;39mid[0m[0;39m:[0m [0;39m2[0m
+    [0;39mname[0m[0;39m:[0m [0;39mBob[0m
+    [0;39mscores[0m[0;39m:[0m [0;39m[][0m
+    [0;39mdetails[0m[0;39m:[0m 
+      [0;39memail[0m[0;39m:[0m [0;39mnull[0m
+      [0;39mactive[0m[0;39m:[0m [0;39mfalse[0m
+      [0;39msettings[0m[0;39m:[0m [0;39m{}[0m

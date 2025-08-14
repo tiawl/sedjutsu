@@ -1,0 +1,134 @@
+[0;39mmetadata[0m[0;39m:[0m 
+  [0;39mversion[0m[0;39m:[0m [0;39m2.1.0[0m
+  [0;39menvironment[0m[0;39m:[0m [0;39mproduction[0m
+  [0;39mgeneratedAt[0m[0;39m:[0m [0;39m2025-09-14T18:57:00Z[0m
+  [0;39mtags[0m[0;39m:[0m 
+  [0;39m-[0m [0;39mcomplex[0m
+  [0;39m-[0m [0;39mnested[0m
+  [0;39m-[0m [0;39medge-cases[0m
+  [0;39mpriority[0m[0;39m:[0m [0;39m1[0m
+[0;39muser[0m[0;39m:[0m 
+  [0;39mid[0m[0;39m:[0m [0;39musr_987654321[0m
+  [0;39mprofile[0m[0;39m:[0m 
+    [0;39musername[0m[0;39m:[0m [0;39msuper_user[0m
+    [0;39mdisplayName[0m[0;39m:[0m [0;39mSuper User 😎[0m
+    [0;39mroles[0m[0;39m:[0m 
+    [0;39m-[0m [0;39madmin[0m
+    [0;39m-[0m [0;39meditor[0m
+    [0;39m-[0m [0;39mviewer[0m
+    [0;39mpreferences[0m[0;39m:[0m 
+      [0;39mtheme[0m[0;39m:[0m [0;39mdark[0m
+      [0;39mnotifications[0m[0;39m:[0m 
+        [0;39memail[0m[0;39m:[0m [0;39mtrue[0m
+        [0;39msms[0m[0;39m:[0m [0;39mfalse[0m
+        [0;39mpush[0m[0;39m:[0m [0;39mnull[0m
+      [0;39mlanguages[0m[0;39m:[0m 
+      [0;39m-[0m [0;39men-US[0m
+      [0;39m-[0m [0;39mes-ES[0m
+      [0;39m-[0m [0;39mzh-CN[0m
+    [0;39mstats[0m[0;39m:[0m 
+      [0;39mlogins[0m[0;39m:[0m [0;39m1024[0m
+      [0;39mlastActive[0m[0;39m:[0m [0;39m2025-09-14T10:30:00Z[0m
+      [0;39mactivityScore[0m[0;39m:[0m [0;39m0.98765[0m
+  [0;39msecurity[0m[0;39m:[0m 
+    [0;39mtwoFactor[0m[0;39m:[0m 
+      [0;39menabled[0m[0;39m:[0m [0;39mtrue[0m
+      [0;39mmethods[0m[0;39m:[0m 
+      [0;39m-[0m [0;39mauthenticator[0m
+      [0;39m-[0m [0;39msms[0m
+      [0;39mbackupCodes[0m[0;39m:[0m 
+      [0;39m-[0m [0;39mabc123[0m
+      [0;39m-[0m [0;39mxyz789[0m
+      [0;39m-[0m [0;39mnull[0m
+    [0;39msessions[0m[0;39m:[0m 
+    [0;39m-[0m [0;39msessionId[0m[0;39m:[0m [0;39msess_001[0m
+      [0;39mdevice[0m[0;39m:[0m [0;39miPhone 13[0m
+      [0;39mipAddress[0m[0;39m:[0m [0;39m192.168.1.1[0m
+      [0;39mlastUsed[0m[0;39m:[0m [0;39m2025-09-14T12:00:00Z[0m
+    [0;39m-[0m [0;39msessionId[0m[0;39m:[0m [0;39msess_002[0m
+      [0;39mdevice[0m[0;39m:[0m [0;39mChrome on Windows[0m
+      [0;39mipAddress[0m[0;39m:[0m [0;39m10.0.0.1[0m
+      [0;39mlastUsed[0m[0;39m:[0m [0;39mnull[0m
+[0;39mdataStructures[0m[0;39m:[0m 
+  [0;39msparseArray[0m[0;39m:[0m 
+  [0;39m-[0m [0;39mnull[0m
+  [0;39m-[0m [0;39mitem1[0m
+  [0;39m-[0m [0;39m42[0m
+  [0;39m-[0m [0;39mnull[0m
+  [0;39m-[0m [0;39mkey[0m[0;39m:[0m [0;39mvalue[0m
+  [0;39m-[0m [0;39m[][0m
+  [0;39mdeepNestedArray[0m[0;39m:[0m 
+  [0;39m-[0m [0;39m-[0m [0;39m1[0m
+    [0;39m-[0m [0;39m-[0m [0;39m2[0m
+      [0;39m-[0m [0;39m-[0m [0;39m3[0m
+        [0;39m-[0m [0;39m-[0m [0;39m4[0m
+          [0;39m-[0m [0;39m-[0m [0;39m5[0m
+  [0;39m-[0m [0;39m-[0m [0;39m-[0m [0;39ma[0m
+      [0;39m-[0m [0;39m-[0m [0;39mb[0m
+        [0;39m-[0m [0;39m-[0m [0;39mc[0m
+    [0;39m-[0m [0;39mnull[0m
+  [0;39m-[0m [0;39m[][0m
+  [0;39mcomplexObject[0m[0;39m:[0m 
+    [0;39mlayer1[0m[0;39m:[0m 
+      [0;39mlayer2[0m[0;39m:[0m 
+        [0;39mlayer3[0m[0;39m:[0m 
+          [0;39mlayer4[0m[0;39m:[0m 
+            [0;39mlayer5[0m[0;39m:[0m 
+              [0;39mvalue[0m[0;39m:[0m [0;39mdeepest[0m
+              [0;39mmetadata[0m[0;39m:[0m 
+                [0;39mdepth[0m[0;39m:[0m [0;39m5[0m
+                [0;39mtype[0m[0;39m:[0m [0;39mstring[0m
+  [0;39mmixedTypes[0m[0;39m:[0m 
+  [0;39m-[0m [0;39m123[0m
+  [0;39m-[0m [0;39mstring[0m
+  [0;39m-[0m [0;39mfalse[0m
+  [0;39m-[0m [0;39mnull[0m
+  [0;39m-[0m [0;39mnested[0m[0;39m:[0m [0;39mvalue[0m
+  [0;39m-[0m [0;39m-[0m [0;39m1[0m
+    [0;39m-[0m [0;39mtwo[0m
+    [0;39m-[0m [0;39mnull[0m
+  [0;39m-[0m [0;39m1.7976931348623157e+308[0m
+  [0;39m-[0m [0;39m-1.7976931348623157e+308[0m
+  [0;39m-[0m [0;39m2.3e-308[0m
+[0;39medgeCases[0m[0;39m:[0m 
+  [0;39municodeEdge[0m[0;39m:[0m [0;39m'\uD800\uDBFF\uDFFF'[0m
+  [0;39mlargeString[0m[0;39m:[0m [0;39mxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx[0m
+  [0;39mdeepNulls[0m[0;39m:[0m 
+    [0;39ma[0m[0;39m:[0m [0;39mnull[0m
+    [0;39mb[0m[0;39m:[0m 
+      [0;39mc[0m[0;39m:[0m [0;39mnull[0m
+      [0;39md[0m[0;39m:[0m 
+        [0;39me[0m[0;39m:[0m [0;39mnull[0m
+  [0;39mcircularReferenceSimulation[0m[0;39m:[0m 
+    [0;39mself[0m[0;39m:[0m [0;39mreferenced[0m
+    [0;39mbackLink[0m[0;39m:[0m [0;39mself[0m
+  [0;39mspecialNumbers[0m[0;39m:[0m 
+    [0;39mmaxSafeInt[0m[0;39m:[0m [0;39m9007199254740991[0m
+    [0;39mminSafeInt[0m[0;39m:[0m [0;39m-9007199254740991[0m
+    [0;39mnotANumber[0m[0;39m:[0m [0;39mnull[0m
+    [0;39mpositiveInfinity[0m[0;39m:[0m [0;39mnull[0m
+    [0;39mnegativeInfinity[0m[0;39m:[0m [0;39mnull[0m
+[0;39mdynamicData[0m[0;39m:[0m 
+  [0;39mrandomized[0m[0;39m:[0m 
+  [0;39m-[0m [0;39mid[0m[0;39m:[0m [0;39m1[0m
+    [0;39mvalue[0m[0;39m:[0m [0;39m0.123456789[0m
+  [0;39m-[0m [0;39mid[0m[0;39m:[0m [0;39m2[0m
+    [0;39mvalue[0m[0;39m:[0m [0;39m0.987654321[0m
+  [0;39m-[0m [0;39mid[0m[0;39m:[0m [0;39m3[0m
+    [0;39mvalue[0m[0;39m:[0m [0;39m0.456789123[0m
+  [0;39mconditional[0m[0;39m:[0m 
+    [0;39mactive[0m[0;39m:[0m [0;39mtrue[0m
+    [0;39mdetails[0m[0;39m:[0m 
+      [0;39mtype[0m[0;39m:[0m [0;39msuccess[0m
+      [0;39mcode[0m[0;39m:[0m [0;39m200[0m
+[0;39mmisc[0m[0;39m:[0m 
+  [0;39memptyObject[0m[0;39m:[0m [0;39m{}[0m
+  [0;39memptyArray[0m[0;39m:[0m [0;39m[][0m
+  [0;39msingleElementArray[0m[0;39m:[0m 
+  [0;39m-[0m [0;39m42[0m
+  [0;39mescapedStrings[0m[0;39m:[0m [0;39mLine1\nLine2\tTabbed\\Backslash\"Quoted\"[0m
+  [0;39mregexPattern[0m[0;39m:[0m [0;39m/[a-zA-Z0-9]/g[0m
+  [0;39mdateFormats[0m[0;39m:[0m 
+  [0;39m-[0m [0;39m2025-09-14[0m
+  [0;39m-[0m [0;39mSun, 14 Sep 2025 18:57:00 GMT[0m
+  [0;39m-[0m [0;39m2025-09-14T18:57:00.123Z[0m
