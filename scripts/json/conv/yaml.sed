@@ -166,15 +166,6 @@
 ###    "false"
 ###    "null"
 
-# If a value is a ge-1-item array or a ge-1-item object => new line
-: json_2_yaml___value_in_object
-  /^{/ {
-    b json_2_yaml___object_in_object
-  }
-  /^\[/ {
-    b json_2_yaml___array_in_object
-  }
-  b json_2_yaml___value_1
 : json_2_yaml___value
   /^{/ {
     b json_2_yaml___object
@@ -333,104 +324,6 @@
       s/^/`,` or `}` expected while parsing JSON object/
       b json_2_yaml___PARSING_FAILURE
     : json_2_yaml___object_3
-      /^}/ {
-        s/.//
-        x
-        # Remove object keys
-        s/^\([^\x00\n]*[\x00\n]\)[^\t]*\t/\1\r/
-        s/[\n\x00]$/x\0/
-        x
-        b json_2_yaml___RETURN
-      }
-      z
-      s/^/`,` or `}` expected while parsing JSON object/
-      b json_2_yaml___PARSING_FAILURE
-  }
-  z
-  s/^/`{` expected while parsing JSON object/
-  b json_2_yaml___PARSING_FAILURE
-
-# If a value is a ge-1-item object => new line
-: json_2_yaml___object_in_object
-  /^{[ \n\r\t]*}/ {
-    s/.//
-    x
-    s/^/oo1/
-    # Format the output for the next line to print
-    /^[^\x00\n]*\x00/ {
-      s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00x\+\)\{2\}\x00$/\x1b[\1m{}\x1b[0m\0/
-    }
-    /^[^\x00\n]*\n/ {
-      s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\nx\+\)\{2\}\n$/\x1b[\1m{}\x1b[0m\0/
-    }
-    s/[\n\x00]$/x\0/
-    x
-    b json_2_yaml___ws
-    : json_2_yaml___object_in_object_1
-      /^}/ {
-        s/.//
-        x
-        s/[\n\x00]$/x\0/
-        x
-        b json_2_yaml___RETURN
-      }
-      z
-      s/^/`,` or `}` expected while parsing JSON object/
-      b json_2_yaml___PARSING_FAILURE
-  }
-  /^{/ {
-    s/.//
-    x
-    s/^/oo2oo3/
-    # \t character to split keys between objects
-    s/^[^\x00\n]*[\x00\n]\r/\0\t/
-    s/[\n\x00]$/x\0/
-    x
-    b json_2_yaml___PRINT
-    : json_2_yaml___object_in_object_2
-      x
-      # Increment the indent level
-      /^[^\x00\n]*\x00/ {
-        # Increment AND decrement (later) the indent level IIF the object is not in an array
-        /^\([^\x00]*\x00\)\{3\} *\x1b\[[0-57-9];\(3[0-79]\|9[0-7]\)m-\x1b\[0m / {
-          s/^oo3/oo4/
-        }
-        /^\([^\x00]*\x00\)\{3\} *\x1b\[[0-57-9];\(3[0-79]\|9[0-7]\)m-\x1b\[0m / ! {
-          s/^\([^\x00]*\x00\)\{2\}\( \+\):[^\x00]*\x00/\0\2/
-        }
-      }
-      /^[^\x00\n]*\n/ {
-        # Increment AND decrement (later) the indent level IIF the object is not in an array
-        /^\([^\n]*\n\)\{3\} *\x1b\[[0-57-9];\(3[0-79]\|9[0-7]\)m-\x1b\[0m / {
-          s/^oo3/oo4/
-        }
-        /^\([^\n]*\n\)\{3\} *\x1b\[[0-57-9];\(3[0-79]\|9[0-7]\)m-\x1b\[0m / ! {
-          s/^\([^\n]*\n\)\{2\}\( \+\):[^\n]*\n/\0\2/
-        }
-      }
-      x
-      b json_2_yaml___members
-    : json_2_yaml___object_in_object_3
-      /^}/ {
-        s/.//
-        x
-        # Decrement the indent level
-        /^[^\x00\n]*\x00/ {
-          s/^\([^\x00]*\x00[^\x00]*\x00\)\( \+\)\(:[^\x00]*\x00\)\2/\1\2\3/
-        }
-        /^[^\x00\n]*\n/ {
-          s/^\([^\n]*\n[^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
-        }
-        # Remove object keys
-        s/^\([^\x00\n]*[\x00\n]\)[^\t]*\t/\1\r/
-        s/[\n\x00]$/x\0/
-        x
-        b json_2_yaml___RETURN
-      }
-      z
-      s/^/`,` or `}` expected while parsing JSON object/
-      b json_2_yaml___PARSING_FAILURE
-    : json_2_yaml___object_in_object_4
       /^}/ {
         s/.//
         x
@@ -614,75 +507,6 @@
   s/^/`[` expected while parsing JSON array/
   b json_2_yaml___PARSING_FAILURE
 
-# If a value is a ge-1-item array => new line
-: json_2_yaml___array_in_object
-  /^\[[ \n\r\t]*]/ {
-    s/.//
-    x
-    s/^/ao1/
-    # Format the output for the next line to print
-    /^[^\x00\n]*\x00/ {
-      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00x\+\)\{2\}\x00$/\x1b[\1m[]\x1b[0m\0/
-    }
-    /^[^\x00\n]*\n/ {
-      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\nx\+\)\{2\}\n$/\x1b[\1m[]\x1b[0m\0/
-    }
-    s/[\n\x00]$/x\0/
-    x
-    b json_2_yaml___ws
-    : json_2_yaml___array_in_object_1
-      /^]/ {
-        s/.//
-        x
-        s/[\n\x00]$/x\0/
-        x
-        b json_2_yaml___RETURN
-      }
-      z
-      s/^/`,` or `]` expected while parsing JSON array/
-      b json_2_yaml___PARSING_FAILURE
-  }
-  /^\[/ {
-    s/.//
-    x
-    s/^/ao2ao3/
-    s/[\n\x00]$/x\0/
-    x
-    b json_2_yaml___PRINT
-    : json_2_yaml___array_in_object_2
-      x
-      # Increment the indent level
-      /^[^\x00\n]*\x00/ {
-        s/^\([^\x00]*\x00\)\{2\}\( \+\):[^\x00]*\x00/\0\2/
-      }
-      /^[^\x00\n]*\n/ {
-        s/^\([^\n]*\n\)\{2\}\( \+\):[^\n]*\n/\0\2/
-      }
-      x
-      b json_2_yaml___elements
-    : json_2_yaml___array_in_object_3
-      /^]/ {
-        s/.//
-        x
-        # Decrement the indent level
-        /^[^\x00\n]*\x00/ {
-          s/^\([^\x00]*\x00[^\x00]*\x00\)\( \+\)\(:[^\x00]*\x00\)\2/\1\2\3/
-        }
-        /^[^\x00\n]*\n/ {
-          s/^\([^\n]*\n[^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
-        }
-        s/[\n\x00]$/x\0/
-        x
-        b json_2_yaml___RETURN
-      }
-      z
-      s/^/`,` or `]` expected while parsing JSON array/
-      b json_2_yaml___PARSING_FAILURE
-  }
-  z
-  s/^/`[` expected while parsing JSON array/
-  b json_2_yaml___PARSING_FAILURE
-
 ### elements
 ###     element
 ###     element ',' elements
@@ -709,31 +533,8 @@
     }
     b json_2_yaml___RETURN
 
-# Reset leading hyphens from array's items
-: json_2_yaml___reset_hyphens
-  x
-  /^[^\x00\n]*\x00/ {
-    t json_2_yaml___reset_hyphens_1
-    : json_2_yaml___reset_hyphens_1
-      s/^\(\([^\x00]*\x00\)\{2\} \+\(:[^:]\+\)\{5\}:\([^:]\+\)[^\x00]*\x00 *\)\x1b\[\4m-\x1b\[0m/\1 /
-      t json_2_yaml___reset_hyphens_1
-  }
-  /^[^\x00\n]*\n/ {
-    t json_2_yaml___reset_hyphens_2
-    : json_2_yaml___reset_hyphens_2
-      s/^\(\([^\n]*\n\)\{2\} \+\(:[^:]\+\)\{5\}:\([^:]\+\)[^\n]*\n *\)\x1b\[\4m-\x1b\[0m/\1 /
-      t json_2_yaml___reset_hyphens_2
-  }
-  x
-  b json_2_yaml___RETURN
-
 ### element
 ###     ws value ws
-: json_2_yaml___element_in_object
-  x
-  s/^/e2e3/
-  x
-  b json_2_yaml___ws
 : json_2_yaml___element
   x
   s/^/e1e3/
@@ -1254,6 +1055,203 @@
     b json_2_yaml___ws
   }
   b json_2_yaml___RETURN
+
+# Reset leading hyphens from array's items
+: json_2_yaml___reset_hyphens
+  x
+  /^[^\x00\n]*\x00/ {
+    t json_2_yaml___reset_hyphens_1
+    : json_2_yaml___reset_hyphens_1
+      s/^\(\([^\x00]*\x00\)\{2\} \+\(:[^:]\+\)\{5\}:\([^:]\+\)[^\x00]*\x00 *\)\x1b\[\4m-\x1b\[0m/\1 /
+      t json_2_yaml___reset_hyphens_1
+  }
+  /^[^\x00\n]*\n/ {
+    t json_2_yaml___reset_hyphens_2
+    : json_2_yaml___reset_hyphens_2
+      s/^\(\([^\n]*\n\)\{2\} \+\(:[^:]\+\)\{5\}:\([^:]\+\)[^\n]*\n *\)\x1b\[\4m-\x1b\[0m/\1 /
+      t json_2_yaml___reset_hyphens_2
+  }
+  x
+  b json_2_yaml___RETURN
+
+# YAML conversion special functions: If an object's value is an array or an object with at least 1 item,
+# the algorithm prints the current line and starts to write a new one
+: json_2_yaml___element_in_object
+  x
+  s/^/e2e3/
+  x
+  b json_2_yaml___ws
+: json_2_yaml___value_in_object
+  /^{/ {
+    b json_2_yaml___object_in_object
+  }
+  /^\[/ {
+    b json_2_yaml___array_in_object
+  }
+  b json_2_yaml___value_1
+: json_2_yaml___object_in_object
+  /^{[ \n\r\t]*}/ {
+    s/.//
+    x
+    s/^/oo1/
+    # Format the output for the next line to print
+    /^[^\x00\n]*\x00/ {
+      s/\x00[^\x00]\+:\([^:]\+\):[^:]\+\(\x00x\+\)\{2\}\x00$/\x1b[\1m{}\x1b[0m\0/
+    }
+    /^[^\x00\n]*\n/ {
+      s/\n[^\n]\+:\([^:]\+\):[^:]\+\(\nx\+\)\{2\}\n$/\x1b[\1m{}\x1b[0m\0/
+    }
+    s/[\n\x00]$/x\0/
+    x
+    b json_2_yaml___ws
+    : json_2_yaml___object_in_object_1
+      /^}/ {
+        s/.//
+        x
+        s/[\n\x00]$/x\0/
+        x
+        b json_2_yaml___RETURN
+      }
+      z
+      s/^/`,` or `}` expected while parsing JSON object/
+      b json_2_yaml___PARSING_FAILURE
+  }
+  /^{/ {
+    s/.//
+    x
+    s/^/oo2oo3/
+    # \t character to split keys between objects
+    s/^[^\x00\n]*[\x00\n]\r/\0\t/
+    s/[\n\x00]$/x\0/
+    x
+    b json_2_yaml___PRINT
+    : json_2_yaml___object_in_object_2
+      x
+      # Increment the indent level
+      /^[^\x00\n]*\x00/ {
+        # Increment AND decrement (later) the indent level IIF the object is not in an array
+        /^\([^\x00]*\x00\)\{3\} *\x1b\[[0-57-9];\(3[0-79]\|9[0-7]\)m-\x1b\[0m / {
+          s/^oo3/oo4/
+        }
+        /^\([^\x00]*\x00\)\{3\} *\x1b\[[0-57-9];\(3[0-79]\|9[0-7]\)m-\x1b\[0m / ! {
+          s/^\([^\x00]*\x00\)\{2\}\( \+\):[^\x00]*\x00/\0\2/
+        }
+      }
+      /^[^\x00\n]*\n/ {
+        # Increment AND decrement (later) the indent level IIF the object is not in an array
+        /^\([^\n]*\n\)\{3\} *\x1b\[[0-57-9];\(3[0-79]\|9[0-7]\)m-\x1b\[0m / {
+          s/^oo3/oo4/
+        }
+        /^\([^\n]*\n\)\{3\} *\x1b\[[0-57-9];\(3[0-79]\|9[0-7]\)m-\x1b\[0m / ! {
+          s/^\([^\n]*\n\)\{2\}\( \+\):[^\n]*\n/\0\2/
+        }
+      }
+      x
+      b json_2_yaml___members
+    : json_2_yaml___object_in_object_3
+      /^}/ {
+        s/.//
+        x
+        # Decrement the indent level
+        /^[^\x00\n]*\x00/ {
+          s/^\([^\x00]*\x00[^\x00]*\x00\)\( \+\)\(:[^\x00]*\x00\)\2/\1\2\3/
+        }
+        /^[^\x00\n]*\n/ {
+          s/^\([^\n]*\n[^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
+        }
+        # Remove object keys
+        s/^\([^\x00\n]*[\x00\n]\)[^\t]*\t/\1\r/
+        s/[\n\x00]$/x\0/
+        x
+        b json_2_yaml___RETURN
+      }
+      z
+      s/^/`,` or `}` expected while parsing JSON object/
+      b json_2_yaml___PARSING_FAILURE
+    : json_2_yaml___object_in_object_4
+      /^}/ {
+        s/.//
+        x
+        # Remove object keys
+        s/^\([^\x00\n]*[\x00\n]\)[^\t]*\t/\1\r/
+        s/[\n\x00]$/x\0/
+        x
+        b json_2_yaml___RETURN
+      }
+      z
+      s/^/`,` or `}` expected while parsing JSON object/
+      b json_2_yaml___PARSING_FAILURE
+  }
+  z
+  s/^/`{` expected while parsing JSON object/
+  b json_2_yaml___PARSING_FAILURE
+: json_2_yaml___array_in_object
+  /^\[[ \n\r\t]*]/ {
+    s/.//
+    x
+    s/^/ao1/
+    # Format the output for the next line to print
+    /^[^\x00\n]*\x00/ {
+      s/\x00[^\x00]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\x00x\+\)\{2\}\x00$/\x1b[\1m[]\x1b[0m\0/
+    }
+    /^[^\x00\n]*\n/ {
+      s/\n[^\n]\+:\([^:]\+\)\(:[^:]\+\)\{2\}\(\nx\+\)\{2\}\n$/\x1b[\1m[]\x1b[0m\0/
+    }
+    s/[\n\x00]$/x\0/
+    x
+    b json_2_yaml___ws
+    : json_2_yaml___array_in_object_1
+      /^]/ {
+        s/.//
+        x
+        s/[\n\x00]$/x\0/
+        x
+        b json_2_yaml___RETURN
+      }
+      z
+      s/^/`,` or `]` expected while parsing JSON array/
+      b json_2_yaml___PARSING_FAILURE
+  }
+  /^\[/ {
+    s/.//
+    x
+    s/^/ao2ao3/
+    s/[\n\x00]$/x\0/
+    x
+    b json_2_yaml___PRINT
+    : json_2_yaml___array_in_object_2
+      x
+      # Increment the indent level
+      /^[^\x00\n]*\x00/ {
+        s/^\([^\x00]*\x00\)\{2\}\( \+\):[^\x00]*\x00/\0\2/
+      }
+      /^[^\x00\n]*\n/ {
+        s/^\([^\n]*\n\)\{2\}\( \+\):[^\n]*\n/\0\2/
+      }
+      x
+      b json_2_yaml___elements
+    : json_2_yaml___array_in_object_3
+      /^]/ {
+        s/.//
+        x
+        # Decrement the indent level
+        /^[^\x00\n]*\x00/ {
+          s/^\([^\x00]*\x00[^\x00]*\x00\)\( \+\)\(:[^\x00]*\x00\)\2/\1\2\3/
+        }
+        /^[^\x00\n]*\n/ {
+          s/^\([^\n]*\n[^\n]*\n\)\( \+\)\(:[^\n]*\n\)\2/\1\2\3/
+        }
+        s/[\n\x00]$/x\0/
+        x
+        b json_2_yaml___RETURN
+      }
+      z
+      s/^/`,` or `]` expected while parsing JSON array/
+      b json_2_yaml___PARSING_FAILURE
+  }
+  z
+  s/^/`[` expected while parsing JSON array/
+  b json_2_yaml___PARSING_FAILURE
 
 : json_2_yaml___PRINT
   x
