@@ -306,23 +306,22 @@
     s/\x00\(.\{,16\}\).*/|\1|/
     s/[^[:print:]]/\x1b[1;35m.\x1b[0m/g
     s/$/\n/
-    t hexdump_pretty_hex_1
-    : hexdump_pretty_hex_1
-      s/^\([^|]*\) \([0189a-f][0-9a-f]\) /\1 \x1b[1;35m\2\x1b[0m /
-      t hexdump_pretty_hex_1
-    p
-    b hexdump_next
+    b hexdump_pretty_hex
   }
   /^  \( [ 0-9a-f][ 0-9a-f]\)\{8\} \( [ 0-9a-f][ 0-9a-f]\)\{8\}   \n/ {
     s/\n\(.\{,16\}\).*/|\1|/
     s/[^[:print:]]/\x1b[1;35m.\x1b[0m/g
-    t hexdump_pretty_hex_2
-    : hexdump_pretty_hex_2
-      s/^\([^|]*\) \([0189a-f][0-9a-f]\) /\1 \x1b[1;35m\2\x1b[0m /
-      t hexdump_pretty_hex_2
-    p
-    b hexdump_next
+    b hexdump_pretty_hex
   }
+  b hexdump_next
+
+: hexdump_pretty_hex
+  t hexdump_pretty_hex_in
+  : hexdump_pretty_hex_in
+    s/^\([^|]*\) \([0189a-f][0-9a-f]\) /\1 \x1b[1;35m\2\x1b[0m /
+    t hexdump_pretty_hex_in
+  p
+  b hexdump_next
 
 : hexdump_next
   x
