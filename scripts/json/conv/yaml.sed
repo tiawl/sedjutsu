@@ -1,15 +1,19 @@
 ### README ####################################################################
 #                                                                             #
 #     This script can be used to emulate some `yq` or `json_xs` features.     #
-#   It converts JSON data to YAML. Be aware that `yq` can convert             #
-#   malformatted JSON data to YAML. This should not be possible with this     #
-#   script. For example `yq` can convert this JSON data while this script     #
-#   will return a parsing error:                                              #
-#   ```                                                                       #
-#   {                                                                         #
-#     "Line\nBreak":"\tTab"                                                   #
-#   }                                                                         #
-#   ```                                                                       #
+#   It converts JSON data to YAML.                                            #
+#                                                                             #
+#   Be aware that:                                                            #
+#   - `yq` is more tolerant with malformatted JSON data and can convert it    #
+#     to YAML. This should not be possible with this script. For example      #
+#     `yq` can convert this JSON data while this script will return a         #
+#     parsing error:                                                          #
+#     ```                                                                     #
+#     {                                                                       #
+#       "Line\nBreak":"\tTab"                                                 #
+#     }                                                                       #
+#     ```                                                                     #
+#   - The YAML identation is a bit different from `yq` output.                #
 #                                                                             #
 #     If you do not want to see the trailing new line, use the                #
 #   `-n`/`--quiet` option.                                                    #
