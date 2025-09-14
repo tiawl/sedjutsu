@@ -53,7 +53,7 @@
 #      The script will fail to parse JSON strings with UTF-16 or UTF-32       #
 #      characters which contain \x00 to \x1f or \x22 (hexadecimal             #
 #      representation of the double-quotes character) or \x5c (hexadecimal    #
-#      representation of the backslash character) in their code points.       #
+#      representation of the backslash character) in their UTF-8 encoding.    #
 #                                                                             #
 ### HOW TO RUN IT #############################################################
 #                                                                             #
@@ -1487,7 +1487,7 @@
   x
   /^[^\x00\n]*\x00/ {
     x
-    s/.*/\x1b[0mReached unreachable code in scripts\/json\/pretty-printer.sed: \0\n/
+    s/.*/\x1b[0mReached unreachable code in scripts\/json\/conv\/yaml.sed: \0\n/
     # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
     w /dev/stderr
     # If outside the scope it triggers the next conditional statement
@@ -1495,7 +1495,7 @@
   }
   /^[^\x00\n]*\n/ {
     x
-    s/^/\x1b[0mReached unreachable code in scripts\/json\/pretty-printer.sed: /
+    s/^/\x1b[0mReached unreachable code in scripts\/json\/conv\/yaml.sed: /
     # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
     w /dev/stderr
     z

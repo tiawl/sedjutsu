@@ -34,7 +34,7 @@
 #      The script will fail to parse JSON strings with UTF-16 or UTF-32       #
 #      characters which contain \x00 to \x1f or \x22 (hexadecimal             #
 #      representation of the double-quotes character) or \x5c (hexadecimal    #
-#      representation of the backslash character) in their code points.       #
+#      representation of the backslash character) in their UTF-8 encoding.    #
 #                                                                             #
 ### HOW TO RUN IT #############################################################
 #                                                                             #
