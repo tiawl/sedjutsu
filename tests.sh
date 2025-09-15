@@ -115,7 +115,7 @@ tests_json2yaml () {
     local code
     code='0'
 
-    output="$(SEDJUTSU_MONOCHROME= LC_CTYPE='C' sed --quiet --file scripts/json/conv/yaml.sed "${json}" 2> /dev/null)" || code="${?}"
+    output="$(SEDJUTSU_NOCOLOR= LC_CTYPE='C' sed --quiet --file scripts/json/conv/yaml.sed "${json}" 2> /dev/null)" || code="${?}"
 
     diff='\033[38;5;5mUNTESTED\033[m'
     case "${basename}" in
