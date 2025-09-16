@@ -2,6 +2,8 @@
 
 A set of cursed scripts emulating standard utilities only usable when you are stucked with GNU `sed`
 
+<img src="/demos/json-pretty-printer/render.gif">
+
 ## Warning
 
 Do not be fooled by the above seductive sentence. Most of the time, even when working in a very restrictive environment, if you can find GNU `sed` on the server you are working on, it is certainly neither the only friend you have nor the best choice for what you are trying to achieve. Among (maybe not so) many other tools already installed on the server you are working on, you can probably find `awk`, `perl`, `python` or a shell. Except for very specific usecases, these are options you should consider before.
