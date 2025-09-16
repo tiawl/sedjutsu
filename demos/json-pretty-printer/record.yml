@@ -1,6 +1,6 @@
 config:
   command: bash -l
-  cwd: /home/user/Workspace/sedjutsu/demos/json-pretty-printer
+  cwd: /home/user/sedjutsu/demos/json-pretty-printer
   env:
     recording: true
   cols: 90
@@ -46,7 +46,7 @@ config:
 
 records:
   - delay: 0
-    content: "\e[!p\e[?3;4l\e[4l\e>\e[?69l\e[?2004h\e]0;user: ~/sedjutsu\a\e[01;32muser\e[m:\e[01;34m~/sedjutsu\e[m(\e[01;38;5;93mtrunk\e[m)$ "
+    content: "\r\e[01;31m>\e[m "
   - delay: 1000
     content: "\0"
   - delay: 150
@@ -184,6 +184,6 @@ records:
   - delay: 100
     content: "        \e[1;34m\"active\"\e[0m\e[1;39m:\e[0m \e[0;39mtrue\e[0m\r\n    \e[1;39m}\e[0m\r\n\e[1;39m}\e[0m\r\n"
   - delay: 0
-    content: "\e[?2004h\e]0;user: ~/sedjutsu\a\e[01;32muser\e[m:\e[01;34m~/sedjutsu\e[m(\e[01;38;5;93mtrunk\e[m)$ "
+    content: "\r\e[01;31m>\e[m "
   - delay: 1000
     content: "\0"
