@@ -8,12 +8,10 @@
 #     If you do not want to see the trailing new line, use the                #
 #   `-n`/`--quiet` option.                                                    #
 #                                                                             #
-#     For UTF-8 support, you need to set and export the LC_CTYPE, LANG or     #
-#   LC_ALL variables into your environment. You can also set it with the      #
-#   `env` utility if exporting one of these variable is not possible          #
-#   outside the running environment. Depending of your system you need to     #
-#   change the value of one of these with "C", "C.UTF-8" or                   #
-#   "<lang_COUNTRY>.UTF-8" (for example: "en_US.UTF-8").                      #
+#     For UTF-8 support, set (and export) the LC_CTYPE, LANG or LC_ALL        #
+#   variables into your environment. Depending on your system you change      #
+#   the value of one of these to   "C", "C.UTF-8" or "<lang_COUNTRY>.UTF-8"   #
+#   (for example: "en_US.UTF-8").                                             #
 #                                                                             #
 ### KNOWN LIMITATIONS #########################################################
 #                                                                             #
@@ -54,7 +52,7 @@
     N
     b init_holdspace
   }
-  # Depending of the `-z`/`--null-data` option usage, the `D`, `G`, `H`, `N` and `P` sed commands work with new line or NUL characters. This script must know which one of these characters these commands are using
+  # Depending on the `-z`/`--null-data` option usage, the `D`, `G`, `H`, `N` and `P` sed commands work with new line or NUL characters. This script must know which one of these characters these commands are using
   G
   h
   s/.$//
@@ -677,7 +675,7 @@
   }
   b json_validator___RETURN
 
-# Redirect the workflow depending of the first element in the workflow stack
+# Redirect the workflow depending on the first element in the workflow stack
 : json_validator___RETURN
   x
   /^a1/ {

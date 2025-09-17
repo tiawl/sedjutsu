@@ -8,10 +8,10 @@
 #     If you do not want to see the trailing new line, use the                #
 #   `-n`/`--quiet` option.                                                    #
 #                                                                             #
-#     For UTF-8 support, you need to set (and export) the LC_CTYPE, LANG or   #
-#   LC_ALL variables into your environment. Depending of your system you      #
-#   need to change the value of one of these with "C", "C.UTF-8" or           #
-#   "<lang_COUNTRY>.UTF-8" (for example: "en_US.UTF-8").                      #
+#     For UTF-8 support, set (and export) the LC_CTYPE, LANG or LC_ALL        #
+#   variables into your environment. Depending on your system you change      #
+#   the value of one of these to "C", "C.UTF-8" or "<lang_COUNTRY>.UTF-8"     #
+#   (for example: "en_US.UTF-8").                                             #
 #                                                                             #
 #     You can configure this script behavior by providing these               #
 #   environment variables:                                                    #
@@ -19,7 +19,7 @@
 #     for indentation (default: 4)                                            #
 #   - SEDJUTSU_NOCOLOR: disable color. The script will consider this          #
 #     variable whatever its value (even empty).                               #
-#   - SEDJUTSU_COLORS: colon-delimited list of partial terminal escape        #
+#   - SEDJUTSU_COLORS: colon-separated list of partial terminal escape        #
 #     sequences like "1;31", in this order:                                   #
 #     * color for null                                                        #
 #     * color for false                                                       #
@@ -30,8 +30,8 @@
 #     * color for objects                                                     #
 #     * color for object keys                                                 #
 #     The default value is "0;90:0;39:0;39:0;39:0;32:1;39:1;39:1;34".         #
-#   If SEDJUTSU_NOCOLOR and SEDJUTSU_COLORS are set when the script run,      #
-#   coloring is disabled.                                                     #
+#   If SEDJUTSU_NOCOLOR and SEDJUTSU_COLORS are both exported in your         #
+#   environment, SEDJUTSU_NOCOLOR prevails.                                   #
 #                                                                             #
 ### KNOWN LIMITATIONS #########################################################
 #                                                                             #
@@ -75,7 +75,7 @@
     N
     b init_holdspace
   }
-  # Depending of the `-z`/`--null-data` option usage, the `D`, `G`, `H`, `N` and `P` sed commands work with new line or NUL characters. This script must know which one of these characters these commands are using
+  # Depending on the `-z`/`--null-data` option usage, the `D`, `G`, `H`, `N` and `P` sed commands work with new line or NUL characters. This script must know which one of these characters these commands are using
   G
   h
   s/.$//
@@ -1235,7 +1235,7 @@
   x
   b json_pp___RETURN
 
-# Redirect the workflow depending of the first element in the workflow stack
+# Redirect the workflow depending on the first element in the workflow stack
 : json_pp___RETURN
   x
   /^a1/ {
