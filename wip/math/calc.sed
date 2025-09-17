@@ -92,6 +92,18 @@
 : math_calc___precedence4
   # TODO
 
+: math_calc___bool
+: math_calc___and
+: math_calc___or
+: math_calc___xor
+: math_calc___not
+: math_calc___gt
+: math_calc___lt
+: math_calc___ge
+: math_calc___le
+: math_calc___eq
+: math_calc___ne
+
 # number
 #     integer fraction
 : math_calc___number

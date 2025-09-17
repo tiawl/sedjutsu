@@ -67,9 +67,16 @@
     x
   }
   x
+  /\x80\|\x81\|\x82\|\x83\|\x84\|\x85\|\x86\|\x87\|\x88\|\x89\|\x8a\|\x8b\|\x8c\|\x8d\|\x8e\|\x8f\|\x90\|\x91\|\x92\|\x93\|\x94\|\x95\|\x96\|\x97\|\x98\|\x99\|\x9a\|\x9b\|\x9c\|\x9d\|\x9e\|\x9f\|\xa0\|\xa1\|\xa2\|\xa3\|\xa4\|\xa5\|\xa6\|\xa7\|\xa8\|\xa9\|\xaa\|\xab\|\xac\|\xad\|\xae\|\xaf\|\xb0\|\xb1\|\xb2\|\xb3\|\xb4\|\xb5\|\xb6\|\xb7\|\xb8\|\xb9\|\xba\|\xbb\|\xbc\|\xbd\|\xbe\|\xbf\|\xc0\|\xc1\|\xc2\|\xc3\|\xc4\|\xc5\|\xc6\|\xc7\|\xc8\|\xc9\|\xca\|\xcb\|\xcc\|\xcd\|\xce\|\xcf\|\xd0\|\xd1\|\xd2\|\xd3\|\xd4\|\xd5\|\xd6\|\xd7\|\xd8\|\xd9\|\xda\|\xdb\|\xdc\|\xdd\|\xde\|\xdf\|\xe0\|\xe1\|\xe2\|\xe3\|\xe4\|\xe5\|\xe6\|\xe7\|\xe8\|\xe9\|\xea\|\xeb\|\xec\|\xed\|\xee\|\xef\|\xf0\|\xf1\|\xf2\|\xf3\|\xf4\|\xf5\|\xf6\|\xf7\|\xf8\|\xf9\|\xfa\|\xfb\|\xfc\|\xfd\|\xfe\|\xff/ {
+    /^.*$/ ! {
+      z
+      s/^/UTF-8 encoding detected in your input. Export LC_CTYPE, LANG or LC_ALL in your environment to allow UTF-8 support with sed/
+      b json_pp___ENV_FAILURE
+    }
+  }
   /^$/ {
     s/^/empty input/
-    b json_validator___FAILURE
+    b json_validator___PARSING_FAILURE
   }
   b json_validator___json
 
@@ -90,7 +97,7 @@
     }
     z
     s/^/garbage after main element/
-    b json_validator___FAILURE
+    b json_validator___PARSING_FAILURE
 
 ### value
 ###    object
@@ -136,7 +143,7 @@
   }
   z
   s/^/malformed JSON string, neither array, object, number, string or atom/
-  b json_validator___FAILURE
+  b json_validator___PARSING_FAILURE
 
 ### object
 ###     '{' ws '}'
@@ -159,7 +166,7 @@
       }
       z
       s/^/`,` or `}` expected while parsing JSON object/
-      b json_validator___FAILURE
+      b json_validator___PARSING_FAILURE
   }
   /^{/ {
     s/.//
@@ -182,11 +189,11 @@
       }
       z
       s/^/`,` or `}` expected while parsing JSON object/
-      b json_validator___FAILURE
+      b json_validator___PARSING_FAILURE
   }
   z
   s/^/`{` expected while parsing JSON object/
-  b json_validator___FAILURE
+  b json_validator___PARSING_FAILURE
 
 ### members
 ###     member
@@ -235,7 +242,7 @@
         s/^\(x\+\)\x00\(\([^\x00]*\x00\)\{2\}x\+\x00\)\1x/\2/
         x
         s/^x\+\x00[^\x00]*\x00\a\([^\a\t]*\).*/JSON object with duplicated key "\1"/
-        b json_validator___FAILURE
+        b json_validator___PARSING_FAILURE
       }
     }
     /^[^\x00\n]*\n/ {
@@ -250,7 +257,7 @@
         s/^\(x\+\)\n\(\([^\n]*\n\)\{2\}x\+\n\)\1x/\2/
         x
         s/^x\+\n[^\n]*\n\a\([^\a\t]*\).*/JSON object with duplicated key "\1"/
-        b json_validator___FAILURE
+        b json_validator___PARSING_FAILURE
       }
     }
     # Add the stop character
@@ -267,7 +274,7 @@
     }
     z
     s/^/`:` expected/
-    b json_validator___FAILURE
+    b json_validator___PARSING_FAILURE
 
 ### array
 ###     '[' ws ']'
@@ -290,7 +297,7 @@
       }
       z
       s/^/`,` or `]` expected while parsing JSON array/
-      b json_validator___FAILURE
+      b json_validator___PARSING_FAILURE
   }
   /^\[/ {
     s/.//
@@ -309,11 +316,11 @@
       }
       z
       s/^/`,` or `]` expected while parsing JSON array/
-      b json_validator___FAILURE
+      b json_validator___PARSING_FAILURE
   }
   z
   s/^/`[` expected while parsing JSON array/
-  b json_validator___FAILURE
+  b json_validator___PARSING_FAILURE
 
 ### elements
 ###     element
@@ -360,7 +367,7 @@
   }
   z
   s/^/`"` expected while parsing JSON string/
-  b json_validator___FAILURE
+  b json_validator___PARSING_FAILURE
   : json_validator___string_1
     /^"/ {
       s/.//
@@ -371,7 +378,7 @@
     }
     z
     s/^/Unexpected end of string while parsing JSON string/
-    b json_validator___FAILURE
+    b json_validator___PARSING_FAILURE
 
 ### characters
 ###     character characters
@@ -401,7 +408,7 @@
   /^[\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"]/ {
     z
     s/^/Invalid character encountered/
-    b json_validator___FAILURE
+    b json_validator___PARSING_FAILURE
   }
   x
   s/[\n\x00]$/x\0/
@@ -471,7 +478,7 @@
   }
   z
   s/^/Invalid escaped character encountered/
-  b json_validator___FAILURE
+  b json_validator___PARSING_FAILURE
 
 ### hex
 ###     digit
@@ -502,7 +509,7 @@
   }
   z
   s/^/Invalid hexadecimal character encountered/
-  b json_validator___FAILURE
+  b json_validator___PARSING_FAILURE
 
 ### number
 ###     integer fraction exponent
@@ -541,7 +548,7 @@
   }
   z
   s/^/Invalid integer encountered/
-  b json_validator___FAILURE
+  b json_validator___PARSING_FAILURE
 
 ### digits
 ###     digit
@@ -576,7 +583,7 @@
   }
   z
   s/^/Invalid digit encountered/
-  b json_validator___FAILURE
+  b json_validator___PARSING_FAILURE
 
 ### onenine
 ###     '1' . '9'
@@ -602,7 +609,7 @@
   }
   z
   s/^/Invalid onenine encountered/
-  b json_validator___FAILURE
+  b json_validator___PARSING_FAILURE
 
 ### fraction
 ###     '.' digits
@@ -787,8 +794,8 @@
   s/^/"Unknown return code"/
   b json_validator___UNREACHABLE
 
-: json_validator___COMPUTE_FAILURE_LOCATION
-  : json_validator___COMPUTE_FAILURE_LOCATION_ROW
+: json_validator___COMPUTE_PARSING_FAILURE_LOCATION
+  : json_validator___COMPUTE_PARSING_FAILURE_LOCATION_ROW
     G
     h
     s/^\([xyz]*\)[\x00\n].*/\1/
@@ -800,13 +807,13 @@
       s/xxxxxxxxxx/y/g
       # If the pattern space if full of 'y' we add a trailing 'z' to replace it later with a '0'
       s/^y\+$/\0z/
-      b json_validator___COMPUTE_FAILURE_LOCATION_ROW_NEXT
+      b json_validator___COMPUTE_PARSING_FAILURE_LOCATION_ROW_NEXT
     }
     /yyyyyyyyyy/ {
       s/yyyyyyyyyy/x/g
       # If the pattern space if full of 'x' we add a trailing 'z' to replace it later with a '0'
       s/^x\+$/\0z/
-      b json_validator___COMPUTE_FAILURE_LOCATION_ROW_NEXT
+      b json_validator___COMPUTE_PARSING_FAILURE_LOCATION_ROW_NEXT
     }
     G
     s/[\x00\n]//
@@ -814,16 +821,16 @@
     x
     s/^\([xyz]*[\x00\n]\)\{2\}//
     x
-    b json_validator___COMPUTE_FAILURE_LOCATION_COL
-    : json_validator___COMPUTE_FAILURE_LOCATION_ROW_NEXT
+    b json_validator___COMPUTE_PARSING_FAILURE_LOCATION_COL
+    : json_validator___COMPUTE_PARSING_FAILURE_LOCATION_ROW_NEXT
       G
       s/[\x00\n]//
       s/[\x00\n][^\x00\n]*$//
       x
       s/^\([xyz]*[\x00\n]\)\{2\}//
       x
-      b json_validator___COMPUTE_FAILURE_LOCATION_ROW
-  : json_validator___COMPUTE_FAILURE_LOCATION_COL
+      b json_validator___COMPUTE_PARSING_FAILURE_LOCATION_ROW
+  : json_validator___COMPUTE_PARSING_FAILURE_LOCATION_COL
     G
     h
     s/^[xyz]*[\x00\n]\([xyz]*\)[\x00\n].*/\1/
@@ -835,13 +842,13 @@
       s/xxxxxxxxxx/y/g
       # If the pattern space if full of 'y' we add a trailing 'z' to replace it later with a '0'
       s/^y\+$/\0z/
-      b json_validator___COMPUTE_FAILURE_LOCATION_COL_NEXT
+      b json_validator___COMPUTE_PARSING_FAILURE_LOCATION_COL_NEXT
     }
     /yyyyyyyyyy/ {
       s/yyyyyyyyyy/x/g
       # If the pattern space if full of 'x' we add a trailing 'z' to replace it later with a '0'
       s/^x\+$/\0z/
-      b json_validator___COMPUTE_FAILURE_LOCATION_COL_NEXT
+      b json_validator___COMPUTE_PARSING_FAILURE_LOCATION_COL_NEXT
     }
     G
     s/[\x00\n][^\x00\n]*[\x00\n]//
@@ -852,8 +859,8 @@
     s/^[xyz]*[\x00\n][xyz]*//
     x
     s/^\([xyz]*[\x00\n][xyz]*\).*/\1/
-    b json_validator___COMPUTE_FAILURE_LOCATION_END
-    : json_validator___COMPUTE_FAILURE_LOCATION_COL_NEXT
+    b json_validator___COMPUTE_PARSING_FAILURE_LOCATION_END
+    : json_validator___COMPUTE_PARSING_FAILURE_LOCATION_COL_NEXT
       G
       s/[\x00\n][^\x00\n]*[\x00\n]//
       x
@@ -863,8 +870,8 @@
       s/^[xyz]*[\x00\n][xyz]*//
       x
       s/^\([xyz]*[\x00\n][xyz]*\).*/\1/
-      b json_validator___COMPUTE_FAILURE_LOCATION_COL
-  : json_validator___COMPUTE_FAILURE_LOCATION_END
+      b json_validator___COMPUTE_PARSING_FAILURE_LOCATION_COL
+  : json_validator___COMPUTE_PARSING_FAILURE_LOCATION_END
     s/xxxxxxxxx\|yyyyyyyyy/9/g
     s/xxxxxxxx\|yyyyyyyy/8/g
     s/xxxxxxx\|yyyyyyy/7/g
@@ -876,9 +883,9 @@
     s/x\|y/1/g
     s/z/0/g
     /\x00/ {
-      b json_validator___FAILURE_NUL
+      b json_validator___PARSING_FAILURE_NUL
     }
-    b json_validator___FAILURE_NEWLINE
+    b json_validator___PARSING_FAILURE_NEWLINE
 
 : json_validator___UNREACHABLE
   x
@@ -899,12 +906,12 @@
   }
   Q 5
 
-: json_validator___FAILURE
+: json_validator___PARSING_FAILURE
   x
   /^[^\x00\n]*\x00/ {
     s/.*\x00\(x\+\x00x\+\)\x00$/\1/
-    b json_validator___COMPUTE_FAILURE_LOCATION
-    : json_validator___FAILURE_NUL
+    b json_validator___COMPUTE_PARSING_FAILURE_LOCATION
+    : json_validator___PARSING_FAILURE_NUL
       x
       H
       x
@@ -915,8 +922,8 @@
   }
   /^[^\x00\n]*\n/ {
     s/.*\n\(x\+\nx\+\)\n$/\1/
-    b json_validator___COMPUTE_FAILURE_LOCATION
-    : json_validator___FAILURE_NEWLINE
+    b json_validator___COMPUTE_PARSING_FAILURE_LOCATION
+    : json_validator___PARSING_FAILURE_NEWLINE
       x
       H
       x
@@ -927,6 +934,25 @@
       z
   }
   Q 6
+
+: json_validator___ENV_FAILURE
+  x
+  /^[^\x00\n]*\x00/ {
+    x
+    s/.*/\x1b[0mError in your environment: \0\n/
+    # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
+    w /dev/stderr
+    # If outside the scope it triggers the next conditional statement
+    z
+  }
+  /^[^\x00\n]*\n/ {
+    x
+    s/^/\x1b[0mError in your environment: /
+    # It is duplicated code needed by the script: a weird output bug occured when this instruction is not in the same scope
+    w /dev/stderr
+    z
+  }
+  Q 7
 
 : json_validator___SUCCESS
   x
