@@ -8,12 +8,10 @@
 #     If you do not want to see the trailing new line, use the                #
 #   `-n`/`--quiet` option.                                                    #
 #                                                                             #
-#     For UTF-8 support, you need to set and export the LC_CTYPE, LANG or     #
-#   LC_ALL variables into your environment. You can also set it with the      #
-#   `env` utility if exporting one of these variable is not possible          #
-#   outside the running environment. Depending of your system you need to     #
-#   change the value of one of these with "C", "C.UTF-8" or                   #
-#   "<lang_COUNTRY>.UTF-8" (for example: "en_US.UTF-8").                      #
+#     For UTF-8 support, set (and export) the LC_CTYPE, LANG or LC_ALL        #
+#   variables into your environment. Depending of your system you change      #
+#   the value of one of these with "C", "C.UTF-8" or "<lang_COUNTRY>.UTF-8"   #
+#   (for example: "en_US.UTF-8").                                             #
 #                                                                             #
 ### KNOWN LIMITATIONS #########################################################
 #                                                                             #

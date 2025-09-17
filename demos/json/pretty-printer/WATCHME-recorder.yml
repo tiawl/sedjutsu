@@ -14,7 +14,7 @@ config:
     title: null
     style:
       boxShadow: none
-      padding: 15px
+      padding: 30px
       backgroundColor: black
   watermark:
     imagePath: null
@@ -46,7 +46,7 @@ config:
 
 records:
   - delay: 0
-    content: "\r\e[01;31m>\e[m "
+    content: "\e[H\e[2J\e[3J\e[01;31m>\e[m "
   - delay: 1000
     content: "\0"
   - delay: 50
@@ -300,158 +300,6 @@ records:
   - delay: 50
     content: 't'
   - delay: 50
-    content: '.'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'I'
-  - delay: 50
-    content: 't'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'r'
-  - delay: 50
-    content: 'e'
-  - delay: 50
-    content: 't'
-  - delay: 50
-    content: 'u'
-  - delay: 50
-    content: 'r'
-  - delay: 50
-    content: 'n'
-  - delay: 50
-    content: 's'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 't'
-  - delay: 50
-    content: 'h'
-  - delay: 50
-    content: 'e'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'p'
-  - delay: 50
-    content: 'a'
-  - delay: 50
-    content: 'r'
-  - delay: 50
-    content: 's'
-  - delay: 50
-    content: 'i'
-  - delay: 50
-    content: 'n'
-  - delay: 50
-    content: 'g'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'e'
-  - delay: 50
-    content: 'r'
-  - delay: 50
-    content: 'r'
-  - delay: 50
-    content: 'o'
-  - delay: 50
-    content: 'r'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'l'
-  - delay: 50
-    content: 'o'
-  - delay: 50
-    content: 'c'
-  - delay: 50
-    content: 'a'
-  - delay: 50
-    content: 't'
-  - delay: 50
-    content: 'i'
-  - delay: 50
-    content: 'o'
-  - delay: 50
-    content: 'n'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'i'
-  - delay: 50
-    content: 'n'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'c'
-  - delay: 50
-    content: 'a'
-  - delay: 50
-    content: 's'
-  - delay: 50
-    content: 'e'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'o'
-  - delay: 50
-    content: 'f'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'f'
-  - delay: 50
-    content: 'a'
-  - delay: 50
-    content: 'i'
-  - delay: 50
-    content: 'l'
-  - delay: 50
-    content: 'u'
-  - delay: 50
-    content: 'r'
-  - delay: 50
-    content: 'e'
-  - delay: 50
-    content: '.'
-  - delay: 50
-    content: "\r\n"
-  - delay: 0
-    content: "\r\e[01;31m>\e[m "
-  - delay: 200
-    content: "\0"
-  - delay: 50
-    content: '#'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'S'
-  - delay: 50
-    content: 'U'
-  - delay: 50
-    content: 'C'
-  - delay: 50
-    content: 'C'
-  - delay: 50
-    content: 'E'
-  - delay: 50
-    content: 'S'
-  - delay: 50
-    content: 'S'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'c'
-  - delay: 50
-    content: 'a'
-  - delay: 50
-    content: 's'
-  - delay: 50
-    content: 'e'
-  - delay: 50
     content: ':'
   - delay: 50
     content: "\r\n"
@@ -500,64 +348,20 @@ records:
   - delay: 150
     content: 'c'
   - delay: 150
-    content: 'r'
-  - delay: 150
-    content: 'i'
-  - delay: 150
-    content: 'p'
-  - delay: 150
-    content: 't'
-  - delay: 150
-    content: 's'
-  - delay: 150
-    content: '/'
-  - delay: 150
+    content: 'ripts/'
+  - delay: 300
     content: 'j'
   - delay: 150
     content: 's'
   - delay: 150
-    content: 'o'
-  - delay: 150
-    content: 'n'
-  - delay: 150
-    content: '/'
-  - delay: 150
+    content: 'on/'
+  - delay: 300
     content: 'p'
   - delay: 150
     content: 'r'
   - delay: 150
-    content: 'e'
-  - delay: 150
-    content: 't'
-  - delay: 150
-    content: 't'
-  - delay: 150
-    content: 'y'
-  - delay: 150
-    content: '-'
-  - delay: 150
-    content: 'p'
-  - delay: 150
-    content: 'r'
-  - delay: 150
-    content: 'i'
-  - delay: 150
-    content: 'n'
-  - delay: 150
-    content: 't'
-  - delay: 150
-    content: 'e'
-  - delay: 150
-    content: 'r'
-  - delay: 150
-    content: '.'
-  - delay: 150
-    content: 's'
-  - delay: 150
-    content: 'e'
-  - delay: 150
-    content: 'd'
-  - delay: 150
+    content: 'etty-printer.sed '
+  - delay: 300
     content: "\r\n"
   - delay: 100
     content: "\e[1;39m{\e[0m\r\n"
@@ -651,6 +455,104 @@ records:
     content: 'p'
   - delay: 50
     content: 't'
+  - delay: 50
+    content: ':'
+  - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 200
+    content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '-'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'u'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'h'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'p'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 'g'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: ','
+  - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 200
+    content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '-'
   - delay: 50
     content: ' '
   - delay: 50
@@ -764,55 +666,19 @@ records:
   - delay: 50
     content: ' '
   - delay: 50
-    content: 'i'
-  - delay: 50
-    content: 's'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'm'
-  - delay: 50
-    content: 'e'
-  - delay: 50
-    content: 't'
-  - delay: 50
-    content: '.'
-  - delay: 50
-    content: "\r\n"
-  - delay: 0
-    content: "\r\e[01;31m>\e[m "
-  - delay: 200
-    content: "\0"
-  - delay: 50
-    content: '#'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'F'
-  - delay: 50
-    content: 'A'
-  - delay: 50
-    content: 'I'
-  - delay: 50
-    content: 'L'
-  - delay: 50
-    content: 'U'
-  - delay: 50
-    content: 'R'
-  - delay: 50
-    content: 'E'
-  - delay: 50
-    content: ' '
+    content: 'o'
   - delay: 50
     content: 'c'
   - delay: 50
-    content: 'a'
+    content: 'c'
   - delay: 50
-    content: 's'
+    content: 'u'
+  - delay: 50
+    content: 'r'
   - delay: 50
     content: 'e'
   - delay: 50
-    content: ':'
+    content: 'd'
   - delay: 50
     content: "\r\n"
   - delay: 0
@@ -860,64 +726,20 @@ records:
   - delay: 150
     content: 'c'
   - delay: 150
-    content: 'r'
-  - delay: 150
-    content: 'i'
-  - delay: 150
-    content: 'p'
-  - delay: 150
-    content: 't'
-  - delay: 150
-    content: 's'
-  - delay: 150
-    content: '/'
-  - delay: 150
+    content: 'ripts/'
+  - delay: 300
     content: 'j'
   - delay: 150
     content: 's'
   - delay: 150
-    content: 'o'
-  - delay: 150
-    content: 'n'
-  - delay: 150
-    content: '/'
-  - delay: 150
+    content: 'on/'
+  - delay: 300
     content: 'p'
   - delay: 150
     content: 'r'
   - delay: 150
-    content: 'e'
-  - delay: 150
-    content: 't'
-  - delay: 150
-    content: 't'
-  - delay: 150
-    content: 'y'
-  - delay: 150
-    content: '-'
-  - delay: 150
-    content: 'p'
-  - delay: 150
-    content: 'r'
-  - delay: 150
-    content: 'i'
-  - delay: 150
-    content: 'n'
-  - delay: 150
-    content: 't'
-  - delay: 150
-    content: 'e'
-  - delay: 150
-    content: 'r'
-  - delay: 150
-    content: '.'
-  - delay: 150
-    content: 's'
-  - delay: 150
-    content: 'e'
-  - delay: 150
-    content: 'd'
-  - delay: 150
+    content: 'etty-printer.sed '
+  - delay: 300
     content: "\r\n"
   - delay: 100
     content: "\e[1;39m{\e[0m\r\n"
@@ -1148,64 +970,20 @@ records:
   - delay: 150
     content: 'c'
   - delay: 150
-    content: 'r'
-  - delay: 150
-    content: 'i'
-  - delay: 150
-    content: 'p'
-  - delay: 150
-    content: 't'
-  - delay: 150
-    content: 's'
-  - delay: 150
-    content: '/'
-  - delay: 150
+    content: 'ripts/'
+  - delay: 300
     content: 'j'
   - delay: 150
     content: 's'
   - delay: 150
-    content: 'o'
-  - delay: 150
-    content: 'n'
-  - delay: 150
-    content: '/'
-  - delay: 150
+    content: 'on/'
+  - delay: 300
     content: 'p'
   - delay: 150
     content: 'r'
   - delay: 150
-    content: 'e'
-  - delay: 150
-    content: 't'
-  - delay: 150
-    content: 't'
-  - delay: 150
-    content: 'y'
-  - delay: 150
-    content: '-'
-  - delay: 150
-    content: 'p'
-  - delay: 150
-    content: 'r'
-  - delay: 150
-    content: 'i'
-  - delay: 150
-    content: 'n'
-  - delay: 150
-    content: 't'
-  - delay: 150
-    content: 'e'
-  - delay: 150
-    content: 'r'
-  - delay: 150
-    content: '.'
-  - delay: 150
-    content: 's'
-  - delay: 150
-    content: 'e'
-  - delay: 150
-    content: 'd'
-  - delay: 150
+    content: 'etty-printer.sed '
+  - delay: 300
     content: "\r\n"
   - delay: 100
     content: "\e[1;39m{\e[0m\r\n"
@@ -1277,30 +1055,6 @@ records:
     content: 't'
   - delay: 50
     content: ','
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'y'
-  - delay: 50
-    content: 'o'
-  - delay: 50
-    content: 'u'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'n'
-  - delay: 50
-    content: 'e'
-  - delay: 50
-    content: 'e'
-  - delay: 50
-    content: 'd'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 't'
-  - delay: 50
-    content: 'o'
   - delay: 50
     content: ' '
   - delay: 50
@@ -1432,6 +1186,14 @@ records:
   - delay: 50
     content: '.'
   - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 200
+    content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
     content: ' '
   - delay: 50
     content: 'D'
@@ -1511,30 +1273,6 @@ records:
     content: 'n'
   - delay: 50
     content: ','
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'y'
-  - delay: 50
-    content: 'o'
-  - delay: 50
-    content: 'u'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 'n'
-  - delay: 50
-    content: 'e'
-  - delay: 50
-    content: 'e'
-  - delay: 50
-    content: 'd'
-  - delay: 50
-    content: ' '
-  - delay: 50
-    content: 't'
-  - delay: 50
-    content: 'o'
   - delay: 50
     content: ' '
   - delay: 50
@@ -1810,64 +1548,20 @@ records:
   - delay: 150
     content: 'c'
   - delay: 150
-    content: 'r'
-  - delay: 150
-    content: 'i'
-  - delay: 150
-    content: 'p'
-  - delay: 150
-    content: 't'
-  - delay: 150
-    content: 's'
-  - delay: 150
-    content: '/'
-  - delay: 150
+    content: 'ripts/'
+  - delay: 300
     content: 'j'
   - delay: 150
     content: 's'
   - delay: 150
-    content: 'o'
-  - delay: 150
-    content: 'n'
-  - delay: 150
-    content: '/'
-  - delay: 150
+    content: 'on/'
+  - delay: 300
     content: 'p'
   - delay: 150
     content: 'r'
   - delay: 150
-    content: 'e'
-  - delay: 150
-    content: 't'
-  - delay: 150
-    content: 't'
-  - delay: 150
-    content: 'y'
-  - delay: 150
-    content: '-'
-  - delay: 150
-    content: 'p'
-  - delay: 150
-    content: 'r'
-  - delay: 150
-    content: 'i'
-  - delay: 150
-    content: 'n'
-  - delay: 150
-    content: 't'
-  - delay: 150
-    content: 'e'
-  - delay: 150
-    content: 'r'
-  - delay: 150
-    content: '.'
-  - delay: 150
-    content: 's'
-  - delay: 150
-    content: 'e'
-  - delay: 150
-    content: 'd'
-  - delay: 150
+    content: 'etty-printer.sed '
+  - delay: 300
     content: "\r\n"
   - delay: 100
     content: "\e[0mError in your environment: UTF-8 encoding detected in your input. Export LC_CTYPE, LANG or LC_ALL in your environment to allow UTF-8 support with sed\r\n"
@@ -1877,6 +1571,7 @@ records:
     content: "\0"
   - delay: 150
     content: "printf '{\"utf-8 encoded string\": \"\\x1a\"}' | sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+# TODO: does this work ?
   - delay: 150
     content: "Lsed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
   - delay: 150
@@ -1898,7 +1593,7 @@ records:
   - delay: 150
     content: "Csed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
   - delay: 150
-    content: " sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+    content: " sed -n -f scripts/json/pretty-printer.sed"
   - delay: 150
     content: "\r\n"
   - delay: 100
@@ -1911,9 +1606,6 @@ records:
     content: "\r\e[01;31m>\e[m "
   - delay: 1000
     content: "\0"
-
-
-
   - delay: 50
     content: '#'
   - delay: 50
@@ -2054,3 +1746,1911 @@ records:
     content: "\e[H\e[2J\e[3J\e[01;31m>\e[m "
   - delay: 1000
     content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'Y'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'u'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 'f'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'g'
+  - delay: 50
+    content: 'u'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'h'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '`'
+  - delay: 50
+    content: 'j'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: '/'
+  - delay: 50
+    content: 'p'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'y'
+  - delay: 50
+    content: '-'
+  - delay: 50
+    content: 'p'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: '.'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'd'
+  - delay: 50
+    content: '`'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'p'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'b'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'h'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'v'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'b'
+  - delay: 50
+    content: 'y'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'p'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'v'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'd'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 'g'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'h'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 'v'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 'm'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'v'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'b'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: ':'
+  - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 200
+    content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '-'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'S'
+  - delay: 50
+    content: 'E'
+  - delay: 50
+    content: 'D'
+  - delay: 50
+    content: 'J'
+  - delay: 50
+    content: 'U'
+  - delay: 50
+    content: 'T'
+  - delay: 50
+    content: 'S'
+  - delay: 50
+    content: 'U'
+  - delay: 50
+    content: '_'
+  - delay: 50
+    content: 'I'
+  - delay: 50
+    content: 'N'
+  - delay: 50
+    content: 'D'
+  - delay: 50
+    content: 'E'
+  - delay: 50
+    content: 'N'
+  - delay: 50
+    content: 'T'
+  - delay: 50
+    content: ':'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'u'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'h'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'g'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'v'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 'u'
+  - delay: 50
+    content: 'm'
+  - delay: 50
+    content: 'b'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'f'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: 'p'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '('
+  - delay: 50
+    content: 'b'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'w'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '1'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 'd'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '8'
+  - delay: 50
+    content: ')'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'f'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 'd'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '('
+  - delay: 50
+    content: 'd'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'f'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'u'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: ':'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '4'
+  - delay: 50
+    content: ')'
+  - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 1000
+    content: "\0"
+  - delay: 150
+    content: 'e'
+  - delay: 150
+    content: 'c'
+  - delay: 150
+    content: 'h'
+  - delay: 150
+    content: 'o'
+  - delay: 150
+    content: ' '
+  - delay: 150
+    content: "'"
+  - delay: 300
+    content: '{"name":"John Doe","age":30,"city":"New York","hobbies":["reading","hiking","coding"],"isStudent":false}'
+  - delay: 300
+    content: "'"
+  - delay: 150
+    content: ' '
+  - delay: 150
+    content: '|'
+  - delay: 150
+    content: ' '
+  - delay: 150
+    content: 'S'
+  - delay: 150
+    content: 'E'
+  - delay: 150
+    content: 'D'
+  - delay: 150
+    content: 'J'
+  - delay: 150
+    content: 'U'
+  - delay: 150
+    content: 'T'
+  - delay: 150
+    content: 'S'
+  - delay: 150
+    content: 'U'
+  - delay: 150
+    content: '_'
+  - delay: 150
+    content: 'I'
+  - delay: 150
+    content: 'N'
+  - delay: 150
+    content: 'D'
+  - delay: 150
+    content: 'E'
+  - delay: 150
+    content: 'N'
+  - delay: 150
+    content: 'T'
+  - delay: 150
+    content: '='
+  - delay: 150
+    content: '2'
+  - delay: 150
+    content: ' '
+  - delay: 150
+    content: 's'
+  - delay: 150
+    content: 'e'
+  - delay: 150
+    content: 'd'
+  - delay: 150
+    content: ' '
+  - delay: 150
+    content: '-'
+  - delay: 150
+    content: 'n'
+  - delay: 150
+    content: ' '
+  - delay: 150
+    content: '-'
+  - delay: 150
+    content: 'f'
+  - delay: 150
+    content: ' '
+  - delay: 150
+    content: 's'
+  - delay: 150
+    content: 'c'
+  - delay: 150
+    content: 'ripts/'
+  - delay: 300
+    content: 'j'
+  - delay: 150
+    content: 's'
+  - delay: 150
+    content: 'on/'
+  - delay: 300
+    content: 'p'
+  - delay: 150
+    content: 'r'
+  - delay: 150
+    content: 'etty-printer.sed '
+  - delay: 300
+    content: "\r\n"
+  - delay: 100
+    content: "\e[1;39m{\e[0m\r\n"
+  - delay: 100
+    content: "  \e[1;34m\"name\"\e[0m\e[1;39m:\e[0m \e[0;32m\"John Doe\"\e[0m\e[1;39m,\e[0m\r\n"
+  - delay: 100
+    content: "  \e[1;34m\"age\"\e[0m\e[1;39m:\e[0m \e[0;39m30\e[0m\e[1;39m,\e[0m\r\n"
+  - delay: 100
+    content: "  \e[1;34m\"city\"\e[0m\e[1;39m:\e[0m \e[0;32m\"New York\"\e[0m\e[1;39m,\e[0m\r\n"
+  - delay: 100
+    content: "  \e[1;34m\"hobbies\"\e[0m\e[1;39m:\e[0m \e[1;39m[\e[0m\r\n"
+  - delay: 100
+    content: "    \e[0;32m\"reading\"\e[0m\e[1;39m,\e[0m\r\n"
+  - delay: 100
+    content: "    \e[0;32m\"hiking\"\e[0m\e[1;39m,\e[0m\r\n"
+  - delay: 100
+    content: "    \e[0;32m\"coding\"\e[0m\r\n"
+  - delay: 100
+    content: "  \e[1;39m]\e[0m\e[1;39m,\e[0m\r\n"
+  - delay: 100
+    content: "  \e[1;34m\"isStudent\"\e[0m\e[1;39m:\e[0m \e[0;39mfalse\e[0m\r\n"
+  - delay: 100
+    content: "\e[1;39m}\e[0m\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 3000
+    content: "\0"
+  - delay: 0
+    content: "\e[H\e[2J\e[3J\e[01;31m>\e[m "
+  - delay: 1000
+    content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '-'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'S'
+  - delay: 50
+    content: 'E'
+  - delay: 50
+    content: 'D'
+  - delay: 50
+    content: 'J'
+  - delay: 50
+    content: 'U'
+  - delay: 50
+    content: 'T'
+  - delay: 50
+    content: 'S'
+  - delay: 50
+    content: 'U'
+  - delay: 50
+    content: '_'
+  - delay: 50
+    content: 'N'
+  - delay: 50
+    content: 'O'
+  - delay: 50
+    content: 'C'
+  - delay: 50
+    content: 'O'
+  - delay: 50
+    content: 'L'
+  - delay: 50
+    content: 'O'
+  - delay: 50
+    content: 'R'
+  - delay: 50
+    content: ':'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'd'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'b'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: '.'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'T'
+  - delay: 50
+    content: 'h'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'p'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'w'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'd'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'h'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'v'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'b'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'w'
+  - delay: 50
+    content: 'h'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'v'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'v'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'u'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '('
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'v'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'm'
+  - delay: 50
+    content: 'p'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'y'
+  - delay: 50
+    content: ')'
+  - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 1000
+    content: "\0"
+  - delay: 150
+    content: "echo {\"name\":\"John Doe\",\"age\":30,\"city\":\"New York\",\"hobbies\":[\"reading\",\"hiking\",\"coding\"],\"isStudent\":false} | SEDJUTSU_INDENT=2 sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\b sed -n -f scripts/json/pretty-printer.sed\e[K\e[J\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\b sed -n -f scripts/json/pretty-printer.sed\e[K\e[J\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\b sed -n -f scripts/json/pretty-printer.sed\e[K\e[J\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\b sed -n -f scripts/json/pretty-printer.sed\e[K\e[J\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\b sed -n -f scripts/json/pretty-printer.sed\e[K\e[J\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\b sed -n -f scripts/json/pretty-printer.sed\e[K\e[J\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\b sed -n -f scripts/json/pretty-printer.sed\e[K\e[J\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\b sed -n -f scripts/json/pretty-printer.sed\e[K\e[J\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\bN sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "O sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "C sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "O sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "L sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "O sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "R sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "= sed -n -f scripts/json/pretty-printer.sed"
+  - delay: 150
+    content: "\r\n"
+  - delay: 100
+    content: "{\n"
+  - delay: 100
+    content: "    \"name\": \"John Doe\",\r\n"
+  - delay: 100
+    content: "    \"age\": 30,\r\n"
+  - delay: 100
+    content: "    \"city\": \"New York\",\r\n"
+  - delay: 100
+    content: "    \"hobbies\": [\r\n"
+  - delay: 100
+    content: "        \"reading\",\r\n"
+  - delay: 100
+    content: "        \"hiking\",\r\n"
+  - delay: 100
+    content: "        \"coding\"\r\n"
+  - delay: 100
+    content: "    ],\r\n"
+  - delay: 100
+    content: "    \"isStudent\": false\r\n"
+  - delay: 100
+    content: "}\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 3000
+    content: "\0"
+  - delay: 0
+    content: "\e[H\e[2J\e[3J\e[01;31m>\e[m "
+  - delay: 1000
+    content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '-'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'S'
+  - delay: 50
+    content: 'E'
+  - delay: 50
+    content: 'D'
+  - delay: 50
+    content: 'J'
+  - delay: 50
+    content: 'U'
+  - delay: 50
+    content: 'T'
+  - delay: 50
+    content: 'S'
+  - delay: 50
+    content: 'U'
+  - delay: 50
+    content: '_'
+  - delay: 50
+    content: 'C'
+  - delay: 50
+    content: 'O'
+  - delay: 50
+    content: 'L'
+  - delay: 50
+    content: 'O'
+  - delay: 50
+    content: 'R'
+  - delay: 50
+    content: 'S'
+  - delay: 50
+    content: ':'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: '-'
+  - delay: 50
+    content: 'd'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'm'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'd'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'f'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'p'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'm'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'p'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'q'
+  - delay: 50
+    content: 'u'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'k'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '"'
+  - delay: 50
+    content: '1'
+  - delay: 50
+    content: ';'
+  - delay: 50
+    content: '3'
+  - delay: 50
+    content: '1'
+  - delay: 50
+    content: '"'
+  - delay: 50
+    content: ','
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'h'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'd'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ':'
+  - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 200
+    content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '1'
+  - delay: 50
+    content: ')'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'f'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 'u'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 200
+    content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '2'
+  - delay: 50
+    content: ')'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'f'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'f'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 200
+    content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '3'
+  - delay: 50
+    content: ')'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'f'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'u'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 200
+    content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '4'
+  - delay: 50
+    content: ')'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'f'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 'u'
+  - delay: 50
+    content: 'm'
+  - delay: 50
+    content: 'b'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 200
+    content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '5'
+  - delay: 50
+    content: ')'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'f'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 'g'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 200
+    content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '6'
+  - delay: 50
+    content: ')'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'f'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'y'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 200
+    content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '7'
+  - delay: 50
+    content: ')'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'f'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'b'
+  - delay: 50
+    content: 'j'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 200
+    content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '8'
+  - delay: 50
+    content: ')'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'f'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'b'
+  - delay: 50
+    content: 'j'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'c'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'k'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'y'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 200
+    content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'T'
+  - delay: 50
+    content: 'h'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'd'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'f'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'u'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'v'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 'u'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: '"'
+  - delay: 50
+    content: '0'
+  - delay: 50
+    content: ';'
+  - delay: 50
+    content: '9'
+  - delay: 50
+    content: '0'
+  - delay: 50
+    content: ':'
+  - delay: 50
+    content: '0'
+  - delay: 50
+    content: ';'
+  - delay: 50
+    content: '3'
+  - delay: 50
+    content: '9'
+  - delay: 50
+    content: ':'
+  - delay: 50
+    content: '0'
+  - delay: 50
+    content: ';'
+  - delay: 50
+    content: '3'
+  - delay: 50
+    content: '9'
+  - delay: 50
+    content: ':'
+  - delay: 50
+    content: '0'
+  - delay: 50
+    content: ';'
+  - delay: 50
+    content: '3'
+  - delay: 50
+    content: '9'
+  - delay: 50
+    content: ':'
+  - delay: 50
+    content: '0'
+  - delay: 50
+    content: ';'
+  - delay: 50
+    content: '3'
+  - delay: 50
+    content: '2'
+  - delay: 50
+    content: ':'
+  - delay: 50
+    content: '1'
+  - delay: 50
+    content: ';'
+  - delay: 50
+    content: '3'
+  - delay: 50
+    content: '9'
+  - delay: 50
+    content: ':'
+  - delay: 50
+    content: '1'
+  - delay: 50
+    content: ';'
+  - delay: 50
+    content: '3'
+  - delay: 50
+    content: '9'
+  - delay: 50
+    content: ':'
+  - delay: 50
+    content: '1'
+  - delay: 50
+    content: ';'
+  - delay: 50
+    content: '3'
+  - delay: 50
+    content: '4'
+  - delay: 50
+    content: '"'
+  - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 1000
+    content: "\0"
+  - delay: 150
+    content: "echo {\"name\":\"John Doe\",\"age\":30,\"city\":\"New York\",\"hobbies\":[\"reading\",\"hiking\",\"coding\"],\"isStudent\":false} | SEDJUTSU_NOCOLOR= sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\b sed -n -f scripts/json/pretty-printer.sed\e[K\e[J\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\b sed -n -f scripts/json/pretty-printer.sed\e[K\e[J\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\b sed -n -f scripts/json/pretty-printer.sed\e[K\e[J\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\b sed -n -f scripts/json/pretty-printer.sed\e[K\e[J\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\b sed -n -f scripts/json/pretty-printer.sed\e[K\e[J\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\b sed -n -f scripts/json/pretty-printer.sed\e[K\e[J\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\b sed -n -f scripts/json/pretty-printer.sed\e[K\e[J\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\b sed -n -f scripts/json/pretty-printer.sed\e[K\e[J\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\bC sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "O sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "L sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "O sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "R sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "S sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "= sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "' sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 300
+    content: "0;90:0;95:0;95:0;95:0;33:1;32:1;32:1;31 sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 300
+    content: "' sed -n -f scripts/json/pretty-printer.sed\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  - delay: 150
+    content: "\r\n"
+  - delay: 100
+    content: "\e[1;32m{\e[0m\r\n"
+  - delay: 100
+    content: "    \e[1;31m\"name\"\e[0m\e[1;32m:\e[0m \e[0;33m\"John Doe\"\e[0m\e[1;32m,\e[0m\r\n"
+  - delay: 100
+    content: "    \e[1;31m\"age\"\e[0m\e[1;32m:\e[0m \e[0;95m30\e[0m\e[1;32m,\e[0m\r\n"
+  - delay: 100
+    content: "    \e[1;31m\"city\"\e[0m\e[1;32m:\e[0m \e[0;33m\"New York\"\e[0m\e[1;32m,\e[0m\r\n"
+  - delay: 100
+    content: "    \e[1;31m\"hobbies\"\e[0m\e[1;32m:\e[0m \e[1;32m[\e[0m\r\n"
+  - delay: 100
+    content: "        \e[0;33m\"reading\"\e[0m\e[1;32m,\e[0m\r\n"
+  - delay: 100
+    content: "        \e[0;33m\"hiking\"\e[0m\e[1;32m,\e[0m\r\n"
+  - delay: 100
+    content: "        \e[0;33m\"coding\"\e[0m\r\n"
+  - delay: 100
+    content: "    \e[1;32m]\e[0m\e[1;32m,\e[0m\r\n"
+  - delay: 100
+    content: "    \e[1;31m\"isStudent\"\e[0m\e[1;32m:\e[0m \e[0;95mfalse\e[0m\r\n"
+  - delay: 100
+    content: "\e[1;32m}\e[0m\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 1000
+    content: "\0"
+  - delay: 50
+    content: '#'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'I'
+  - delay: 50
+    content: 'f'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'S'
+  - delay: 50
+    content: 'E'
+  - delay: 50
+    content: 'D'
+  - delay: 50
+    content: 'J'
+  - delay: 50
+    content: 'U'
+  - delay: 50
+    content: 'T'
+  - delay: 50
+    content: 'S'
+  - delay: 50
+    content: 'U'
+  - delay: 50
+    content: '_'
+  - delay: 50
+    content: 'N'
+  - delay: 50
+    content: 'O'
+  - delay: 50
+    content: 'C'
+  - delay: 50
+    content: 'O'
+  - delay: 50
+    content: 'L'
+  - delay: 50
+    content: 'O'
+  - delay: 50
+    content: 'R'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 'd'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'S'
+  - delay: 50
+    content: 'E'
+  - delay: 50
+    content: 'D'
+  - delay: 50
+    content: 'J'
+  - delay: 50
+    content: 'U'
+  - delay: 50
+    content: 'T'
+  - delay: 50
+    content: 'S'
+  - delay: 50
+    content: 'U'
+  - delay: 50
+    content: '_'
+  - delay: 50
+    content: 'C'
+  - delay: 50
+    content: 'O'
+  - delay: 50
+    content: 'L'
+  - delay: 50
+    content: 'O'
+  - delay: 50
+    content: 'R'
+  - delay: 50
+    content: 'S'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'b'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'h'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'x'
+  - delay: 50
+    content: 'p'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'd'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'y'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'u'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 'v'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'o'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 'm'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'n'
+  - delay: 50
+    content: 't'
+  - delay: 50
+    content: ','
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'S'
+  - delay: 50
+    content: 'E'
+  - delay: 50
+    content: 'D'
+  - delay: 50
+    content: 'J'
+  - delay: 50
+    content: 'U'
+  - delay: 50
+    content: 'T'
+  - delay: 50
+    content: 'S'
+  - delay: 50
+    content: 'U'
+  - delay: 50
+    content: '_'
+  - delay: 50
+    content: 'N'
+  - delay: 50
+    content: 'O'
+  - delay: 50
+    content: 'C'
+  - delay: 50
+    content: 'O'
+  - delay: 50
+    content: 'L'
+  - delay: 50
+    content: 'O'
+  - delay: 50
+    content: 'R'
+  - delay: 50
+    content: ' '
+  - delay: 50
+    content: 'p'
+  - delay: 50
+    content: 'r'
+  - delay: 50
+    content: 'e'
+  - delay: 50
+    content: 'v'
+  - delay: 50
+    content: 'a'
+  - delay: 50
+    content: 'i'
+  - delay: 50
+    content: 'l'
+  - delay: 50
+    content: 's'
+  - delay: 50
+    content: "\r\n"
+  - delay: 0
+    content: "\r\e[01;31m>\e[m "
+  - delay: 3000
+    content: "\0"
+  - delay: 0
+    content: "\e[H\e[2J\e[3J\e[m\n\n\n                              .oooooo.    ooooo oooooooooooo\n                             d8P'  `Y8b   `888' `888'     `8\n                            888            888   888\n                            888            888   888oooo8\n                            888     ooooo  888   888    \"\n                            `88.    .88'   888   888\n                             `Y8bood8P'   o888o o888o\n\n                                                                .\n                                                              .o8\n                      oooo d8b  .ooooo.   .oooo.o  .ooooo.  .o888oo\n                      `888\"\"8P d88' `88b d88(  \"8 d88' `88b   888\n                       888     888ooo888 `\"Y88b.  888ooo888   888\n                       888     888    .o o.  )88b 888    .o   888 .\n                      d888b    `Y8bod8P' 8\"\"888P' `Y8bod8P'   \"888\"\n\n\n                                         .oooo.\n                                       .dP\"\"Y88b\n                                             ]8P'\n                                           <88b.\n                                            `88b.\n                                       o.   .88P\n                                       `8bd88P'"
+  - delay: 1000
+    content: "\e[H\e[2J\e[3J\e[m\n\n\n                              .oooooo.    ooooo oooooooooooo\n                             d8P'  `Y8b   `888' `888'     `8\n                            888            888   888\n                            888            888   888oooo8\n                            888     ooooo  888   888    \"\n                            `88.    .88'   888   888\n                             `Y8bood8P'   o888o o888o\n\n                                                                .\n                                                              .o8\n                      oooo d8b  .ooooo.   .oooo.o  .ooooo.  .o888oo\n                      `888\"\"8P d88' `88b d88(  \"8 d88' `88b   888\n                       888     888ooo888 `\"Y88b.  888ooo888   888\n                       888     888    .o o.  )88b 888    .o   888 .\n                      d888b    `Y8bod8P' 8\"\"888P' `Y8bod8P'   \"888\"\n\n\n                                         .oooo.\n                                       .dP\"\"Y88b\n                                             ]8P'\n                                           .d8P'\n                                         .dP'\n                                       .oP     .o\n                                       8888888888"
+  - delay: 1000
+    content: "\e[H\e[2J\e[3J\e[m\n\n\n                              .oooooo.    ooooo oooooooooooo\n                             d8P'  `Y8b   `888' `888'     `8\n                            888            888   888\n                            888            888   888oooo8\n                            888     ooooo  888   888    \"\n                            `88.    .88'   888   888\n                             `Y8bood8P'   o888o o888o\n\n                                                                .\n                                                              .o8\n                      oooo d8b  .ooooo.   .oooo.o  .ooooo.  .o888oo\n                      `888\"\"8P d88' `88b d88(  \"8 d88' `88b   888\n                       888     888ooo888 `\"Y88b.  888ooo888   888\n                       888     888    .o o.  )88b 888    .o   888 .\n                      d888b    `Y8bod8P' 8\"\"888P' `Y8bod8P'   \"888\"\n\n\n                                            .o\n                                          o888\n                                           888\n                                           888\n                                           888\n                                           888\n                                          o888o"
+  - delay: 1000
+    content: "\0"
+  - delay: 0
+    content: "\e[H\e[2J\e[3J\e[m"
