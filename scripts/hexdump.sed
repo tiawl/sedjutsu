@@ -7,8 +7,8 @@
 #   `-n`/`--quiet` option.                                                    #
 #                                                                             #
 #     For UTF-8 support, set (and export) the LC_CTYPE, LANG or LC_ALL        #
-#   variables into your environment. Depending of your system you change      #
-#   the value of one of these with "C", "C.UTF-8" or "<lang_COUNTRY>.UTF-8"   #
+#   variables into your environment. Depending on your system you change      #
+#   the value of one of these to "C", "C.UTF-8" or "<lang_COUNTRY>.UTF-8"     #
 #   (for example: "en_US.UTF-8").                                             #
 #                                                                             #
 ### HOW TO RUN IT #############################################################

@@ -19,8 +19,8 @@
 #   `-n`/`--quiet` option.                                                    #
 #                                                                             #
 #     For UTF-8 support, set (and export) the LC_CTYPE, LANG or LC_ALL        #
-#   variables into your environment. Depending of your system you change      #
-#   the value of one of these with "C", "C.UTF-8" or "<lang_COUNTRY>.UTF-8"   #
+#   variables into your environment. Depending on your system you change      #
+#   the value of one of these to "C", "C.UTF-8" or "<lang_COUNTRY>.UTF-8"     #
 #   (for example: "en_US.UTF-8").                                             #
 #                                                                             #
 #     You can configure this script behavior by providing these               #
@@ -29,7 +29,7 @@
 #     for indentation (default: 2)                                            #
 #   - SEDJUTSU_NOCOLOR: disable color. The script will consider this          #
 #     variable whatever its value (even empty).                               #
-#   - SEDJUTSU_COLORS: colon-delimited list of partial terminal escape        #
+#   - SEDJUTSU_COLORS: colon-separated list of partial terminal escape        #
 #     sequences like "1;31", in this order:                                   #
 #     * color for null                                                        #
 #     * color for false                                                       #
@@ -85,7 +85,7 @@
     N
     b init_holdspace
   }
-  # Depending of the `-z`/`--null-data` option usage, the `D`, `G`, `H`, `N` and `P` sed commands work with new line or NUL characters. This script must know which one of these characters these commands are using
+  # Depending on the `-z`/`--null-data` option usage, the `D`, `G`, `H`, `N` and `P` sed commands work with new line or NUL characters. This script must know which one of these characters these commands are using
   G
   h
   s/.$//
@@ -1436,7 +1436,7 @@
   x
   b json_2_yaml___RETURN
 
-# Redirect the workflow depending of the first element in the workflow stack
+# Redirect the workflow depending on the first element in the workflow stack
 : json_2_yaml___RETURN
   x
   /^a1/ {

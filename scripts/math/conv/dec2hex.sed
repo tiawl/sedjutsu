@@ -24,7 +24,7 @@
 : init_holdspace
   # Remove trailing newline if the `-z`/`--null-data` is used
   s/\n$//
-  # Depending of the `-z`/`--null-data` option usage, the `D`, `G`, `H`, `N` and `P` sed commands work with new line or NUL characters. This script must know which one of these characters these commands are using
+  # Depending on the `-z`/`--null-data` option usage, the `D`, `G`, `H`, `N` and `P` sed commands work with new line or NUL characters. This script must know which one of these characters these commands are using
   G
   h
   s/.$//

@@ -27,11 +27,11 @@ Some features implemented with GNU `sed` originated from these utilities:
 
 ## Important notes
 
-- Each script has its own README written as a header comment. **You can find a (GIF-formatted) WATCHME version for each README into the demos directory**. Except a brief description, it contains useful details to make the script work:
+- Each script has its own README written as a header comment. **You can find a (GIF-formatted) WATCHME version for each README into the doc directory**. Except a brief description, it contains useful details to make the script work:
     - A command example.
     - A set of usable environment variables to configure the script.
     - Potential known limitations.
-- If you want to make a script work with an other `sed` implementations than the GNU one, you will need to rework it. Depending of the script and the `sed` implementation you are using, the amount of work needed can vary a lot. It may range from just some minor replacements to more technical rewriting due to differences between the implementations' feature set.
+- If you want to make a script work with an other `sed` implementations than the GNU one, you will need to rework it. Depending on the script and the `sed` implementation you are using, the amount of work needed can vary a lot. It may range from just some minor replacements to more technical rewriting due to differences between the implementations' feature set.
 - I assume a POSIX-compliant shell (bash, ash, dash, ...) is also installed on your laptop.
 
 ## Contributing
