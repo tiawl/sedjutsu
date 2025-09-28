@@ -59,16 +59,15 @@
   /^-/ {
     s/.//
     x
-    s/^/-w0p0/
+    s/^/w000-0/
     x
     b math_calc___RETURN
   }
   /^+/ {
     s/.//
     x
-    s/^/+w0p0/
+    s/^/w000+0/
     x
-    b math_calc___RETURN
   }
   b math_calc___RETURN
 
@@ -121,7 +120,7 @@
 
 # precedence4
 #     '(' ws precedence0 ws ')'
-#     number
+#     ws number ws
 : math_calc___precedence4
   /^(/ {
     s/.//
@@ -138,15 +137,10 @@
       s/^/`)` expected/
       b math_calc___ERROR
   }
-  /^[-0-9]/ {
-    x
-    s/^/n0/
-    x
-    b math_calc___RETURN
-  }
-  z
-  s/^/`(` expected/
-  b math_calc___ERROR
+  x
+  s/^/w0n0w0/
+  x
+  b math_calc___RETURN
 
 # number
 #     integer fraction exponent
@@ -225,10 +219,10 @@
     H
     x
     /^[^\x00\n]*\x00/ {
-      s/\x00\([1-9]\)[^\x00]*$/\1/
+      s/\x00\(.\)[^\x00]*$/\1/
     }
     /^[^\x00\n]*\n/ {
-      s/\n\([1-9]\)[^\n]*$/\1/
+      s/\n\(.\)[^\n]*$/\1/
     }
     x
     s/.//
@@ -240,7 +234,7 @@
 
 # fraction
 #     '.' onenine
-#     '.' digits onenine
+#     '.' digits
 #     ""
 : math_calc___fraction
   /^\./ {
@@ -248,9 +242,9 @@
     x
     s/$/./
     x
-    /^[0-9][1-9]/ {
+    /^[0-9]\+/ {
       x
-      s/^/D0o0/
+      s/^/D0/
       x
       b math_calc___RETURN
     }
@@ -274,8 +268,8 @@
   /^[eE]/ {
     s/.//
     x
-    s/^/s0D0^*/
-    s/$/\t10\t/
+    s/^/s0D0^0*0/
+    s/$/\t+10.0\t/
     x
   }
   b math_calc___RETURN
@@ -292,7 +286,7 @@
     x
     b math_calc___RETURN
   }
-  s/.//
+  s/^+//
   x
   s/$/+/
   x
@@ -315,41 +309,251 @@
   }
   b math_calc___RETURN
 
-: math_calc___ADD
+# Align decimal parts of 2 last numbers into the numbers stack
+: math_calc___task_ALIGN
   x
-  /-\t[.0-9]*\t+[.0-9]*$/ {
-    # switch 2 last numbers
-  }
-  /+\t[.0-9]*\t-[.0-9]*$/ {
-    # SUB
-  }
-  # Add trailing fractional part for integers
+  # Add trailing decimal part for integers
   s/\([-+][0-9]*\)\(\t\|$\)/\1.0\2/g
-  # 1. Align fracts
-  s/\.\([0-9]*\)\t[-+][0-9]*\.\([0-9]*\)$/\0\t\1\t\2/
-  # printf '+12.54\n+5.6' | sed -z 's/\([-+][0-9]*\)\(\n\|$\)/\1.0\2/g; s/\.\([0-9]*\)\n[-+][0-9]*\.[0-9]*$/\0\n\1/; tt; :t; s/[0-9]\(x*\)$/x\1/; tt; s/\.\([0-9]*\)\nx*$/\0\n\1/; ts; :s; s/[0-9]\(x*\)$/x\1/; ts; :l; /\(x*\)\n\1$/ { bk; }; bl; :k; s/$/\n/;'
-  # 2. Add fracts
-  # 3. Add ints
-  # 4. Merge ints and fracts
+  # 1) Put decimal part of the 1st number at the end
+  s/\.\([0-9]*\)\t[-+][0-9]*\.[0-9]*$/\0\t\1/
+  # 2) Into the decimal part of the 1st number (at the end) replace digits with 'x' characters
+  t math_calc___task_ALIGN_replace_digit_with_x_1
+  : math_calc___task_ALIGN_replace_digit_with_x_1
+    s/[0-9]\(x*\)$/x\1/
+    t math_calc___task_ALIGN_replace_digit_with_x_1
+  # 3) Put decimal part of the 2nd number at the end
+  s/\.\([0-9]*\)\tx*$/\0\t\1/
+  # 4) Into the decimal part of the 2nd number (at the end) replace digits with 'x' characters
+  t math_calc___task_ALIGN_replace_digit_with_x_2
+  : math_calc___task_ALIGN_replace_digit_with_x_2
+    s/[0-9]\(x*\)$/x\1/
+    t math_calc___task_ALIGN_replace_digit_with_x_2
+  # 5) Add zeroes to decimal parts of the 2 numbers using 'x' characters
+  : math_calc___task_ALIGN_align_decimal_loop
+  t math_calc___task_ALIGN_align_decimal_loop
+    /\t\(x*\)\t\1$/ {
+      b math_calc___task_ALIGN_align_decimal_break
+    }
+    s/\(x*\)\t\1$/\0x/
+    T math_calc___task_ALIGN_align_decimal_loop_1
+    s/\tx*\tx*$/0\0/
+    b math_calc___task_ALIGN_align_decimal_loop
+    : math_calc___task_ALIGN_align_decimal_loop_1
+      s/\tx*$/x\0/
+      s/\t[-+][0-9]*\.[0-9]*\tx*\tx*$/0\0/
+      b math_calc___task_ALIGN_align_decimal_loop
+  : math_calc___task_ALIGN_align_decimal_break
+    s/\tx*\tx*$//
+    x
+    b math_calc___RETURN
+
+# Alternatively replace digits into the two last numbers with repeated 'x' then repeated 'y' (or 'z' for zero)
+: math_calc___task_CONVERT
+  x
+  s/\t\([^\t]*\t[^\t]*\)$/\v\1/
+  t math_calc___task_CONVERT_to_x
+  : math_calc___task_CONVERT_to_x
+    s/\v\([-+][xyz]*\.[xyz]*\t[-+][xyz]*\.[xyz]*\)$/\t\1/
+    t math_calc___task_CONVERT_end
+    s/\([^\v]*\)0$/z\1/
+    t math_calc___task_CONVERT_to_y
+    s/\([^\v]*\)1$/x\1/
+    t math_calc___task_CONVERT_to_y
+    s/\([^\v]*\)2$/xx\1/
+    t math_calc___task_CONVERT_to_y
+    s/\([^\v]*\)3$/xxx\1/
+    t math_calc___task_CONVERT_to_y
+    s/\([^\v]*\)4$/xxxx\1/
+    t math_calc___task_CONVERT_to_y
+    s/\([^\v]*\)5$/xxxxx\1/
+    t math_calc___task_CONVERT_to_y
+    s/\([^\v]*\)6$/xxxxxx\1/
+    t math_calc___task_CONVERT_to_y
+    s/\([^\v]*\)7$/xxxxxxx\1/
+    t math_calc___task_CONVERT_to_y
+    s/\([^\v]*\)8$/xxxxxxxx\1/
+    t math_calc___task_CONVERT_to_y
+    s/\([^\v]*\)9$/xxxxxxxxx\1/
+    t math_calc___task_CONVERT_to_y
+    s/\([^\v]*\)\([-+.\t]\)$/\2\1/
+    t math_calc___task_CONVERT_to_x
+    b math_calc___UNREACHABLE
+  : math_calc___task_CONVERT_to_y
+    s/\v\([-+][xyz]*\.[xyz]*\t[-+][xyz]*\.[xyz]*\)$/\t\1/
+    t math_calc___task_CONVERT_end
+    s/\([^\v]*\)0$/z\1/
+    t math_calc___task_CONVERT_to_x
+    s/\([^\v]*\)1$/y\1/
+    t math_calc___task_CONVERT_to_x
+    s/\([^\v]*\)2$/yy\1/
+    t math_calc___task_CONVERT_to_x
+    s/\([^\v]*\)3$/yyy\1/
+    t math_calc___task_CONVERT_to_x
+    s/\([^\v]*\)4$/yyyy\1/
+    t math_calc___task_CONVERT_to_x
+    s/\([^\v]*\)5$/yyyyy\1/
+    t math_calc___task_CONVERT_to_x
+    s/\([^\v]*\)6$/yyyyyy\1/
+    t math_calc___task_CONVERT_to_x
+    s/\([^\v]*\)7$/yyyyyyy\1/
+    t math_calc___task_CONVERT_to_x
+    s/\([^\v]*\)8$/yyyyyyyy\1/
+    t math_calc___task_CONVERT_to_x
+    s/\([^\v]*\)9$/yyyyyyyyy\1/
+    t math_calc___task_CONVERT_to_x
+    s/\([^\v]*\)\([-+.\t]\)$/\2\1/
+    t math_calc___task_CONVERT_to_x
+    b math_calc___UNREACHABLE
+  : math_calc___task_CONVERT_end
+    x
+    b math_calc___RETURN
+
+: math_calc___task_REVERT
+  x
+  t math_calc___task_REVERT_loop
+  : math_calc___task_REVERT_loop
+    s/\(xxxxxxxxx\|yyyyyyyyy\)\([.0-9]*\)$/9\2/
+    t math_calc___task_REVERT_loop
+    s/\(xxxxxxxx\|yyyyyyyy\)\([.0-9]*\)$/8\2/
+    t math_calc___task_REVERT_loop
+    s/\(xxxxxxx\|yyyyyyy\)\([.0-9]*\)$/7\2/
+    t math_calc___task_REVERT_loop
+    s/\(xxxxxx\|yyyyyy\)\([.0-9]*\)$/6\2/
+    t math_calc___task_REVERT_loop
+    s/\(xxxxx\|yyyyy\)\([.0-9]*\)$/5\2/
+    t math_calc___task_REVERT_loop
+    s/\(xxxx\|yyyy\)\([.0-9]*\)$/4\2/
+    t math_calc___task_REVERT_loop
+    s/\(xxx\|yyy\)\([.0-9]*\)$/3\2/
+    t math_calc___task_REVERT_loop
+    s/\(xx\|yy\)\([.0-9]*\)$/2\2/
+    t math_calc___task_REVERT_loop
+    s/\(x\|y\)\([.0-9]*\)$/1\2/
+    t math_calc___task_REVERT_loop
+    s/z\([.0-9]*\)$/0\1/
+    t math_calc___task_REVERT_loop
   x
   b math_calc___RETURN
 
-: math_calc___SUB
+: math_calc___op_ADD
+  x
+  /-[.0-9]*\t+[.0-9]*$/ {
+    # TODO: switch 2 last numbers
+  }
+  /+[.0-9]*\t-[.0-9]*$/ {
+    # TODO: SUB
+  }
+  /-[.0-9]*\t-[.0-9]*$/ {
+    # TODO: + +
+    #       MUL by -1.0
+  }
+  s/^/tAtC+1tR/
+  x
+  b math_calc___RETURN
+  # Sum sequences of 'x' and 'y' characters into 2 last numbers
+  : math_calc___op_ADD_1
+    x
+    s/\t[^\t]*\t[^\t]*$/\t+\0/
+    : math_calc___op_ADD_sum_x
+      # Upper trailing 'x' into 'X' characters for 2 last numbers
+      s/x*x$/\U\0\E/
+      s/\(x*x\)\(\t[^\t]*\)$/\U\1\E\2/
+      t math_calc___op_ADD_sum_x
+      s/\t+\t+$//
+      t math_calc___op_ADD_2
+      # trailing 'XX*' and 'XX*' case
+      s/\([.xyz]*\t[^X\t]*\)\(XX*\)\(\t[^X\t]*\)\(XX*\)$/\L\2\4\E\1\3/
+      t math_calc___op_ADD_sum_x_end
+      # trailing 'z' and 'XX*' case
+      s/\([.xyz]*\t[^\t]*\)z\(\t[^X\t]*\)\(XX*\)$/\L\3\E\1\2/
+      t math_calc___op_ADD_sum_x_end
+      # trailing 'XX*' and 'z' case
+      s/\([.xyz]*\t[^X\t]*\)\(XX*\)\(\t[^\t]*\)z$/\L\2\E\1\3/
+      t math_calc___op_ADD_sum_x_end
+      # trailing 'z' and 'z' case
+      s/\([.xyz]*\t[^\t]*\)z\(\t[^\t]*\)z$/z\1\2/
+      t math_calc___op_ADD_sum_x_end
+      # trailing '+' and 'XX*' case
+      s/\([.xyz]*\t+\t[^X\t]*\)\(XX*\)$/\L\2\E\1/
+      t math_calc___op_ADD_sum_x_end
+      # trailing '+' and 'z' case
+      s/\([.xyz]*\t+\t[^\t]*\)z$/z\1/
+      t math_calc___op_ADD_sum_x_end
+      # trailing 'XX*' and '+' case
+      s/\([.xyz]*\t[^X\t]*\)\(XX*\)\t+$/\L\2\E\1\t+/
+      t math_calc___op_ADD_sum_x_end
+      # trailing 'z' and '+' case
+      s/\([.xyz]*\t[^\t]*\)z\t+$/z\1\t+/
+      t math_calc___op_ADD_sum_x_end
+      b math_calc___UNREACHABLE
+    : math_calc___op_ADD_sum_x_end
+      # trailing '.' and '.' case
+      s/\([xyz]*\t[^\t]*\)\.\(\t[^\t]*\)\.$/.\1\2/
+      t math_calc___op_ADD_sum_x_end_1
+      s/xxxxxxxxxx\(x[^\t]*\t[^\t]*\t[^\t]*\)$/y\1/
+      t math_calc___op_ADD_sum_y
+      s/xxxxxxxxxx\([^\t]*\t[^\t]*\t[^\t]*\)$/yz\1/
+      b math_calc___op_ADD_sum_y
+      : math_calc___op_ADD_sum_x_end_1
+        s/\.xxxxxxxxxx\(x[^\t]*\t[^\t]*\t[^\t]*\)$/x.\1/
+        t math_calc___op_ADD_sum_x
+        s/\.xxxxxxxxxx\([^\t]*\t[^\t]*\t[^\t]*\)$/x.z\1/
+        b math_calc___op_ADD_sum_x
+    : math_calc___op_ADD_sum_y
+      s/y*y$/\U\0\E/
+      s/\(y*y\)\(\t[^\t]*\)$/\U\1\E\2/
+      t math_calc___op_ADD_sum_y
+      s/\t+\t+$//
+      t math_calc___op_ADD_2
+      s/\([.xyz]*\t[^Y\t]*\)\(YY*\)\(\t[^Y\t]*\)\(YY*\)$/\L\2\4\E\1\3/
+      t math_calc___op_ADD_sum_y_end
+      s/\([.xyz]*\t[^\t]*\)z\(\t[^Y\t]*\)\(YY*\)$/\L\3\E\1\2/
+      t math_calc___op_ADD_sum_y_end
+      s/\([.xyz]*\t[^Y\t]*\)\(YY*\)\(\t[^\t]*\)z$/\L\2\E\1\3/
+      t math_calc___op_ADD_sum_y_end
+      s/\([.xyz]*\t[^\t]*\)z\(\t[^\t]*\)z$/z\1\2/
+      t math_calc___op_ADD_sum_y_end
+      s/\([.xyz]*\t+\t[^Y\t]*\)\(YY*\)$/\L\2\E\1/
+      t math_calc___op_ADD_sum_y_end
+      s/\([.xyz]*\t+\t[^\t]*\)z$/z\1/
+      t math_calc___op_ADD_sum_y_end
+      s/\([.xyz]*\t[^Y\t]*\)\(YY*\)\t+$/\L\2\E\1\t+/
+      t math_calc___op_ADD_sum_y_end
+      s/\([.xyz]*\t[^\t]*\)z\t+$/z\1\t+/
+      t math_calc___op_ADD_sum_y_end
+      b math_calc___UNREACHABLE
+    : math_calc___op_ADD_sum_y_end
+      s/\([xyz]*\t[^\t]*\)\.\(\t[^\t]*\)\.$/.\1\2/
+      t math_calc___op_ADD_sum_y_end
+      s/\(\.\?\)yyyyyyyyyy\(y[^\t]*\t[^\t]*\t[^\t]*\)$/x\1\2/
+      t math_calc___op_ADD_sum_x
+      s/\(\.\?\)yyyyyyyyyy\([^\t]*\t[^\t]*\t[^\t]*\)$/x\1z\2/
+      b math_calc___op_ADD_sum_x
+  : math_calc___op_ADD_2
+    x
+    b math_calc___RETURN
+
+: math_calc___op_SUB
   # TODO
   b math_calc___RETURN
 
 # Redirect the workflow depending on the first element in the workflow stack
 : math_calc___RETURN
   x
-  /^+/ {
+  /^+0/ {
     s/..//
     x
-    b math_calc___ADD
+    b math_calc___op_ADD
   }
-  /^-/ {
+  /^+1/ {
     s/..//
     x
-    b math_calc___SUB
+    b math_calc___op_ADD_1
+  }
+  /^-0/ {
+    s/..//
+    x
+    b math_calc___op_SUB
   }
   /^00/ {
     s/..//
@@ -451,6 +655,21 @@
     x
     b math_calc___SUCCESS
   }
+  /^tA/ {
+    s/..//
+    x
+    b math_calc___task_ALIGN
+  }
+  /^tC/ {
+    s/..//
+    x
+    b math_calc___task_CONVERT
+  }
+  /^tR/ {
+    s/..//
+    x
+    b math_calc___task_REVERT
+  }
   /^w0/ {
     s/..//
     x
@@ -498,4 +717,18 @@
   Q 6
 
 : math_calc___SUCCESS
-  # TODO
+  x
+  /^[^\x00\n]*\x00/ {
+    s/.*\t[-+]\([.0-9]*\)$/\1\n/
+    s/0*\n/\n/
+    s/\.\n/\n/
+    p
+    z
+  }
+  /^[^\x00\n]*\n/ {
+    s/.*\t[-+]\([.0-9]*\)$/\1/
+    s/0*$//
+    s/\.$//
+    p
+    z
+  }

@@ -27,7 +27,7 @@ Some features implemented with GNU `sed` originated from these utilities:
 
 ## Important notes
 
-- Each script has its own README written as a header comment. **You can find a (GIF-formatted) WATCHME version for each README into the doc directory**. Except a brief description, it contains useful details to make the script work:
+- Each script has its own README written as a header comment. **You can find a (GIF-formatted) WATCHME version for each README into the `./doc` directory**. Except a brief description, it contains useful details to make the script work:
     - A command example.
     - A set of usable environment variables to configure the script.
     - Potential known limitations.
@@ -38,7 +38,7 @@ Some features implemented with GNU `sed` originated from these utilities:
 
 If you have other GNU `sed` idea to emulate other utilities:
 - you can open a pull request for your script,
-- you can open an issue (if I am interested in and have time for, I will go for it. Otherwise I will let it opened if someone else is interested to implement your idea)
+- you can open an issue. If I am interested in and have time for, I will go for it. Otherwise I will let it opened if someone else is interested to implement your idea.
 
 ## License
 
