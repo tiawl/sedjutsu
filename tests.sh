@@ -145,6 +145,64 @@ tests_json2yaml () {
   done
 }
 
+tests_math_calc () {
+  local expr expected res code
+
+  # Success tests
+  for expr in \
+    '1+3' \
+    '2+8' \
+    ' 2+8' \
+    '2+8 ' \
+    ' 2+8   ' \
+    ' 2  +     8   ' \
+    '2 + 0' \
+    '0 + 0' \
+    '2 + 8 + 1' \
+    '2 + 8 + 1 + 9 + 7 + 4 + 5 + 3 + 6 + 0' \
+    '12 + 6' \
+    '12 + 8' \
+    '12.0 + 8' \
+    '12 + 8.0' \
+    '12.0 + 8.0' \
+    '12.0000 + 8.0000' \
+    '12.0000 + 8.00000000' \
+    '12.6 + 5.4' \
+    '12.654272 + 5.44005' \
+    '12.654272 + 5.44005000'
+  do
+    expected="$(calc -p -- "${expr}")"
+    res="$(printf '%s' "${expr}" | sed -n -f wip/math/calc.sed)"
+    printf '[math/calc.sed n°%s] EXPR: "%s", EXPECTED: %s, RESULT: %s ' "${i}" "${expr}" "${expected}" "${res}"
+    case "${res}" in
+    ( "${expected}" ) printf '\033[38;5;2mOK\033[m\n' ;;
+    ( * ) printf '\033[38;5;1mKO\033[m\n' ;;
+    esac
+    (( i++ ))
+  done
+
+  # Failure tests
+  for expr in \
+    '2+' \
+    '2 + ' \
+    '2+6.' \
+    '2.+6' \
+    '2 ++ ' \
+    '2 ++ 6' \
+    '2 1 + 4' \
+    '2 + 1 4' \
+    '2 1 + 4 2'
+  do
+    printf '%s' "${expr}" | sed -n -f wip/math/calc.sed 2> /dev/null >&2 || code="${?}"
+    printf '[math/calc.sed n°%s] EXPR: "%s", EXPECTED: \033[38;5;1mKO\033[m, CODE: ' "${i}" "${expr}"
+    case "${code}" in
+    ( 0 ) printf '\033[38;5;2mOK\033[m\n'; exit 1 ;;
+    ( * ) printf '\033[38;5;1mKO\033[m\n' ;;
+    esac
+    (( i++ ))
+  done
+}
+
 tests () {
   set -e -u -C
   set -o pipefail
@@ -195,6 +253,7 @@ tests () {
   tests_json 'scripts/json/pretty-printer.sed' "${opts[json_pp]}"
   tests_json 'scripts/json/conv/yaml.sed' "${opts[json2yaml]}"
   tests_json2yaml
+  tests_math_calc
 }
 
 tests "${@}"
