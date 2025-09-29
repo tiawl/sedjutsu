@@ -71,7 +71,7 @@ v 4.0
     /^.*$/ ! {
       z
       s/^/UTF-8 encoding detected in your input. Export LC_CTYPE, LANG or LC_ALL in your environment to allow UTF-8 support with sed/
-      b json_pp___ENV_FAILURE
+      b json_validator___ENV_FAILURE
     }
   }
   /^$/ {

@@ -74,6 +74,9 @@
 
 v 4.0
 
+# TODO fix these cases:
+# printf '[[true, false]]\n' | sed -n -f ./scripts/json/conv/yaml.sed
+
 # Init the holdspace with these variables:
 # - an empty workflow stack
 # - an empty stack to check object keys
@@ -147,7 +150,7 @@ v 4.0
         /^.*$/ ! {
           z
           s/^/UTF-8 encoding detected in your input. Export LC_CTYPE, LANG or LC_ALL in your environment to allow UTF-8 support with sed/
-          b json_pp___ENV_FAILURE
+          b json_2_yaml___ENV_FAILURE
         }
       }
       /^$/ {
@@ -166,10 +169,26 @@ v 4.0
   x
   s/^/j1/
   x
+  # If the main JSON element is an array: Increment the indent level
+  /^[ \n\r\t]*\[/ {
+    x
+    /^[^\x00\n]*\x00/ {
+      s/^\([^\x00]*\x00\)\{2\}\( \+\):[^\x00]*\x00/\0\2/
+    }
+    /^[^\x00\n]*\n/ {
+      s/^\([^\n]*\n\)\{2\}\( \+\):[^\n]*\n/\0\2/
+    }
+    x
+  }
   b json_2_yaml___element
   : json_2_yaml___json_1
     /^$/ {
-      b json_2_yaml___SUCCESS
+      x
+      s/^/j2/
+      x
+      b json_2_yaml___PRINT
+      : json_2_yaml___json_2
+        b json_2_yaml___SUCCESS
     }
     z
     s/^/garbage after main element/
@@ -1404,7 +1423,7 @@ v 4.0
     H
     g
     # Select the formatted line and print it
-    s/^\([^\x00]*\x00\)\{2\}\( \+\)[^\x00]*\x00\2\([^\x00]*\)\x00.*/\3\n/
+    s/^\([^\x00]*\x00\)\{2\}\( *\)[^\x00]*\x00\2\([^\x00]*\)\x00.*/\3\n/
     # Print the line if not empty
     /^\([[:space:]]\|- \|\x1b\[[0-57-9];\(3[0-79]\|9[0-7]\)m-\x1b\[0m\)*$/ ! {
       p
@@ -1423,7 +1442,7 @@ v 4.0
     H
     g
     # Select the formatted line and print it
-    s/^\([^\n]*\n\)\{2\}\( \+\)[^\n]*\n\2\([^\n]*\)\n.*/\3/
+    s/^\([^\n]*\n\)\{2\}\( *\)[^\n]*\n\2\([^\n]*\)\n.*/\3/
     # Print the line if not empty
     /^\([[:space:]]\|- \|\x1b\[[0-57-9];\(3[0-79]\|9[0-7]\)m-\x1b\[0m\)*$/ ! {
       p
@@ -1515,6 +1534,11 @@ v 4.0
     s/..//
     x
     b json_2_yaml___json_1
+  }
+  /^j2/ {
+    s/..//
+    x
+    b json_2_yaml___json_2
   }
   /^M1/ {
     s/..//
