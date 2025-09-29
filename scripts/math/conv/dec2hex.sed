@@ -21,6 +21,8 @@
 #                                                                             #
 ###############################################################################
 
+v 4.0
+
 : init_holdspace
   # Remove trailing newline if the `-z`/`--null-data` is used
   s/\n$//

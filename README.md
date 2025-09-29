@@ -15,6 +15,7 @@ The main purpose of this repository is the challenge. Some popular utilities are
 Some features implemented with GNU `sed` originated from these utilities:
 - `base64`
 - `bc`
+- `calc`
 - `dc`
 - `hd`
 - `jq`
@@ -36,8 +37,8 @@ Some features implemented with GNU `sed` originated from these utilities:
 
 ## Contributing
 
-If you have other GNU `sed` idea to emulate other utilities:
-- you can open a pull request for your script,
+If you have any idea to emulate uncovered features coming from standard utilities:
+- you can open a pull request with your GNU `sed` script,
 - you can open an issue. If I am interested in and have time for, I will go for it. Otherwise I will let it opened if someone else is interested to implement your idea.
 
 ## License
