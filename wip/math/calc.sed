@@ -1,7 +1,7 @@
 ### README ####################################################################
 #                                                                             #
-#     This script can be used to emulate some `bc`, `dc` or shell features    #
-#   It is an arithmetic float calculator:                                     #
+#     This script can be used to emulate some `calc`, `bc`, `dc` or shell     #
+#   features. It is an arithmetic float calculator:                           #
 #   Supported features:                                                       #
 #   - positive and negative float arithmetic                                  #
 #   - operators: + (addition), - (substraction), * (multiplication),          #
@@ -9,6 +9,8 @@
 #   - grouping with parentheses: (, )                                         #
 #                                                                             #
 ###############################################################################
+
+v 4.0
 
 # Init the holdspace with these variables:
 # - an empty workflow stack
@@ -99,7 +101,19 @@
 #     '/' ws precedence2
 #     ""
 : math_calc___muldiv
-  # TODO
+  /^\// {
+    s/.//
+    x
+    s/^/w000\/0/
+    x
+    b math_calc___RETURN
+  }
+  /^\*/ {
+    s/.//
+    x
+    s/^/w000*0/
+    x
+  }
   b math_calc___RETURN
 
 # precedence3
@@ -435,6 +449,105 @@
   x
   b math_calc___RETURN
 
+# Sum sequences of 'x' and 'y' characters into 2 last numbers
+: math_calc___task_SUM
+  x
+  s/\t[^\t]*\t[^\t]*$/\t\0/
+  : math_calc___task_SUM_x
+    # Upper trailing 'x' into 'X' characters for 2 last numbers
+    s/x*x$/\U\0\E/
+    s/\(x*x\)\(\t[^\t]*\)$/\U\1\E\2/
+    t math_calc___task_SUM_x
+    s/\([.xyz]*\)\t\([-+]\)\t\2$/\2\1/
+    t math_calc___task_SUM_end
+    # trailing 'XX*' and 'XX*' case
+    s/\([.xyz]*\t[^X\t]*\)\(XX*\)\(\t[^X\t]*\)\(XX*\)$/\L\2\4\E\1\3/
+    t math_calc___task_SUM_x_end
+    # trailing 'z' and 'XX*' case
+    s/\([.xyz]*\t[^\t]*\)z\(\t[^X\t]*\)\(XX*\)$/\L\3\E\1\2/
+    t math_calc___task_SUM_x_end
+    # trailing 'XX*' and 'z' case
+    s/\([.xyz]*\t[^X\t]*\)\(XX*\)\(\t[^\t]*\)z$/\L\2\E\1\3/
+    t math_calc___task_SUM_x_end
+    # trailing 'z' and 'z' case
+    s/\([.xyz]*\t[^\t]*\)z\(\t[^\t]*\)z$/z\1\2/
+    t math_calc___task_SUM_x_end
+    # trailing '-'/'+' and 'XX*' case
+    s/\([.xyz]*\t[-+]\t[^X\t]*\)\(XX*\)$/\L\2\E\1/
+    t math_calc___task_SUM_x_end
+    # trailing '-'/'+' and 'z' case
+    s/\([.xyz]*\t[-+]\t[^\t]*\)z$/z\1/
+    t math_calc___task_SUM_x_end
+    # trailing 'XX*' and '-'/'+' case
+    s/\([.xyz]*\t[^X\t]*\)\(XX*\)\(\t[-+]\)$/\L\2\E\1\3/
+    t math_calc___task_SUM_x_end
+    # trailing 'z' and '-'/'+' case
+    s/\([.xyz]*\t[^\t]*\)z\(\t[-+]\)$/z\1\2/
+    t math_calc___task_SUM_x_end
+    b math_calc___UNREACHABLE
+  : math_calc___task_SUM_x_end
+    # trailing '.' and '.' case
+    s/\([xyz]*\t[^\t]*\)\.\(\t[^\t]*\)\.$/.\1\2/
+    t math_calc___task_SUM_x_end_1
+    s/xxxxxxxxxx\(x[^\t]*\t[^\t]*\t[^\t]*\)$/y\1/
+    t math_calc___task_SUM_y
+    s/xxxxxxxxxx\([^\t]*\t[^\t]*\t[^\t]*\)$/yz\1/
+    b math_calc___task_SUM_y
+    : math_calc___task_SUM_x_end_1
+      s/\.xxxxxxxxxx\(x[^\t]*\t[^\t]*\t[^\t]*\)$/x.\1/
+      t math_calc___task_SUM_x
+      s/\.xxxxxxxxxx\([^\t]*\t[^\t]*\t[^\t]*\)$/x.z\1/
+      b math_calc___task_SUM_x
+  # Same comments than above but for 'y'/'Y' instead of 'x'/'X'
+  : math_calc___task_SUM_y
+    s/y*y$/\U\0\E/
+    s/\(y*y\)\(\t[^\t]*\)$/\U\1\E\2/
+    t math_calc___task_SUM_y
+    s/\([.xyz]*\)\t\([-+]\)\t\2$/\2\1/
+    t math_calc___task_SUM_end
+    s/\([.xyz]*\t[^Y\t]*\)\(YY*\)\(\t[^Y\t]*\)\(YY*\)$/\L\2\4\E\1\3/
+    t math_calc___task_SUM_y_end
+    s/\([.xyz]*\t[^\t]*\)z\(\t[^Y\t]*\)\(YY*\)$/\L\3\E\1\2/
+    t math_calc___task_SUM_y_end
+    s/\([.xyz]*\t[^Y\t]*\)\(YY*\)\(\t[^\t]*\)z$/\L\2\E\1\3/
+    t math_calc___task_SUM_y_end
+    s/\([.xyz]*\t[^\t]*\)z\(\t[^\t]*\)z$/z\1\2/
+    t math_calc___task_SUM_y_end
+    s/\([.xyz]*\t[-+]\t[^Y\t]*\)\(YY*\)$/\L\2\E\1/
+    t math_calc___task_SUM_y_end
+    s/\([.xyz]*\t[-+]\t[^\t]*\)z$/z\1/
+    t math_calc___task_SUM_y_end
+    s/\([.xyz]*\t[^Y\t]*\)\(YY*\)\(\t[-+]\)$/\L\2\E\1\3/
+    t math_calc___task_SUM_y_end
+    s/\([.xyz]*\t[^\t]*\)z\(\t[-+]\)$/z\1\2/
+    t math_calc___task_SUM_y_end
+    b math_calc___UNREACHABLE
+  : math_calc___task_SUM_y_end
+    s/\([xyz]*\t[^\t]*\)\.\(\t[^\t]*\)\.$/.\1\2/
+    t math_calc___task_SUM_y_end
+    s/\(\.\?\)yyyyyyyyyy\(y[^\t]*\t[^\t]*\t[^\t]*\)$/x\1\2/
+    t math_calc___task_SUM_x
+    s/\(\.\?\)yyyyyyyyyy\([^\t]*\t[^\t]*\t[^\t]*\)$/x\1z\2/
+    b math_calc___task_SUM_x
+  : math_calc___task_SUM_end
+    x
+    b math_calc___RETURN
+
+: math_calc___task_MULTIPLY
+  x
+  s/\t[^\t]*\t[^\t]*$/\t\0/
+  : math_calc___task_MULTIPLY_x
+    # Upper trailing 'x' into 'X' characters for 2 last numbers
+    s/x*x$/\U\0\E/
+    s/\(x*x\)\(\t[^\t]*\)$/\U\1\E\2/
+    t math_calc___task_MULTIPLY_x
+    s/\([.xyz]*\)\t\([-+]\)\t\2$/+\1/
+    t math_calc___task_MULTIPLY_end
+    # TODO
+  : math_calc___task_MULTIPLY_end
+    x
+    b math_calc___RETURN
+
 : math_calc___op_ADD
   x
   /-[.0-9]*\t+[.0-9]*$/ {
@@ -443,97 +556,43 @@
   /+[.0-9]*\t-[.0-9]*$/ {
     # TODO: SUB
   }
-  /-[.0-9]*\t-[.0-9]*$/ {
-    # TODO: + +
-    #       MUL by -1.0
-  }
-  s/^/tAtC+1tR/
+  s/^/tAtCt+tR/
   x
   b math_calc___RETURN
-  # Sum sequences of 'x' and 'y' characters into 2 last numbers
-  : math_calc___op_ADD_1
-    x
-    s/\t[^\t]*\t[^\t]*$/\t+\0/
-    : math_calc___op_ADD_sum_x
-      # Upper trailing 'x' into 'X' characters for 2 last numbers
-      s/x*x$/\U\0\E/
-      s/\(x*x\)\(\t[^\t]*\)$/\U\1\E\2/
-      t math_calc___op_ADD_sum_x
-      s/\t+\t+$//
-      t math_calc___op_ADD_2
-      # trailing 'XX*' and 'XX*' case
-      s/\([.xyz]*\t[^X\t]*\)\(XX*\)\(\t[^X\t]*\)\(XX*\)$/\L\2\4\E\1\3/
-      t math_calc___op_ADD_sum_x_end
-      # trailing 'z' and 'XX*' case
-      s/\([.xyz]*\t[^\t]*\)z\(\t[^X\t]*\)\(XX*\)$/\L\3\E\1\2/
-      t math_calc___op_ADD_sum_x_end
-      # trailing 'XX*' and 'z' case
-      s/\([.xyz]*\t[^X\t]*\)\(XX*\)\(\t[^\t]*\)z$/\L\2\E\1\3/
-      t math_calc___op_ADD_sum_x_end
-      # trailing 'z' and 'z' case
-      s/\([.xyz]*\t[^\t]*\)z\(\t[^\t]*\)z$/z\1\2/
-      t math_calc___op_ADD_sum_x_end
-      # trailing '+' and 'XX*' case
-      s/\([.xyz]*\t+\t[^X\t]*\)\(XX*\)$/\L\2\E\1/
-      t math_calc___op_ADD_sum_x_end
-      # trailing '+' and 'z' case
-      s/\([.xyz]*\t+\t[^\t]*\)z$/z\1/
-      t math_calc___op_ADD_sum_x_end
-      # trailing 'XX*' and '+' case
-      s/\([.xyz]*\t[^X\t]*\)\(XX*\)\t+$/\L\2\E\1\t+/
-      t math_calc___op_ADD_sum_x_end
-      # trailing 'z' and '+' case
-      s/\([.xyz]*\t[^\t]*\)z\t+$/z\1\t+/
-      t math_calc___op_ADD_sum_x_end
-      b math_calc___UNREACHABLE
-    : math_calc___op_ADD_sum_x_end
-      # trailing '.' and '.' case
-      s/\([xyz]*\t[^\t]*\)\.\(\t[^\t]*\)\.$/.\1\2/
-      t math_calc___op_ADD_sum_x_end_1
-      s/xxxxxxxxxx\(x[^\t]*\t[^\t]*\t[^\t]*\)$/y\1/
-      t math_calc___op_ADD_sum_y
-      s/xxxxxxxxxx\([^\t]*\t[^\t]*\t[^\t]*\)$/yz\1/
-      b math_calc___op_ADD_sum_y
-      : math_calc___op_ADD_sum_x_end_1
-        s/\.xxxxxxxxxx\(x[^\t]*\t[^\t]*\t[^\t]*\)$/x.\1/
-        t math_calc___op_ADD_sum_x
-        s/\.xxxxxxxxxx\([^\t]*\t[^\t]*\t[^\t]*\)$/x.z\1/
-        b math_calc___op_ADD_sum_x
-    : math_calc___op_ADD_sum_y
-      s/y*y$/\U\0\E/
-      s/\(y*y\)\(\t[^\t]*\)$/\U\1\E\2/
-      t math_calc___op_ADD_sum_y
-      s/\t+\t+$//
-      t math_calc___op_ADD_2
-      s/\([.xyz]*\t[^Y\t]*\)\(YY*\)\(\t[^Y\t]*\)\(YY*\)$/\L\2\4\E\1\3/
-      t math_calc___op_ADD_sum_y_end
-      s/\([.xyz]*\t[^\t]*\)z\(\t[^Y\t]*\)\(YY*\)$/\L\3\E\1\2/
-      t math_calc___op_ADD_sum_y_end
-      s/\([.xyz]*\t[^Y\t]*\)\(YY*\)\(\t[^\t]*\)z$/\L\2\E\1\3/
-      t math_calc___op_ADD_sum_y_end
-      s/\([.xyz]*\t[^\t]*\)z\(\t[^\t]*\)z$/z\1\2/
-      t math_calc___op_ADD_sum_y_end
-      s/\([.xyz]*\t+\t[^Y\t]*\)\(YY*\)$/\L\2\E\1/
-      t math_calc___op_ADD_sum_y_end
-      s/\([.xyz]*\t+\t[^\t]*\)z$/z\1/
-      t math_calc___op_ADD_sum_y_end
-      s/\([.xyz]*\t[^Y\t]*\)\(YY*\)\t+$/\L\2\E\1\t+/
-      t math_calc___op_ADD_sum_y_end
-      s/\([.xyz]*\t[^\t]*\)z\t+$/z\1\t+/
-      t math_calc___op_ADD_sum_y_end
-      b math_calc___UNREACHABLE
-    : math_calc___op_ADD_sum_y_end
-      s/\([xyz]*\t[^\t]*\)\.\(\t[^\t]*\)\.$/.\1\2/
-      t math_calc___op_ADD_sum_y_end
-      s/\(\.\?\)yyyyyyyyyy\(y[^\t]*\t[^\t]*\t[^\t]*\)$/x\1\2/
-      t math_calc___op_ADD_sum_x
-      s/\(\.\?\)yyyyyyyyyy\([^\t]*\t[^\t]*\t[^\t]*\)$/x\1z\2/
-      b math_calc___op_ADD_sum_x
-  : math_calc___op_ADD_2
-    x
-    b math_calc___RETURN
 
 : math_calc___op_SUB
+  x
+  /^-0/ {
+    s/^/+0/
+    x
+    t math_calc___RETURN
+  }
+  /-[.0-9]*\t+[.0-9]*$/ {
+    s/\(-[.0-9]*\t\)+\([.0-9]*\)$/\1-\2/
+    s/^/+0/
+    x
+    b math_calc___RETURN
+  }
+  x
+  # TODO
+  b math_calc___RETURN
+
+: math_calc___op_MUL
+  x
+  #/-[.0-9]*\t+[.0-9]*$/ {
+  #  # TODO
+  #}
+  #/+[.0-9]*\t-[.0-9]*$/ {
+  #  # TODO
+  #}
+  #/-[.0-9]*\t-[.0-9]*$/ {
+  #  # TODO
+  #}
+  #s/^/tAtCt*tR/
+  x
+  b math_calc___RETURN
+
+: math_calc___op_DIV
   # TODO
   b math_calc___RETURN
 
@@ -545,15 +604,20 @@
     x
     b math_calc___op_ADD
   }
-  /^+1/ {
-    s/..//
-    x
-    b math_calc___op_ADD_1
-  }
   /^-0/ {
     s/..//
     x
     b math_calc___op_SUB
+  }
+  /^\*0/ {
+    s/..//
+    x
+    b math_calc___op_MUL
+  }
+  /^\/0/ {
+    s/..//
+    x
+    b math_calc___op_DIV
   }
   /^00/ {
     s/..//
@@ -655,6 +719,16 @@
     x
     b math_calc___SUCCESS
   }
+  /^t+/ {
+    s/..//
+    x
+    b math_calc___task_SUM
+  }
+  /^t\*/ {
+    s/..//
+    x
+    b math_calc___task_MULTIPLY
+  }
   /^tA/ {
     s/..//
     x
@@ -719,16 +793,20 @@
 : math_calc___SUCCESS
   x
   /^[^\x00\n]*\x00/ {
-    s/.*\t[-+]\([.0-9]*\)$/\1\n/
-    s/0*\n/\n/
-    s/\.\n/\n/
+    s/.*\t\([-+][.0-9]*\)$/\1\n/
+    s/^+//
+    s/0*\n$/\n/
+    s/\.\n$/\n/
+    s/^-0\n$/0\n/
     p
     z
   }
   /^[^\x00\n]*\n/ {
-    s/.*\t[-+]\([.0-9]*\)$/\1/
+    s/.*\t\([-+][.0-9]*\)$/\1/
+    s/^+//
     s/0*$//
     s/\.$//
+    s/^-0$/0/
     p
     z
   }
