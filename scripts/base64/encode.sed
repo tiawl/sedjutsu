@@ -36,6 +36,17 @@ v 4.0
   x
   s/^/printf '%s' "${SEDJUTSU_CHARTABLE:-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+\/}"/
   e
+  /[^[:print:]]/ {
+    z
+    x
+    z
+    s/^/SEDJUTSU_CHARTABLE only accepts characters from [:print:] character class/
+    G
+    s/\n$//
+    s/\x00$/\n/
+    w /dev/stderr
+    Q 7
+  }
   x
 
 : base64_encode_binary

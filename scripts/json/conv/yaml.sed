@@ -74,9 +74,6 @@
 
 v 4.0
 
-# TODO fix these cases:
-# printf '[[true, false]]\n' | sed -n -f ./scripts/json/conv/yaml.sed
-
 # Init the holdspace with these variables:
 # - an empty workflow stack
 # - an empty stack to check object keys
